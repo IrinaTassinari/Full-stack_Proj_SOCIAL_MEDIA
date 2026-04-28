@@ -1,16 +1,24 @@
+/*
+app.ts = настройки Express-приложения
+server.ts = запуск приложения
+
+server.ts запускает сервер
+То есть server.ts отвечает за:
+загрузку .env
+подключение MongoDB
+запуск порта
+*/
+
 import app from './app.js';
-import {connectDB} from './config/db.js';
-import dotenv from 'dotenv';
+import {connectDB} from './db/db.js';
+import { env } from './config/env.js';
 
-dotenv.config();
-
-const PORT = process.env.PORT || 3000;
 
 const startServer = async (): Promise<void> => {
   await connectDB();
 
-  app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+  app.listen(env.port, () => {
+    console.log(`Server is running on http://localhost:${env.port}`);
   });
 };
 

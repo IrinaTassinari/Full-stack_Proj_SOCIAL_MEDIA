@@ -1,3 +1,7 @@
+/**
+ app.ts = настройки Express-приложения
+server.ts = запуск приложения
+ */
 import express from 'express';
 import cors from 'cors';
 import { notFound } from './middlewares/notFound.js';

@@ -8,6 +8,7 @@ AppError нужен для своих “ожидаемых” ошибок API.
   Object.setPrototypeOf(this, AppError.prototype);
  */
 
+// AppError наследуется от стандартной ошибки Error
 export class AppError extends Error {
   statusCode: number;
 
