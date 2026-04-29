@@ -7,6 +7,7 @@ import type {Request, Response} from 'express';
 import cors from 'cors';
 import { notFound } from './middlewares/notFound.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import authRoutes from './routes/authRoutes.js'
 
 const app = express();
 
@@ -26,6 +27,9 @@ app.get('/', (_req: Request, res: Response) => {
         message: 'Server Express is running'
     });
 });
+
+app.use('/api/auth', authRoutes);
+
 
 app.use(notFound);
 

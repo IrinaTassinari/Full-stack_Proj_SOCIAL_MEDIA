@@ -2,10 +2,15 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET is not defined in .env');
+}
+
 export const env = {
     port: Number(process.env.PORT) || 3000,
     mongoUrl: process.env.MONGO_URL || '',
     nodeEnv: process.env.NODE_ENV || 'development',
+    jwtSecret: process.env.JWT_SECRET 
 };
 
 /**

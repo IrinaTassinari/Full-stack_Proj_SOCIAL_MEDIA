@@ -1,6 +1,7 @@
 import mongoose, { Document, Model } from "mongoose";
 import bcrypt from 'bcrypt';
 
+//Это значит: IUser — это пользователь плюс всё, что умеет Mongoose-документ: _id, save(), deleteOne(), isModified(), createdAt, updatedAt
 
 export interface IUser extends Document {
   username: string;
@@ -54,13 +55,19 @@ const userSchema = new mongoose.Schema<IUser>(
     }
 );
 
+
+// candidatePassword: string  - это пароль, который пользователь ввёл при логине
+// this.password -  это хэшированный пароль из базы данных.
 userSchema.methods.comparePassword = async function (
-  candidatePassword: string
+  candidatePassword: string 
 ): Promise<boolean> {
-  return bcrypt.compare(candidatePassword, this.password);
+  return bcrypt.compare(candidatePassword, this.password);   
 };
 
+
+//Это Mongoose middleware. Он запускается перед сохранением пользователя
 userSchema.pre('save', async function () {
+//проверяет: изменился ли пароль?
   if (!this.isModified('password')) {
     return;
   }
