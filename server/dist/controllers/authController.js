@@ -63,8 +63,7 @@ export const login = async (req, res, next) => {
         if (!email || !password) {
             throw new AppError("Email and password required", 400);
         }
-        // Ищем пользователя в базе по email
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email }).select('+password');
         // Если пользователь не найден - ошибка
         if (!user) {
             throw new AppError("Invalid password or email", 401);

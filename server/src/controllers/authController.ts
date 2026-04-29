@@ -1,10 +1,7 @@
-import type { NextFunction, Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { User } from '../models/User.js';
 import generateToken from '../utils/generateToken.js'
 import { AppError } from '../utils/appError.js';
-
-
-
 
 // Регистрация пользователя
 export const register = async (req: Request, res: Response, next: NextFunction) => {
@@ -79,8 +76,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
             throw new AppError("Email and password required", 400);
         }
 
-        // Ищем пользователя в базе по email
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email }).select('+password');
 
         // Если пользователь не найден - ошибка
         if (!user) {

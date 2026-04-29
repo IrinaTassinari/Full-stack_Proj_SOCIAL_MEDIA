@@ -7,6 +7,7 @@ import cors from 'cors';
 import { notFound } from './middlewares/notFound.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 const app = express();
 app.use(cors({
     origin: 'http://localhost:5173',
@@ -21,6 +22,7 @@ app.get('/', (_req, res) => {
     });
 });
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 app.use(notFound);
 app.use(errorHandler);
 export default app;

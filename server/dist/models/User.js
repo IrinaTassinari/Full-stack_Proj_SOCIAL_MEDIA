@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
+        select: false, //  Mongoose по умолчанию не будет возвращать password при запросах
     },
     fullName: {
         type: String,

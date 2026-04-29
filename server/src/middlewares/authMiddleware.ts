@@ -8,7 +8,6 @@ import { User } from '../models/User.js';
 
 // =======================
 // Middleware проверки JWT
-// =======================
 
 // Этот middleware используется для защиты маршрутов.
 // Он проверяет, есть ли токен и валиден ли он.
@@ -39,18 +38,19 @@ export const authMiddleware = async (req: Request, _res: Response, next: NextFun
         // - декодирует токен
         // - проверяет подпись
         // - проверяет срок действия (expiresIn)
-        const decoded = jwt.verify(token, env.jwtSecret);
+        // { id: string } потому что в generateToken.ts создаётся токен с payload: {id: userId}
+        const decoded = jwt.verify(token, env.jwtSecret) as { id: string };
 
-        // Сохраняем данные из токена в req.user
-        // Теперь в следующих middleware/контроллерах доступно:
-        // req.user.id, req.user.email и т.д. (зависит от payload)
-
+        // найди пользователя в MongoDB по id из токена, но не возвращай его пароль
         const user = await User.findById(decoded.id).select('-password');
 
         if (!user) {
             throw new AppError('User not found', 401);
         }
 
+        // Сохраняем данные из токена в req.user
+        // Теперь в следующих middleware/контроллерах доступно:
+        // req.user.id, req.user.email и т.д. (зависит от payload)
         req.user = user;
         // Передаём управление следующему middleware/контроллеру
         next();
