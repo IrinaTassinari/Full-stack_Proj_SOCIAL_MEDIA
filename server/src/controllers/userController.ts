@@ -28,6 +28,7 @@ export const getUserProfile = async (req: Request, res: Response, next: NextFunc
     }
 };
 
+
 export const updateUserProfile = async (req: Request, res: Response, next: NextFunction) => {
     try {
        const { fullName, bio, avatar } = req.body ?? {};
@@ -59,7 +60,6 @@ export const updateUserProfile = async (req: Request, res: Response, next: NextF
             const base64Image = req.file.buffer.toString('base64');
             user.avatar = `data:${req.file.mimetype};base64,${base64Image}`;
         }
-
 
         // Сохраняем изменения в базе
         await user.save();

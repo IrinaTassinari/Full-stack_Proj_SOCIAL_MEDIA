@@ -64,7 +64,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 };
 
 
-// =======================
+
 // Авторизация пользователя (логин)
 export const login = async (req: Request, res: Response, next: NextFunction) => {
     try {

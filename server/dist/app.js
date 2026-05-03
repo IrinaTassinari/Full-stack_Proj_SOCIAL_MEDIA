@@ -9,6 +9,8 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import postRoutes from './routes/postRoutes.js';
+import likeRoutes from './routes/likeRoutes.js';
+import commentRoutes from './routes/commentRoutes.js';
 const app = express();
 app.use(cors({
     origin: 'http://localhost:5173',
@@ -25,6 +27,8 @@ app.get('/', (_req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/likes', likeRoutes);
+app.use('/api/comments', commentRoutes);
 app.use(notFound);
 app.use(errorHandler);
 export default app;

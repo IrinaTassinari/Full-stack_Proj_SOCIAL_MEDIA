@@ -5,8 +5,6 @@ import { AppError } from '../utils/appError.js';
 import { User } from '../models/User.js';
 
 
-
-// =======================
 // Middleware проверки JWT
 
 // Этот middleware используется для защиты маршрутов.

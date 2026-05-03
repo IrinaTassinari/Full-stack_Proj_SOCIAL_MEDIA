@@ -3,7 +3,7 @@ import type { Request, Response, NextFunction } from "express";
 import { Post } from "../models/Post.js";
 import { AppError } from "../utils/appError.js";
 
-//create post
+
 export const createPost = async (
   req: Request,
   res: Response,
@@ -49,7 +49,7 @@ export const createPost = async (
   }
 };
 
-// Получение поста по ID
+
 export const getPostById = async (
   req: Request,
   res: Response,
@@ -80,6 +80,7 @@ export const getPostById = async (
     next(error);
   }
 };
+
 
 //Получение всех постов пользователя
 export const getUserPosts = async (
