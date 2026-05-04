@@ -11,12 +11,14 @@ const postSchema = new mongoose.Schema({
         trim: true,
         default: '',
     },
+    // массив картинок
     image: {
         type: String,
         required: true,
     }
 }, {
-    timestamps: true, // разрешаем создание полей createdAt и updatedAt
-    versionKey: false // запрещаем создание поля __v
+    timestamps: true,
+    versionKey: false
 });
+postSchema.index({ createdAt: -1 });
 export const Post = mongoose.model('Post', postSchema);

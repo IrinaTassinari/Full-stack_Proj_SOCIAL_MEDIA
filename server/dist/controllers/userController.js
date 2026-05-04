@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { User } from "../models/User.js";
 import { AppError } from "../utils/appError.js";
+import { uploadToCloudinary } from "../config/cloudinary.js";
 export const getUserProfile = async (req, res, next) => {
     try {
         // ID задачи берётся из URL: /user/:id
@@ -40,10 +41,9 @@ export const updateUserProfile = async (req, res, next) => {
         if (bio !== undefined)
             user.bio = bio;
         //if (avatar!== undefined) user.avatar = avatar;
-        //req.file появляется только если запрос прошёл через: upload.single('avatar')  middlewares/uploadUserImage.ts
         if (req.file) {
-            const base64Image = req.file.buffer.toString("base64");
-            user.avatar = `data:${req.file.mimetype};base64,${base64Image}`;
+            const avatarUrl = await uploadToCloudinary(req.file.buffer, "inst-project/avatars");
+            user.avatar = avatarUrl;
         }
         // Сохраняем изменения в базе
         await user.save();

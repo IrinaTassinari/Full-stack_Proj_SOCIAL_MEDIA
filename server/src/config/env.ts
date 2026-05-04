@@ -6,11 +6,27 @@ if (!process.env.JWT_SECRET) {
   throw new Error('JWT_SECRET is not defined in .env');
 }
 
+if (!process.env.CLOUDINARY_CLOUD_NAME) {
+  throw new Error("CLOUDINARY_CLOUD_NAME is not defined in .env");
+}
+
+if (!process.env.CLOUDINARY_API_KEY) {
+  throw new Error("CLOUDINARY_API_KEY is not defined in .env");
+}
+
+if (!process.env.CLOUDINARY_API_SECRET) {
+  throw new Error("CLOUDINARY_API_SECRET is not defined in .env");
+}
+
+
 export const env = {
     port: Number(process.env.PORT) || 3000,
     mongoUrl: process.env.MONGO_URL || '',
     nodeEnv: process.env.NODE_ENV || 'development',
-    jwtSecret: process.env.JWT_SECRET 
+    jwtSecret: process.env.JWT_SECRET,
+    cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
+    cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
 };
 
 /**

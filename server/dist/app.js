@@ -12,6 +12,7 @@ import postRoutes from './routes/postRoutes.js';
 import likeRoutes from './routes/likeRoutes.js';
 import commentRoutes from './routes/commentRoutes.js';
 import subscriptionRoutes from './routes/subscribeRoutes.js';
+import notificationsRoutes from './routes/notificationRoutes.js';
 const app = express();
 app.use(cors({
     origin: 'http://localhost:5173',
@@ -31,6 +32,7 @@ app.use('/api/posts', postRoutes);
 app.use('/api/likes', likeRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
+app.use('/api/notifications', notificationsRoutes);
 app.use(notFound);
 app.use(errorHandler);
 export default app;

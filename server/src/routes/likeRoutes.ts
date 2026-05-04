@@ -5,6 +5,6 @@ import { authMiddleware } from "../middlewares/authMiddleware.js";
 const router = Router();
 
 router.post("/:postId", authMiddleware, toggleLike);
-router.get("/:postId", authMiddleware, getPostLikes);
+router.get("/:postId", getPostLikes);
 
 export default router;

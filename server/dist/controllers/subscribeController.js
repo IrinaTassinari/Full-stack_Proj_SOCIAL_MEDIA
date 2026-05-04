@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { User } from "../models/User.js";
 import { Subscribe } from "../models/Subscribe.js";
+import { Notification } from "../models/Notification.js";
 import { AppError } from "../utils/appError.js";
 export const subscribeToUser = async (req, res, next) => {
     try {
@@ -29,6 +30,12 @@ export const subscribeToUser = async (req, res, next) => {
         const subscribe = await Subscribe.create({
             follower: req.user._id,
             following: userId,
+        });
+        await Notification.create({
+            recipient: userId,
+            sender: req.user._id,
+            type: "follow",
+            subscription: subscribe._id,
         });
         res.status(201).json({
             success: true,
@@ -63,6 +70,12 @@ export const unsubscribeFromUser = async (req, res, next) => {
         if (!existingSubscribe) {
             throw new AppError("Subscription is not found", 404);
         }
+        await Notification.deleteOne({
+            recipient: userId,
+            sender: req.user._id,
+            type: "follow",
+            subscription: existingSubscribe._id,
+        });
         await existingSubscribe.deleteOne();
         res.status(200).json({
             success: true,
@@ -85,7 +98,7 @@ export const getUserFollowers = async (req, res, next) => {
             throw new AppError("User is not found", 404);
         }
         const followers = await Subscribe.find({ following: userId })
-            .populate("follower", "username fullName")
+            .populate("follower", "username fullName avatar")
             .sort({ createdAt: -1 });
         const count = await Subscribe.countDocuments({ following: userId });
         res.status(200).json({
@@ -110,7 +123,7 @@ export const getUserFollowing = async (req, res, next) => {
             throw new AppError("User is not found", 404);
         }
         const following = await Subscribe.find({ follower: userId })
-            .populate("following", "username fullName")
+            .populate("following", "username fullName avatar")
             .sort({ createdAt: -1 });
         const count = await Subscribe.countDocuments({ follower: userId });
         res.status(200).json({

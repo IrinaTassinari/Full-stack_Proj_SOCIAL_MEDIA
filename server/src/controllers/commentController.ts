@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import type { Request, Response, NextFunction } from "express";
 import { Post } from "../models/Post.js";
 import { Comment } from "../models/Comment.js";
+import { Notification } from "../models/Notification.js";
 import { AppError } from "../utils/appError.js";
 
 export const addComment = async (
@@ -39,7 +40,16 @@ export const addComment = async (
       post: postId,
       text,
     });
-    await comment.populate("user", "username fullName");
+    await comment.populate("user", "username fullName avatar");
+    if (post.author.toString() !== req.user._id.toString()) {
+      await Notification.create({
+        recipient: post.author,
+        sender: req.user._id,
+        type: "comment",
+        post: postId,
+        comment: comment._id,
+      });
+    }
 
     res.status(201).json({
       success: true,
@@ -70,7 +80,7 @@ export const getPostComments = async (
     }
 
     const comments = await Comment.find({ post: postId })
-      .populate("user", "username fullName")
+      .populate("user", "username fullName avatar")
       .sort({ createdAt: -1 });
 
     const count = await Comment.countDocuments({ post: postId });
@@ -114,7 +124,26 @@ export const deleteComment = async (
       throw new AppError("You are not allowed to delete this comment", 403);
     }
 
+    const post = await Post.findById(comment.post); // id поста, под которым был оставлен комментарий
+    /**
+     * const comment = await Comment.create({
+        user: req.user._id,
+        post: postId,
+        text,
+      });
+     */
+
     await comment.deleteOne();
+
+    if (post) {
+      await Notification.deleteOne({
+        recipient: post.author,
+        sender: req.user._id,
+        type: "comment",
+        post: comment.post,
+        comment: comment._id,
+      });
+    }
 
     res.status(200).json({
       success: true,

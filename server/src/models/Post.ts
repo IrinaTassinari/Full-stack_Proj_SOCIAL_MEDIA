@@ -21,15 +21,19 @@ const postSchema = new mongoose.Schema<IPost>(
             trim: true,
             default: '',
         },
+        // массив картинок
         image: {
             type: String,
             required: true,
         }
     },
     {
-        timestamps: true, // разрешаем создание полей createdAt и updatedAt
-        versionKey: false // запрещаем создание поля __v
+        timestamps: true, 
+        versionKey: false 
     }
 );
+
+postSchema.index({ createdAt: -1 });
+
 
 export const Post: Model<IPost> = mongoose.model<IPost>('Post', postSchema);

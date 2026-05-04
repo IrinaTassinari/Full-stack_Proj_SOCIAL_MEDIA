@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import type { Request, Response, NextFunction } from "express";
 import { Post } from "../models/Post.js";
 import { AppError } from "../utils/appError.js";
-
+import { uploadToCloudinary } from "../config/cloudinary.js";
 
 export const createPost = async (
   req: Request,
@@ -20,18 +20,20 @@ export const createPost = async (
     //Взять description из req.body
     const description = req.body?.description ?? "";
 
-    //Если есть req.file, конвертировать в base64
     if (!req.file) {
       throw new AppError("Image is required", 400);
     }
-    const base64Image = req.file.buffer.toString("base64");
-    const image = `data:${req.file.mimetype};base64,${base64Image}`;
+
+    const imageUrl = await uploadToCloudinary(
+      req.file.buffer,
+      "inst-project/posts",
+    );
 
     // Создать Post через Post.create
     const post = await Post.create({
       author: req.user._id,
       description,
-      image,
+      image: imageUrl,
     });
     await post.populate("author", "username fullName avatar");
 
@@ -48,7 +50,6 @@ export const createPost = async (
     next(error);
   }
 };
-
 
 export const getPostById = async (
   req: Request,
@@ -80,7 +81,6 @@ export const getPostById = async (
     next(error);
   }
 };
-
 
 //Получение всех постов пользователя
 export const getUserPosts = async (
@@ -169,16 +169,18 @@ export const updatePost = async (
       post.description = description;
     }
 
-    // Если пришёл файл image — конвертировать в Base64 и обновить картинку
     if (req.file) {
-      const base64Image = req.file.buffer.toString("base64");
-      post.image = `data:${req.file.mimetype};base64,${base64Image}`;
+      const imageUrl = await uploadToCloudinary(
+        req.file.buffer, //  req.file - Это файл, который пришёл из Postman или frontend 
+        "inst-project/posts", //Это папка в Cloudinary, куда будет загружена картинка
+      );
+
+      post.image = imageUrl;
     }
 
     // Сохранить пост
     await post.save();
     await post.populate("author", "username fullName avatar");
-
 
     // Вернуть обновлённый пост
     res.status(200).json({
@@ -225,7 +227,6 @@ export const deletePost = async (
   }
 };
 
-
 // explore
 export const getExplorePosts = async (
   req: Request,
@@ -233,9 +234,7 @@ export const getExplorePosts = async (
   next: NextFunction,
 ) => {
   try {
-    const posts = await Post.aggregate([
-      { $sample: { size: 50 } },
-    ]);
+    const posts = await Post.aggregate([{ $sample: { size: 50 } }]);
 
     await Post.populate(posts, {
       path: "author",

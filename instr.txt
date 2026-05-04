@@ -11,6 +11,8 @@
   "password": "123456789",
   "fullName": "Suguru Geto"
 }
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZjY4YTgwYjgyMmViNjhkMzk5NzhiZSIsImlhdCI6MTc3NzkzNjYyNCwiZXhwIjoxNzc3OTQzODI0fQ.uZSuT_4qJ45lwrW9AcYTIR1lFBpM7EFDXFHBactw-rc
+postId 69f929272883187655347782
 
 {
   "username": "Satoru",
@@ -19,12 +21,18 @@
   "fullName": "Satoru Gojo"
 }
 
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZjdkYzFhMzFjYmUxNDg1MTc0MWE4NSIsImlhdCI6MTc3NzkzNjc3MiwiZXhwIjoxNzc3OTQzOTcyfQ._QlaKwjzmBQ5LIfZhuD2h41qL8qAyLSLQgOTPXL3oNo
+
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZjdkYzFhMzFjYmUxNDg1MTc0MWE4NSIsImlhdCI6MTc3NzkzNzMwMSwiZXhwIjoxNzc3OTQ0NTAxfQ.Mn0r0eOZcHHlfpme7rfHY7K8D3B7iKyAvtWqKMA2uwE
+
 {
   "username": "Choso",
   "email": "choso@gmail.com",
   "password": "12345678910",
   "fullName": "Choso Big Brother"
 }
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZjdkYzczMzFjYmUxNDg1MTc0MWE4NiIsImlhdCI6MTc3NzkzNzI1NywiZXhwIjoxNzc3OTQ0NDU3fQ.guPnye3NyA-jv5q0U-LOJ3pnJtF3-g9UbnNVqQZ2HYI
 
 {
   "username": "Itadori",
@@ -127,6 +135,10 @@ receiveMessage, и оно отображается в чате.
 уведомлений из базы данных и возврат их пользователю в удобном формате.
 Он будет извлекать уведомления из соответствующей коллекции MongoDB и
 отправлять их пользователю через API.
+
+
+
+
 Клиент
 Вы уже знакомы с React и имеете опыт работы с ним: мы писали компоненты,
 использовали хуки, создавали маршруты, и работали с состоянием через useState

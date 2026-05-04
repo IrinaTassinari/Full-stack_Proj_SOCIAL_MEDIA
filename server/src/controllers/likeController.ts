@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import type { Request, Response, NextFunction } from "express";
 import { Post } from "../models/Post.js";
 import { Like } from "../models/Like.js";
+import { Notification } from "../models/Notification.js";
 import { AppError } from "../utils/appError.js";
 
 export const toggleLike = async (
@@ -35,6 +36,14 @@ export const toggleLike = async (
     //Если лайк уже есть, удалить его.
     if (existingLike) {
       await existingLike.deleteOne();
+
+      await Notification.deleteOne({
+        recipient: post.author,
+        sender: req.user._id,
+        type: "like",
+        post: postId,
+      });
+
       return res.status(200).json({
         success: true,
         liked: false,
@@ -47,6 +56,15 @@ export const toggleLike = async (
       user: req.user._id,
       post: postId,
     });
+    // чтобы автор не мог получать уведомления от самого себя
+    if (post.author.toString() !== req.user._id.toString()) {
+      await Notification.create({
+        recipient: post.author,
+        sender: req.user._id,
+        type: "like",
+        post: postId,
+      });
+    }
 
     return res.status(201).json({
       success: true,
@@ -78,10 +96,9 @@ export const getPostLikes = async (
     }
 
     const likes = await Like.find({ post: postId })
-      .populate("user", "username fullName")
+      .populate("user", "username fullName avatar")
       .sort({ createdAt: -1 });
 
-    
     const count = await Like.countDocuments({ post: postId });
 
     res.status(200).json({

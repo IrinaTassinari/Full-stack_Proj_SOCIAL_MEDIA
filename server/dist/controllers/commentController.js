@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { Post } from "../models/Post.js";
 import { Comment } from "../models/Comment.js";
+import { Notification } from "../models/Notification.js";
 import { AppError } from "../utils/appError.js";
 export const addComment = async (req, res, next) => {
     try {
@@ -26,7 +27,16 @@ export const addComment = async (req, res, next) => {
             post: postId,
             text,
         });
-        await comment.populate("user", "username fullName");
+        await comment.populate("user", "username fullName avatar");
+        if (post.author.toString() !== req.user._id.toString()) {
+            await Notification.create({
+                recipient: post.author,
+                sender: req.user._id,
+                type: "comment",
+                post: postId,
+                comment: comment._id,
+            });
+        }
         res.status(201).json({
             success: true,
             comment,
@@ -48,7 +58,7 @@ export const getPostComments = async (req, res, next) => {
             throw new AppError("Post is not found", 404);
         }
         const comments = await Comment.find({ post: postId })
-            .populate("user", "username fullName")
+            .populate("user", "username fullName avatar")
             .sort({ createdAt: -1 });
         const count = await Comment.countDocuments({ post: postId });
         res.status(200).json({
@@ -78,7 +88,24 @@ export const deleteComment = async (req, res, next) => {
         if (comment.user.toString() !== req.user._id.toString()) {
             throw new AppError("You are not allowed to delete this comment", 403);
         }
+        const post = await Post.findById(comment.post); // id поста, под которым был оставлен комментарий
+        /**
+         * const comment = await Comment.create({
+            user: req.user._id,
+            post: postId,
+            text,
+          });
+         */
         await comment.deleteOne();
+        if (post) {
+            await Notification.deleteOne({
+                recipient: post.author,
+                sender: req.user._id,
+                type: "comment",
+                post: comment.post,
+                comment: comment._id,
+            });
+        }
         res.status(200).json({
             success: true,
             message: "Comment deleted successfully",
