@@ -11,8 +11,8 @@ const likeSchema = new mongoose.Schema({
         required: true,
     },
 }, {
-    timestamps: true, // разрешаем создание полей createdAt и updatedAt
-    versionKey: false // запрещаем создание поля __v
+    timestamps: true,
+    versionKey: false
 });
 /**
  * user: 1, post: 1  - проверять пару user + post.  1 здесь нужен просто потому, что MongoDB требует указать направление индекса. Для уникальности это не главное.

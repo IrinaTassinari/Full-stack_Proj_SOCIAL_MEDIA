@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createPost, deletePost, getAllPosts, getPostById, getUserPosts, updatePost } from "../controllers/postController.js";
+import { createPost, deletePost, getAllPosts, getPostById, getUserPosts, updatePost, getExplorePosts } from "../controllers/postController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { upload } from "../middlewares/uploadUserImage.js";
 
@@ -7,6 +7,7 @@ const router = Router();
 
 router.post("/", authMiddleware, upload.single("image"), createPost);
 router.get("/", getAllPosts);
+router.get("/explore", getExplorePosts);
 router.get("/user/:userId", getUserPosts);
 router.get("/:id", getPostById);
 router.patch("/:id", authMiddleware, upload.single("image"), updatePost);

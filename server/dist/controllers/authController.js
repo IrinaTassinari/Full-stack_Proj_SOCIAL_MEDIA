@@ -53,7 +53,6 @@ export const register = async (req, res, next) => {
         next(error);
     }
 };
-// =======================
 // Авторизация пользователя (логин)
 export const login = async (req, res, next) => {
     try {

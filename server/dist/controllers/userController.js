@@ -1,16 +1,16 @@
-import mongoose from 'mongoose';
-import { User } from '../models/User.js';
-import { AppError } from '../utils/appError.js';
+import mongoose from "mongoose";
+import { User } from "../models/User.js";
+import { AppError } from "../utils/appError.js";
 export const getUserProfile = async (req, res, next) => {
     try {
         // ID задачи берётся из URL: /user/:id
         const { id } = req.params;
-        if (typeof id !== 'string' || !mongoose.Types.ObjectId.isValid(id)) {
-            throw new AppError('Invalid user id', 400);
+        if (typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
+            throw new AppError("Invalid user id", 400);
         }
-        const user = await User.findById(id).select('-password');
+        const user = await User.findById(id).select("-password");
         if (!user) {
-            throw new AppError('User not found', 404);
+            throw new AppError("User not found", 404);
         }
         res.status(200).json({
             success: true,
@@ -26,12 +26,12 @@ export const updateUserProfile = async (req, res, next) => {
         const { fullName, bio, avatar } = req.body ?? {};
         //req.user может быть undefined. Поэтому в контроллере нужно проверить. если authMiddleware не положил пользователя в req.user, значит пользователь не авторизован
         if (!req.user) {
-            throw new AppError('Unauthorized', 401);
+            throw new AppError("Unauthorized", 401);
         }
         //После authMiddleware  -  уже есть текущий пользователь в:req.user
-        const user = await User.findById(req.user._id).select('-password');
+        const user = await User.findById(req.user._id).select("-password");
         if (!user) {
-            throw new AppError('User not found', 404);
+            throw new AppError("User not found", 404);
         }
         // Обновляем только те поля, которые пришли в запросе
         // Это важно - чтобы не затирать данные undefined значениями
@@ -42,15 +42,37 @@ export const updateUserProfile = async (req, res, next) => {
         //if (avatar!== undefined) user.avatar = avatar;
         //req.file появляется только если запрос прошёл через: upload.single('avatar')  middlewares/uploadUserImage.ts
         if (req.file) {
-            const base64Image = req.file.buffer.toString('base64');
+            const base64Image = req.file.buffer.toString("base64");
             user.avatar = `data:${req.file.mimetype};base64,${base64Image}`;
         }
         // Сохраняем изменения в базе
         await user.save();
         res.status(200).json({
             success: true,
-            message: 'User has been successfully updated',
+            message: "User has been successfully updated",
             user,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+export const searchUsers = async (req, res, next) => {
+    try {
+        const { query } = req.query;
+        if (typeof query !== "string" || !query.trim()) {
+            throw new AppError("Search query is required", 400);
+        }
+        const users = await User.find({
+            $or: [
+                { username: { $regex: query, $options: "i" } },
+                { fullName: { $regex: query, $options: "i" } },
+            ],
+        }).select("-password");
+        res.status(200).json({
+            success: true,
+            users,
+            count: users.length,
         });
     }
     catch (error) {
@@ -68,4 +90,4 @@ GET /api/users/:id
 PATCH /api/users/me
 Authorization: Bearer token
 
- */ 
+ */

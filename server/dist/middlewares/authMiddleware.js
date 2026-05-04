@@ -2,7 +2,6 @@ import jwt from 'jsonwebtoken';
 import { env } from './../config/env.js';
 import { AppError } from '../utils/appError.js';
 import { User } from '../models/User.js';
-// =======================
 // Middleware проверки JWT
 // Этот middleware используется для защиты маршрутов.
 // Он проверяет, есть ли токен и валиден ли он.

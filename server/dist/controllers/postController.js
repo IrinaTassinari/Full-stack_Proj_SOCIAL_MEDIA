@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import { Post } from "../models/Post.js";
 import { AppError } from "../utils/appError.js";
-//create post
 export const createPost = async (req, res, next) => {
     try {
         // Проверить req.user значит убедиться, что пользователь авторизован
@@ -37,7 +36,6 @@ export const createPost = async (req, res, next) => {
         next(error);
     }
 };
-// Получение поста по ID
 export const getPostById = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -158,6 +156,26 @@ export const deletePost = async (req, res, next) => {
         res.status(200).json({
             success: true,
             message: "Post deleted successfully",
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+// explore
+export const getExplorePosts = async (req, res, next) => {
+    try {
+        const posts = await Post.aggregate([
+            { $sample: { size: 50 } },
+        ]);
+        await Post.populate(posts, {
+            path: "author",
+            select: "username fullName avatar",
+        });
+        res.status(200).json({
+            success: true,
+            posts,
+            count: posts.length,
         });
     }
     catch (error) {

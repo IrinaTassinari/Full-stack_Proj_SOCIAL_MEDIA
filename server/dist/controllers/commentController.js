@@ -1,9 +1,3 @@
-/**
- * 2. Добавление комментариев (commentController.js): Пользователь может
-добавлять комментарий под постом, передавая текст сообщения.
-Комментарий сохраняется с привязкой к посту и пользователю, который его
-оставил.
- */
 import mongoose from "mongoose";
 import { Post } from "../models/Post.js";
 import { Comment } from "../models/Comment.js";

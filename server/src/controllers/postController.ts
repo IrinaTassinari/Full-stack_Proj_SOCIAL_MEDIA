@@ -224,3 +224,30 @@ export const deletePost = async (
     next(error);
   }
 };
+
+
+// explore
+export const getExplorePosts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const posts = await Post.aggregate([
+      { $sample: { size: 50 } },
+    ]);
+
+    await Post.populate(posts, {
+      path: "author",
+      select: "username fullName avatar",
+    });
+
+    res.status(200).json({
+      success: true,
+      posts,
+      count: posts.length,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
