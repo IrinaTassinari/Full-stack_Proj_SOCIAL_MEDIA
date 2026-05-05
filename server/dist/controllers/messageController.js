@@ -26,6 +26,7 @@ export const sendMessage = async (req, res, next) => {
         if (typeof text !== "string" || !text.trim()) {
             throw new AppError("Text is required", 400);
         }
+        // Сообщения в БД сохраняются через:
         const message = await Message.create({
             sender: req.user._id,
             receiver: receiverId,
@@ -79,7 +80,7 @@ export const getConversation = async (req, res, next) => {
             .populate("sender", "username fullName avatar")
             .populate("receiver", "username fullName avatar")
             .sort({ createdAt: 1 });
-        res.status(201).json({
+        res.status(200).json({
             success: true,
             messages,
             count: messages.length,
@@ -136,7 +137,7 @@ export const getMyChats = async (req, res, next) => {
             Array.from(chatsMap.values()) - сделай из этих значений обычный массив
          */
         const allChats = Array.from(chatsMap.values());
-        res.status(201).json({
+        res.status(200).json({
             success: true,
             allChats,
             count: allChats.length,

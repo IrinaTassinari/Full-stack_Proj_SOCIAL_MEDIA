@@ -14,6 +14,7 @@ import commentRoutes from './routes/commentRoutes.js';
 import subscriptionRoutes from './routes/subscribeRoutes.js';
 import notificationsRoutes from './routes/notificationRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
+import notificationMessageRoutes from "./routes/notificationMessageRoutes.js";
 const app = express();
 app.use(cors({
     origin: 'http://localhost:5173',
@@ -35,6 +36,7 @@ app.use('/api/comments', commentRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/message-notifications", notificationMessageRoutes);
 app.use(notFound);
 app.use(errorHandler);
 export default app;

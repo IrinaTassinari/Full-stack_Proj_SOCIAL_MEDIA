@@ -1,0 +1,46 @@
+{
+  "username": "Nanami",
+  "email": "nanami@example.com",
+  "password": "123456",
+  "fullName": "Nanami Kento"
+}
+
+{
+  "username": "Suguru",
+  "email": "suguru@gmail.com",
+  "password": "123456789",
+  "fullName": "Suguru Geto"
+}
+
+{
+  "username": "Satoru",
+  "email": "satoru@gmail.com",
+  "password": "123456789",
+  "fullName": "Satoru Gojo"
+}
+
+{
+  "username": "Choso",
+  "email": "choso@gmail.com",
+  "password": "12345678910",
+  "fullName": "Choso Big Brother"
+}
+
+{
+  "username": "Itadori",
+  "email": "itadori@gmail.com",
+  "password": "12345678910",
+  "fullName": "Itadori Yuji"
+}
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZjdkY2JkMzFjYmUxNDg1MTc0MWE4NyIsImlhdCI6MTc3ODAxNjQwMywiZXhwIjoxNzc4MDIzNjAzfQ.Epmy5QwMGoGcgSc4-b4rOJEYrKNzB3Z3tyWmLfNU_t0
+
+{
+  "username": "Megumi",
+  "email": "megumii@gmail.com",
+  "password": "12345678910",
+  "fullName": "Megumi Fushiguro"
+}
+
+
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZmE1Y2NiYjViMWQ2Njc1YmVlYzNlMSIsImlhdCI6MTc3ODAxNTQ2OSwiZXhwIjoxNzc4MDIyNjY5fQ.GBxJxJZsWT6UNwgQeFY6YXvEDyx60qQQbZl5vsfZ4Cg
