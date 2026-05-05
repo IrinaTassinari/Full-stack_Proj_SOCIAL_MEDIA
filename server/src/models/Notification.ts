@@ -3,11 +3,10 @@ import mongoose, { Document, Model } from "mongoose";
 export interface INotification extends Document {
   recipient: mongoose.Types.ObjectId;
   sender: mongoose.Types.ObjectId;
-  type: "like" | "comment" | "follow" | "message";
+  type: "like" | "comment" | "follow";
   post?: mongoose.Types.ObjectId;
   comment?: mongoose.Types.ObjectId;
   subscription?: mongoose.Types.ObjectId;
-  message?: mongoose.Types.ObjectId;
   isRead: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -27,7 +26,7 @@ const notificationSchema = new mongoose.Schema<INotification>(
     },
     type: {
       type: String,
-      enum: ["like", "comment", "follow", "message"],
+      enum: ["like", "comment", "follow"],
       required: true,
     },
     post: {
@@ -41,10 +40,6 @@ const notificationSchema = new mongoose.Schema<INotification>(
     subscription: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Subscribe",
-    },
-    message: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Message",
     },
     isRead: {
       type: Boolean,

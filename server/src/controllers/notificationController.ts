@@ -20,7 +20,6 @@ export const getMyNotifications = async (
       .populate("post", "description image")
       .populate("comment", "text")
       .populate("subscription")
-      .populate("message")
       .sort({ createdAt: -1 });
 
     const unreadCount = await Notification.countDocuments({

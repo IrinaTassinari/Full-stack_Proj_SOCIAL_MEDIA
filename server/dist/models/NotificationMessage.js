@@ -1,20 +1,19 @@
 import mongoose from "mongoose";
-const messageSchema = new mongoose.Schema({
+const notificationMessageSchema = new mongoose.Schema({
+    recipient: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+    },
     sender: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true,
     },
-    receiver: {
+    message: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: "Message",
         required: true,
-    },
-    text: {
-        type: String,
-        required: true,
-        trim: true,
-        maxlength: 500,
     },
     isRead: {
         type: Boolean,
@@ -24,4 +23,4 @@ const messageSchema = new mongoose.Schema({
     timestamps: true,
     versionKey: false,
 });
-export const Message = mongoose.model("Message", messageSchema);
+export const NotificationMessage = mongoose.model("NotificationMessage", notificationMessageSchema);

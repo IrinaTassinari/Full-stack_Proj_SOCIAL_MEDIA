@@ -13,7 +13,6 @@ export const getMyNotifications = async (req, res, next) => {
             .populate("post", "description image")
             .populate("comment", "text")
             .populate("subscription")
-            .populate("message")
             .sort({ createdAt: -1 });
         const unreadCount = await Notification.countDocuments({
             recipient: req.user._id,
