@@ -7,13 +7,14 @@ import type {Request, Response} from 'express';
 import cors from 'cors';
 import { notFound } from './middlewares/notFound.js';
 import { errorHandler } from './middlewares/errorHandler.js';
-import authRoutes from './routes/authRoutes.js'
-import userRoutes from './routes/userRoutes.js'
-import postRoutes from './routes/postRoutes.js'
-import likeRoutes from './routes/likeRoutes.js'
-import commentRoutes from './routes/commentRoutes.js'
-import subscriptionRoutes from './routes/subscribeRoutes.js'
-import notificationsRoutes from './routes/notificationRoutes.js'
+import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import postRoutes from './routes/postRoutes.js';
+import likeRoutes from './routes/likeRoutes.js';
+import commentRoutes from './routes/commentRoutes.js';
+import subscriptionRoutes from './routes/subscribeRoutes.js';
+import notificationsRoutes from './routes/notificationRoutes.js';
+import messageRoutes from './routes/messageRoutes.js';
 
 const app = express();
 
@@ -41,6 +42,8 @@ app.use('/api/likes', likeRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/notifications', notificationsRoutes);
+app.use("/api/messages", messageRoutes);
+
 
 
 
