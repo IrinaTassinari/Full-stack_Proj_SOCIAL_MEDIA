@@ -1,11 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../features/auth/authSlice";
+import postsReducer from "../features/posts/postsSlice";
 // import commentsReducer from "../features/comments/commentsSlice";
 // import likesReducer from "../features/likes/likesSlice";
 // import notificationsReducer from "../features/notifications/notificationsSlice";
 // import messagesReducer from "../features/messages/messagesSlice";
 // import messageNotificationsReducer from "../features/messageNotifications/messageNotificationsSlice";
-// import postsReducer from "../features/posts/postsSlice";
 // import profileReducer from "../features/profile/profileSlice";
 // import searchReducer from "../features/search/searchSlice";
 // import subscriptionsReducer from "../features/subscriptions/subscriptionsSlice";
@@ -13,12 +13,12 @@ import authReducer from "../features/auth/authSlice";
  const store = configureStore({
   reducer: {
     auth: authReducer, 
+    posts: postsReducer,
     // comments: commentsReducer,
     // likes: likesReducer,
     // notifications: notificationsReducer,
     // messages: messagesReducer,
     // messageNotifications: messageNotificationsReducer,
-    // posts: postsReducer,
     // profile: profileReducer,
     // search: searchReducer,
     // subscriptions: subscriptionsReducer,

@@ -1,2 +1,6 @@
-Сделать ProtectedRoute
-Чтобы /, /explore, /profile, /messages были доступны только после login. Это симметрично GuestRoute.
+в LeftSidebar пункт Search теперь кнопка, а не ссылка на /search
+в LeftSidebar пункт Notifications теперь открывает overlay, как Search а не ссылка /notifications;
+
+Доделать SearchPanel через реальный API GET /api/users/search?query=....
+Сделать ExplorePage через GET /api/posts/explore.
+Потом переходить к Profile.

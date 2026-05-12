@@ -21,7 +21,7 @@ function Footer() {
         ))}
       </nav>
 
-      <p className={styles.copy}>© 2024 ICHgram</p>
+      <p className={styles.copy}>© 2026 ICHgram</p>
     </footer>
   );
 }
