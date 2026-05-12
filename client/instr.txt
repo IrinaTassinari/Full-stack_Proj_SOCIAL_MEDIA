@@ -1,0 +1,2 @@
+Сделать ProtectedRoute
+Чтобы /, /explore, /profile, /messages были доступны только после login. Это симметрично GuestRoute.

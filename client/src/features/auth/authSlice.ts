@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { loginUser, registerUser } from "./authThunks";
+import { loginUser, registerUser, forgotPassword, resetPassword, } from "./authThunks";
 
 const token = localStorage.getItem("token");
 
@@ -9,6 +9,7 @@ type AuthState = {
   isAuthenticated: boolean;
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
+  message: string | null;
 };
 
 const initialState: AuthState = {
@@ -17,6 +18,7 @@ const initialState: AuthState = {
   isAuthenticated: Boolean(token),
   status: "idle", // idle | loading | succeeded | failed
   error: null,
+  message: null,
 };
 
 const authSlice = createSlice({
@@ -32,6 +34,7 @@ const authSlice = createSlice({
     resetAuthState: (state) => {
       state.status = "idle";
       state.error = null;
+      state.message = null;
     },
   },
   extraReducers: (builder) => {
@@ -72,7 +75,45 @@ const authSlice = createSlice({
           typeof action.payload === "string"
             ? action.payload
             : action.error.message || "Registration failed";
-      });
+      })
+
+      .addCase(forgotPassword.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+        state.message = null;
+      })
+      .addCase(forgotPassword.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.message = action.payload.message || "Password reset link sent";
+      })
+      .addCase(forgotPassword.rejected, (state, action) => {
+        state.status = "failed";
+        state.error =
+          typeof action.payload === "string"
+            ? action.payload
+            : action.error.message || "Password reset request failed";
+      })
+
+      .addCase(resetPassword.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+        state.message = null;
+      })
+      .addCase(resetPassword.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        state.message = action.payload.message || null;
+        localStorage.setItem("token", action.payload.token);
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.status = "failed";
+        state.error =
+          typeof action.payload === "string"
+            ? action.payload
+            : action.error.message || "Password reset failed";
+      })
   },
 });
 

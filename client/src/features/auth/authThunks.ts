@@ -1,12 +1,44 @@
+/**
+ *  API-запросы пишутся в authThunks.ts
+
+Туда идут запросы к backend:
+POST /api/auth/login
+POST /api/auth/register
+POST /api/auth/forgot-password
+PATCH /api/auth/reset-password/:token
+ */
+
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
+type LoginPayload = {
+  identifier: string;
+  password: string;
+};
+
+type RegisterPayload = {
+  email: string;
+  fullName: string;
+  username: string;
+  password: string;
+};
+
+type ForgotPasswordPayload = {
+  identifier: string;
+};
+
+type ResetPasswordPayload = {
+  token: string;
+  password: string;
+};
+
+
 // POST /api/auth/login
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
-  async (payload, { rejectWithValue }) => {
+  async (payload: LoginPayload, { rejectWithValue }) => {
     try {
       const response = await axios.post(`${API_URL}/api/auth/login`, payload);
       return response.data;
@@ -21,7 +53,7 @@ export const loginUser = createAsyncThunk(
 // POST /api/auth/register
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
-  async (payload, { rejectWithValue }) => {
+  async (payload: RegisterPayload, { rejectWithValue }) => {
     try {
       const response = await axios.post(`${API_URL}/api/auth/register`, payload);
       return response.data;
@@ -32,6 +64,42 @@ export const registerUser = createAsyncThunk(
     }
   }
 );
-
-
 // rejectWithValue - это функция из createAsyncThunk, которая позволяет самой задать, что попадёт в action.payload, если запрос упал
+
+
+// POST /api/auth/forgot-password 
+export const forgotPassword = createAsyncThunk(
+  "auth/forgotPassword",
+  async (payload: ForgotPasswordPayload, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${API_URL}/api/auth/forgot-password`, payload);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Password reset request failed"
+      );
+    }
+  }
+);
+
+// PATCH /api/auth/reset-password/:token  
+export const resetPassword = createAsyncThunk(
+  "auth/resetPassword",
+
+  /** same
+  async (payload: ResetPasswordPayload, { rejectWithValue }) => {
+  const token = payload.token;
+  const password = payload.password;
+}
+   */
+  async ( { token, password }: ResetPasswordPayload, { rejectWithValue }) => {
+    try {
+      const response = await axios.patch(`${API_URL}/api/auth/reset-password/${token}`, {password});
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Password reset failed"
+      );
+    }
+  }
+);

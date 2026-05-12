@@ -10,6 +10,8 @@ export interface IUser extends Document {
   fullName: string;
   bio?: string;
   avatar?: string;
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -48,7 +50,12 @@ const userSchema = new mongoose.Schema<IUser>(
             type: String,
             default: '',
         },
-
+        passwordResetToken: {
+            type: String,
+        },
+        passwordResetExpires: {
+            type: Date,
+        }
     },
     {
         timestamps: true, // разрешаем создание полей createdAt и updatedAt

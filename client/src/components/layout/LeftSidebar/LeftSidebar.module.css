@@ -1,0 +1,95 @@
+.sidebar {
+  width: 244px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 25px 122px 235px 25px;
+  border-right: 1px solid #dbdbdb;
+  background: #ffffff;
+}
+
+.logoLink {
+  width: fit-content;
+  display: block;
+  margin-bottom: 34px;
+}
+
+.logo {
+  width: 146px;
+  height: auto;
+  display: block;
+}
+
+.nav {
+  flex: 1;
+}
+
+.navList {
+  display: flex;
+  flex-direction: column;
+  gap: 43px;
+  list-style: none;
+}
+
+.navLink,
+.profileLink {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #000000;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 125%;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.navLink:hover,
+.profileLink:hover {
+  opacity: 0.65;
+}
+
+.active {
+  font-weight: 600;
+}
+
+.icon,
+.profileIcon {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 20px;
+  object-fit: contain;
+}
+
+.profileLink {
+  margin-top: 60px;
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: 72px;
+    padding: 32px 20px;
+    align-items: center;
+  }
+
+  .logoLink {
+    margin-bottom: 48px;
+  }
+
+  .logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    object-position: left center;
+  }
+
+  .navLink,
+  .profileLink {
+    gap: 0;
+  }
+
+  .navLink span,
+  .profileLink span {
+    display: none;
+  }
+}

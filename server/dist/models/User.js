@@ -32,6 +32,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: '',
     },
+    passwordResetToken: {
+        type: String,
+    },
+    passwordResetExpires: {
+        type: Date,
+    }
 }, {
     timestamps: true, // разрешаем создание полей createdAt и updatedAt
     versionKey: false // запрещаем создание поля __v

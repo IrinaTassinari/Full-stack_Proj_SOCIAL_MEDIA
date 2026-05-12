@@ -8,7 +8,7 @@
 {
   "username": "Suguru",
   "email": "suguru@gmail.com",
-  "password": "123456789",
+  "password": "newPassword123",
   "fullName": "Suguru Geto"
 }
 
