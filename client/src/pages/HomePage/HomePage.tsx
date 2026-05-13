@@ -1,6 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import PostPreviewModal from "../../components/posts/PostPreviewModal";
 import { fetchAllPosts } from "../../features/posts/postsThunks";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import type { Post } from "../../types/post";
 import styles from "./HomePage.module.css";
 
 const getPostAgeLabel = (createdAt: string) => {
@@ -30,6 +32,7 @@ const getPostAgeLabel = (createdAt: string) => {
 function HomePage() {
   const dispatch = useAppDispatch();
   const { allPosts, feedStatus, error } = useAppSelector((state) => state.posts);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
   useEffect(() => {
     dispatch(fetchAllPosts());
@@ -71,7 +74,13 @@ function HomePage() {
               </button>
             </header>
 
-            <img className={styles.postImage} src={post.image} alt="" />
+            <button
+              className={styles.postImageButton}
+              type="button"
+              onClick={() => setSelectedPost(post)}
+            >
+              <img className={styles.postImage} src={post.image} alt="" />
+            </button>
 
             <div className={styles.actions}>
               <button className={styles.iconButton} type="button" aria-label="Like">
@@ -111,6 +120,13 @@ function HomePage() {
         <p className={styles.updatesTitle}>You&apos;ve seen all the updates</p>
         <p className={styles.updatesText}>You have viewed all new publications</p>
       </div>
+
+      {selectedPost && (
+        <PostPreviewModal
+          post={selectedPost}
+          onClose={() => setSelectedPost(null)}
+        />
+      )}
     </section>
   );
 }

@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import PostPreviewModal from "../../components/posts/PostPreviewModal";
 import { fetchExplorePosts } from "../../features/posts/postsThunks";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import styles from "./ExplorePage.module.css";
@@ -6,6 +7,9 @@ import styles from "./ExplorePage.module.css";
 function ExplorePage() {
   const dispatch = useAppDispatch();
   const { explorePosts, status, error } = useAppSelector((state) => state.posts);
+  const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
+  const selectedPost =
+    selectedPostIndex === null ? null : explorePosts[selectedPostIndex] ?? null;
 
   useEffect(() => {
     dispatch(fetchExplorePosts());
@@ -28,20 +32,51 @@ function ExplorePage() {
       <div className={styles.grid}>
         {/* Это логика, которая назначает разным картинкам разные размеры в сетке Explore */}
         {explorePosts.map((post, index) => (
-          <article
+          <button
             className={`${styles.tile} ${
               index % 7 === 2 || index % 7 === 5 ? styles.tall : ""
             } ${index % 11 === 6 ? styles.wide : ""}`}
             key={post._id}
+            type="button"
+            onClick={() => setSelectedPostIndex(index)}
           >
             <img
               className={styles.image}
               src={post.image}
               alt={post.description || `${post.author.username} post`}
             />
-          </article>
+          </button>
         ))}
       </div>
+
+      {selectedPost && (
+        <PostPreviewModal
+          post={selectedPost}
+          onClose={() => setSelectedPostIndex(null)}
+          onPrevious={() =>
+            setSelectedPostIndex((currentIndex) => {
+              if (currentIndex === null) {
+                return currentIndex;
+              }
+
+              return currentIndex === 0
+                ? explorePosts.length - 1
+                : currentIndex - 1;
+            })
+          }
+          onNext={() =>
+            setSelectedPostIndex((currentIndex) => {
+              if (currentIndex === null) {
+                return currentIndex;
+              }
+
+              return currentIndex === explorePosts.length - 1
+                ? 0
+                : currentIndex + 1;
+            })
+          }
+        />
+      )}
     </section>
   );
 }

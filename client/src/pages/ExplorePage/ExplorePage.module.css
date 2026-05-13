@@ -14,7 +14,10 @@
 .tile {
   min-width: 0;
   overflow: hidden;
+  padding: 0;
+  border: 0;
   background: #efefef;
+  cursor: pointer;
 }
 
 .tall {
@@ -30,6 +33,11 @@
   height: 100%;
   display: block;
   object-fit: cover;
+  transition: opacity 0.15s ease;
+}
+
+.tile:hover .image {
+  opacity: 0.85;
 }
 
 .stateText,

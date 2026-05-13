@@ -1,0 +1,251 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  border: 0;
+  background: rgba(0, 0, 0, 0.65);
+  cursor: default;
+}
+
+.navButton {
+  width: 44px;
+  height: 44px;
+  position: fixed;
+  top: 50%;
+  z-index: 32;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: #000000;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: opacity 0.15s ease;
+}
+
+.navButton:hover {
+  opacity: 0.75;
+}
+
+.navButtonLeft {
+  left: 28px;
+}
+
+.navButtonRight {
+  right: 28px;
+}
+
+.modal {
+  width: min(1100px, calc(100vw - 80px));
+  max-height: calc(100vh - 80px);
+  position: relative;
+  z-index: 31;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) 420px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #ffffff;
+}
+
+.imageWrap {
+  min-height: 620px;
+  background: #000000;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.details {
+  min-width: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  border-left: 1px solid #dbdbdb;
+}
+
+.header {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  border-bottom: 1px solid #dbdbdb;
+}
+
+.author,
+.captionRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatarRing {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f6c33b, #ff4b3e 42%, #d629d1 78%);
+}
+
+.avatarRing img {
+  width: 38px;
+  height: 38px;
+  display: block;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.author strong,
+.captionRow strong,
+.footer strong {
+  color: #000000;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 129%;
+}
+
+.closeButton {
+  width: 28px;
+  height: 28px;
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.closeButton::before,
+.closeButton::after {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: #000000;
+  content: "";
+}
+
+.closeButton::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.closeButton::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.captionArea {
+  overflow: auto;
+  padding: 18px;
+}
+
+.captionRow {
+  align-items: flex-start;
+}
+
+.captionRow p {
+  margin: 0;
+  white-space: pre-wrap;
+  color: #000000;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 129%;
+}
+
+.footer {
+  display: grid;
+  gap: 8px;
+  padding: 14px 18px;
+  border-top: 1px solid #dbdbdb;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.actions img {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .overlay {
+    left: 72px;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 24px 16px 16px;
+  }
+
+  .modal {
+    width: min(520px, calc(100vw - 72px - 32px));
+    max-height: calc(100dvh - 32px);
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) auto;
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  .navButton {
+    display: none;
+  }
+
+  .imageWrap {
+    height: min(46dvh, calc(100dvh - 220px), calc(100vw - 72px - 32px));
+    min-height: auto;
+  }
+
+  .image {
+    object-fit: contain;
+  }
+
+  .captionArea {
+    max-height: 18dvh;
+  }
+
+  .details {
+    border-left: 0;
+  }
+
+  .header {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .overlay {
+    padding: 16px 12px 12px;
+  }
+
+  .modal {
+    width: calc(100vw - 72px - 24px);
+    max-height: calc(100dvh - 24px);
+  }
+
+  .imageWrap {
+    height: min(42dvh, calc(100dvh - 200px), calc(100vw - 72px - 24px));
+  }
+}
