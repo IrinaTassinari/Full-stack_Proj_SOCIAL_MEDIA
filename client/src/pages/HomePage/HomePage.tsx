@@ -1,53 +1,69 @@
+import { useEffect } from "react";
+import { fetchAllPosts } from "../../features/posts/postsThunks";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import styles from "./HomePage.module.css";
 
-type FeedPost = {
-  id: string;
-  author: {
-    username: string;
-    avatar: string;
-  };
-  createdAtLabel: string;
-  image: string;
-  likes: string;
-  caption: string;
-  previewComment: string;
-  commentsCount: string;
+const getPostAgeLabel = (createdAt: string) => {
+  const createdTime = new Date(createdAt).getTime();
+  const diffMs = Date.now() - createdTime;
+  const diffMinutes = Math.max(1, Math.floor(diffMs / 60000));
+
+  if (diffMinutes < 60) {
+    return `${diffMinutes}m`;
+  }
+
+  const diffHours = Math.floor(diffMinutes / 60);
+
+  if (diffHours < 24) {
+    return `${diffHours}h`;
+  }
+
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffDays < 7) {
+    return `${diffDays}d`;
+  }
+
+  return `${Math.floor(diffDays / 7)}w`;
 };
 
-const mockPosts: FeedPost[] = Array.from({ length: 4 }, (_, index) => ({
-  id: `post-${index + 1}`,
-  author: {
-    username: "sashaa",
-    avatar: "/icons/ICH_Profile.png",
-  },
-  createdAtLabel: "2 week",
-  // Temporary Cloudinary URL for layout. Real posts will use post.image from API.
-  image:
-    "https://res.cloudinary.com/demo/image/upload/w_640,h_640,c_fill,g_auto/sample.jpg",
-  likes: "101 824",
-  caption: "It's golden, Ponyboy!",
-  previewComment: "heyyyyy",
-  commentsCount: "732",
-}));
-
 function HomePage() {
+  const dispatch = useAppDispatch();
+  const { allPosts, feedStatus, error } = useAppSelector((state) => state.posts);
+
+  useEffect(() => {
+    dispatch(fetchAllPosts());
+  }, [dispatch]);
+
+  if (feedStatus === "idle" || feedStatus === "loading") {
+    return <p className={styles.stateText}>Loading posts...</p>;
+  }
+
+  if (feedStatus === "failed") {
+    return <p className={styles.errorText}>{error}</p>;
+  }
+
+  if (feedStatus === "succeeded" && allPosts.length === 0) {
+    return <p className={styles.stateText}>No posts yet.</p>;
+  }
+
   return (
     <section className={styles.page}>
       <div className={styles.feedGrid}>
-        {mockPosts.map((post) => (
-          <article className={styles.postCard} key={post.id}>
+        {allPosts.map((post) => (
+          <article className={styles.postCard} key={post._id}>
             <header className={styles.postHeader}>
               <img
                 className={styles.avatar}
-                src={post.author.avatar}
+                src={post.author.avatar || "/icons/ICH_avatar.png"}
                 alt={`${post.author.username} avatar`}
               />
 
               <div className={styles.authorMeta}>
                 <span className={styles.username}>{post.author.username}</span>
-                <span className={styles.dot}>·</span>
-                <span className={styles.time}>{post.createdAtLabel}</span>
-                <span className={styles.dot}>·</span>
+                <span className={styles.dot}>.</span>
+                <span className={styles.time}>{getPostAgeLabel(post.createdAt)}</span>
+                <span className={styles.dot}>.</span>
               </div>
 
               <button className={styles.followButton} type="button">
@@ -70,19 +86,16 @@ function HomePage() {
               </button>
             </div>
 
-            <p className={styles.likes}>{post.likes} likes</p>
+            <p className={styles.likes}>0 likes</p>
 
-            <p className={styles.caption}>
-              <span>{post.author.username}</span> <em>{post.caption}</em>
-            </p>
-
-            <p className={styles.previewComment}>
-              {post.previewComment}
-              <span>| ... more</span>
-            </p>
+            {post.description && (
+              <p className={styles.caption}>
+                <span>{post.author.username}</span> <em>{post.description}</em>
+              </p>
+            )}
 
             <button className={styles.commentsButton} type="button">
-              View all comments ({post.commentsCount})
+              View all comments
             </button>
           </article>
         ))}

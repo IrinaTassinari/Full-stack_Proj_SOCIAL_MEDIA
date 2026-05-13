@@ -1,0 +1,226 @@
+.page {
+  min-height: calc(100vh - 158px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 32px;
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.modal {
+  width: min(936px, 100%);
+  overflow: hidden;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.header {
+  height: 44px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #dbdbdb;
+}
+
+.header h1 {
+  margin: 0;
+  color: #000000;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 150%;
+}
+
+.headerActions {
+  position: absolute;
+  right: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.closeButton,
+.shareButton {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.closeButton {
+  padding: 0;
+  color: #ed4956;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 150%;
+}
+
+.shareButton {
+  padding: 0;
+  color: #0095f6;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 150%;
+}
+
+.shareButton:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.body {
+  min-height: 536px;
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) 350px;
+}
+
+.uploadArea {
+  min-height: 536px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.uploadIcon {
+  width: 154px;
+  height: 154px;
+  display: block;
+  object-fit: contain;
+}
+
+.previewImage {
+  width: 100%;
+  height: 536px;
+  display: block;
+  object-fit: cover;
+}
+
+.details {
+  min-width: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  border-left: 1px solid #dbdbdb;
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 18px 12px;
+}
+
+.author img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.author span {
+  color: #000000;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 129%;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 260px;
+  resize: none;
+  padding: 0 18px;
+  border: 0;
+  outline: 0;
+  color: #000000;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 129%;
+}
+
+.counter {
+  margin: 0;
+  padding: 0 18px 24px;
+  color: #c7c7c7;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 129%;
+  text-align: right;
+}
+
+.footerRow {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  border-top: 1px solid #dbdbdb;
+}
+
+.smileIcon {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #737373;
+  border-radius: 50%;
+  color: #737373;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.error {
+  margin: 0;
+  padding: 10px 16px;
+  border-top: 1px solid #dbdbdb;
+  color: #ed4956;
+  font-size: 12px;
+  text-align: center;
+}
+
+.footerRow {
+  position: relative;
+}
+
+.smileButton {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.smileButton img {
+  width: 36px;
+  height: 36px;
+  display: block;
+}
+
+.emojiPicker {
+  position: absolute;
+  left: 12px;
+  bottom: 48px;
+  z-index: 10;
+}
+
+
+@media (max-width: 900px) {
+  .body {
+    grid-template-columns: 1fr;
+  }
+
+  .details {
+    border-left: 0;
+    border-top: 1px solid #dbdbdb;
+  }
+}

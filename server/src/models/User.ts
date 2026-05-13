@@ -9,6 +9,7 @@ export interface IUser extends Document {
   password: string;
   fullName: string;
   bio?: string;
+  website?: string;
   avatar?: string;
   passwordResetToken?: string;
   passwordResetExpires?: Date;
@@ -45,6 +46,11 @@ const userSchema = new mongoose.Schema<IUser>(
         bio: {
             type: String,
             default: '',
+        },
+        website: {
+            type: String,
+            default: '',
+            trim: true,
         },
         avatar: {
             type: String,

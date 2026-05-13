@@ -34,7 +34,8 @@
 }
 
 .navLink,
-.profileLink {
+.profileLink,
+.logoutButton {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -44,6 +45,20 @@
   line-height: 125%;
   text-decoration: none;
   transition: opacity 0.15s ease;
+}
+
+.logoutButton {
+  width: fit-content;
+  margin-top: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #ed4956;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 125%;
+  cursor: pointer;
 }
 
 .navButton {
@@ -56,7 +71,8 @@
 }
 
 .navLink:hover,
-.profileLink:hover {
+.profileLink:hover,
+.logoutButton:hover {
   opacity: 0.65;
 }
 
@@ -66,14 +82,27 @@
 
 .icon,
 .profileIcon {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   flex: 0 0 20px;
   object-fit: contain;
 }
 
+.profileIcon {
+  border: 1px solid #dbdbdb;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 .profileLink {
   margin-top: 60px;
+}
+
+.logoutIcon {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 20px;
+  object-fit: contain;
 }
 
 @media (max-width: 900px) {
@@ -95,12 +124,18 @@
   }
 
   .navLink,
-  .profileLink {
+  .profileLink,
+  .logoutButton {
     gap: 0;
   }
 
   .navLink span,
-  .profileLink span {
+  .profileLink span,
+  .logoutButton span {
+    display: none;
+  }
+
+  .logoutButton {
     display: none;
   }
 }

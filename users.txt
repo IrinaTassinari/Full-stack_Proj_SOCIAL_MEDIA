@@ -1,19 +1,20 @@
 {
-  "username": "Nanami",
+  "username": "Nanami Kento",
   "email": "nanami@example.com",
   "password": "123456",
   "fullName": "Nanami Kento"
+    photo - done
 }
 
 {
-  "username": "Suguru",
+  "username": "Suguru Geto",
   "email": "suguru@gmail.com",
   "password": "newPassword123",
   "fullName": "Suguru Geto"
 }
 
 {
-  "username": "Satoru",
+  "username": "Satoru Gojo",
   "email": "satoru@gmail.com",
   "password": "123456789",
   "fullName": "Satoru Gojo"
@@ -24,19 +25,63 @@
   "email": "choso@gmail.com",
   "password": "12345678910",
   "fullName": "Choso Big Brother"
+   photo - done
 }
 
 {
-  "username": "Itadori",
+  "username": "Itadori Yuji",
   "email": "itadori@gmail.com",
   "password": "12345678910",
   "fullName": "Itadori Yuji"
+  photo -done
 }
 
 {
-  "username": "Megumi",
+  "username": "Megumi Fushiguro",
   "email": "megumii@gmail.com",
   "password": "12345678910",
   "fullName": "Megumi Fushiguro"
+  photo -done
 }
+
+{
+  "username": "Panda",
+  "email": "panda@gmail.com",
+  "password": "123",
+  "fullName": "Just Panda"
+  photo -done
+}
+
+{
+  "username": "Yuta Okkotsu",
+  "email": "yuta@gmail.com",
+  "password": "12345",
+  "fullName": "Yuta Okkotsu"
+}
+
+{
+  "username": "Maki",
+  "email": "maki@gmail.com",
+  "password": "12345",
+  "fullName": "Maki Zenin"
+  photo -done
+}
+
+{
+  "username": "Todo Aoi",
+  "email": "todo@gmail.com",
+  "password": "12345678910",
+  "fullName": "Todo Aoi"
+  photo -done
+}
+
+{
+  "username": "Sukuna",
+  "email": "sukuna@gmail.com",
+  "password": "12345",
+  "fullName": "Sukuna Ryomen"
+  photo -done
+}
+
+
 

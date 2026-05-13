@@ -1,4 +1,8 @@
-import { NavLink } from "react-router-dom";
+import { useEffect } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { logout } from "../../../features/auth/authSlice";
+import { fetchMyProfile } from "../../../features/profile/profileThunks";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import styles from "./LeftSidebar.module.css";
 
 const navItems = [
@@ -19,6 +23,20 @@ function LeftSidebar({
   onSearchClick,
   onNotificationsClick,
 }: LeftSidebarProps) {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { myProfile } = useAppSelector((state) => state.profile);
+  const profileAvatar = myProfile?.avatar || "/icons/ICH_avatar.png";
+
+  useEffect(() => {
+    dispatch(fetchMyProfile());
+  }, [dispatch]);
+
+  const handleLogout = () => {
+    dispatch(logout()); // в authSlice.ts есть reducers logout - Redux Toolkit из этого reducer автоматически создаёт функцию logout() и через dispatch её вызываем
+    navigate("/login");
+  };
+
   return (
     <aside className={styles.sidebar}>
       <NavLink className={styles.logoLink} to="/" aria-label="ICHgram home">
@@ -130,12 +148,22 @@ function LeftSidebar({
       >
         <img
           className={styles.profileIcon}
-          src="/icons/ICH_Profile.png"
+          src={profileAvatar}
           alt=""
           aria-hidden="true"
         />
         <span>Profile</span>
       </NavLink>
+
+      <button className={styles.logoutButton} type="button" onClick={handleLogout}>
+        <img
+          className={styles.logoutIcon}
+          src="/icons/logout-icon.webp"
+          alt=""
+          aria-hidden="true"
+        />
+        <span>Log out</span>
+      </button>
     </aside>
   );
 }

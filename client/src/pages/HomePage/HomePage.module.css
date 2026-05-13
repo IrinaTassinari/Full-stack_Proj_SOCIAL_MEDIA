@@ -5,6 +5,19 @@
   background: #ffffff;
 }
 
+.stateText,
+.errorText {
+  margin: 120px auto;
+  color: #737373;
+  font-size: 16px;
+  line-height: 125%;
+  text-align: center;
+}
+
+.errorText {
+  color: #ed4956;
+}
+
 .feedGrid {
   width: min(100%, 1168px);
   margin: 0 auto;

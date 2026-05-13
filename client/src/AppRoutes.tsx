@@ -5,6 +5,10 @@ import ForgotPasswordPage from './pages/auth/ForgotPasswordPage/ForgotPasswordPa
 import ResetPasswordPage from './pages/auth/ResetPasswordPage/ResetPasswordPage'
 import ExplorePage from "./pages/ExplorePage/ExplorePage";
 import HomePage from "./pages/HomePage/HomePage";
+import EditProfilePage from "./pages/EditProfilePage/EditProfilePage";
+import MyProfilePage from "./pages/MyProfilePage/MyProfilePage";
+import CreatePostPage from "./pages/CreatePostPage/CreatePostPage";
+import EditPostPage from "./pages/EditPostPage/EditPostPage";
 import GuestRoute from "./components/routes/GuestRoute";
 import ProtectedRoute from "./components/routes/ProtectedRoute";
 import MainLayout from "./components/layout/MainLayout/MainLayout";
@@ -28,8 +32,10 @@ function AppRoutes() {
           <Route path="/explore" element={<ExplorePage />} />
           <Route path="/messages" element={<div>Messages page</div>} />
           <Route path="/notifications" element={<div>Notifications page</div>} />
-          <Route path="/create" element={<div>Create page</div>} />
-          <Route path="/profile" element={<div>Profile page</div>} />
+          <Route path="/create" element={<CreatePostPage />} />
+          <Route path="/posts/:postId/edit" element={<EditPostPage />} />
+          <Route path="/profile" element={<MyProfilePage />} />
+          <Route path="/profile/edit" element={<EditProfilePage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Route>

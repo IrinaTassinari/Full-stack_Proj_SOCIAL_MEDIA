@@ -22,9 +22,23 @@ export const getUserProfile = async (req, res, next) => {
         next(error);
     }
 };
+export const getMyProfile = async (req, res, next) => {
+    try {
+        if (!req.user) {
+            throw new AppError("Unauthorized", 401);
+        }
+        res.status(200).json({
+            success: true,
+            user: req.user,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
 export const updateUserProfile = async (req, res, next) => {
     try {
-        const { fullName, bio, avatar } = req.body ?? {};
+        const { fullName, username, bio, website } = req.body ?? {};
         //req.user может быть undefined. Поэтому в контроллере нужно проверить. если authMiddleware не положил пользователя в req.user, значит пользователь не авторизован
         if (!req.user) {
             throw new AppError("Unauthorized", 401);
@@ -34,23 +48,42 @@ export const updateUserProfile = async (req, res, next) => {
         if (!user) {
             throw new AppError("User not found", 404);
         }
+        const nextUsername = typeof username === "string" ? username.trim() : undefined;
+        const nextFullName = typeof fullName === "string" ? fullName.trim() : undefined;
+        const nextBio = typeof bio === "string" ? bio.trim() : undefined;
+        const nextWebsite = typeof website === "string" ? website.trim() : undefined;
+        if (nextUsername !== undefined && !nextUsername) {
+            throw new AppError("Username is required", 400);
+        }
         // Обновляем только те поля, которые пришли в запросе
         // Это важно - чтобы не затирать данные undefined значениями
-        if (fullName !== undefined)
-            user.fullName = fullName;
-        if (bio !== undefined)
-            user.bio = bio;
+        if (nextFullName !== undefined)
+            user.fullName = nextFullName;
+        if (nextUsername !== undefined && nextUsername !== user.username) {
+            const existingUser = await User.findOne({
+                username: nextUsername,
+                _id: { $ne: user._id },
+            });
+            if (existingUser) {
+                throw new AppError("Username is already taken", 409);
+            }
+            user.username = nextUsername;
+        }
+        if (nextBio !== undefined)
+            user.bio = nextBio;
+        if (nextWebsite !== undefined)
+            user.website = nextWebsite;
         //if (avatar!== undefined) user.avatar = avatar;
         if (req.file) {
             const avatarUrl = await uploadToCloudinary(req.file.buffer, "inst-project/avatars");
             user.avatar = avatarUrl;
         }
         // Сохраняем изменения в базе
-        await user.save();
+        const updatedUser = await user.save();
         res.status(200).json({
             success: true,
             message: "User has been successfully updated",
-            user,
+            user: updatedUser,
         });
     }
     catch (error) {
