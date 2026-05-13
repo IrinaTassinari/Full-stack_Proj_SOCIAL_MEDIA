@@ -38,18 +38,23 @@ function EditProfilePage() {
 
   const isLoading = status === "loading";
 
+  // handlePhotoChange срабатывает сразу, когда пользователь выбрал файл
   const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
     if (!file) return;
 
     setAvatarFile(file);
-    setAvatarPreview(URL.createObjectURL(file));
+    setAvatarPreview(URL.createObjectURL(file)); //идёт вот сюда <img className={styles.avatar} src={avatarPreview} alt="" />
+
   };
 
+
+  //  handleSubmit срабатывает позже, когда пользователь нажал Save
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    // FormData — это специальный объект браузера для отправки данных формы на backend, особенно когда есть файлы. Обычный JSON хорошо подходит для текста. Но когда нужно отправить картинку, аватарку, файл поста, лучше использовать FormData.
     const formData = new FormData();
     formData.append("username", username.trim());
     formData.append("website", website.trim());

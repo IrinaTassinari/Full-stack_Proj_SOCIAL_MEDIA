@@ -23,9 +23,7 @@ function SearchPanel() {
           type="button"
           aria-label="Clear search"
           onClick={() => setSearchValue("")}
-        >
-          <img src="/icons/button-close.png" alt="" aria-hidden="true" />
-        </button>
+        />
       </label>
 
       <div className={styles.recentBlock}>

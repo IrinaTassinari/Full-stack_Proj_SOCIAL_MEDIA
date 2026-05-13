@@ -16,13 +16,17 @@ function MainLayout() {
     setActivePanel(null);
   };
 
+  const togglePanel = (panel: "search" | "notifications") => {
+    setActivePanel((currentPanel) => (currentPanel === panel ? null : panel));
+  };
+
   return (
     <div className={styles.layout}>
       <LeftSidebar
         isSearchOpen={activePanel === "search"}
         isNotificationsOpen={activePanel === "notifications"}
-        onSearchClick={() => setActivePanel("search")}
-        onNotificationsClick={() => setActivePanel("notifications")}
+        onSearchClick={() => togglePanel("search")}
+        onNotificationsClick={() => togglePanel("notifications")}
       />
       <main className={styles.content}>
         <div className={styles.pageContent}>

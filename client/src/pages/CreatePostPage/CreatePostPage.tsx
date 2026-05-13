@@ -21,7 +21,7 @@ function CreatePostPage() {
   const { createStatus, error } = useAppSelector((state) => state.posts);
   const [description, setDescription] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(null); // Это state для превью картинки перед созданием поста
   const [isEmojiOpen, setIsEmojiOpen] = useState(false);
 
   const avatar = myProfile?.avatar || "/icons/ICH_avatar.png";
@@ -40,14 +40,16 @@ function CreatePostPage() {
     }
   }, [dispatch, myProfile]);
 
+    //  превью картинки перед созданием поста - огда ты выбираешь картинку, код делает:URL.createObjectURL(file) Это создает временную ссылку на файл
   useEffect(() => {
     return () => {
       if (preview) {
-        URL.revokeObjectURL(preview);
+        URL.revokeObjectURL(preview); // очисти старую preview-ссылку
       }
     };
   }, [preview]);
 
+  // Счетчик символов 0/200
   const counterText = useMemo(
     () => `${description.length}/${maxDescriptionLength}`,
     [description.length],
@@ -58,10 +60,6 @@ function CreatePostPage() {
 
     if (!file) {
       return;
-    }
-
-    if (preview) {
-      URL.revokeObjectURL(preview);
     }
 
     setImageFile(file);

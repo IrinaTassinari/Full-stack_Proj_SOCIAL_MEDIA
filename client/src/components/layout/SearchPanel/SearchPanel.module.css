@@ -51,15 +51,27 @@
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: transparent;
+  background: #c7c7c7;
   cursor: pointer;
   transform: translateY(-50%);
 }
 
-.clearButton img {
-  width: 20px;
-  height: 20px;
-  display: block;
+.clearButton::before,
+.clearButton::after {
+  position: absolute;
+  width: 10px;
+  height: 2px;
+  border-radius: 999px;
+  background: #ffffff;
+  content: "";
+}
+
+.clearButton::before {
+  transform: rotate(45deg);
+}
+
+.clearButton::after {
+  transform: rotate(-45deg);
 }
 
 .clearButton:hover {
