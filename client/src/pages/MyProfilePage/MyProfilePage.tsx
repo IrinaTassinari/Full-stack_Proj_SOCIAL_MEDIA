@@ -4,6 +4,7 @@ import { deletePost } from "../../features/posts/postsThunks";
 import { fetchMyPosts, fetchMyProfile } from "../../features/profile/profileThunks";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import type { Post } from "../../types/post";
+import { getPostCoverImage, getPostImages } from "../../utils/postImages";
 import styles from "./MyProfilePage.module.css";
 
 const getUserId = (user: { _id?: string; id?: string; userId?: string } | null) =>
@@ -18,6 +19,7 @@ function MyProfilePage() {
   );
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isPostMenuOpen, setIsPostMenuOpen] = useState(false);
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied">("idle");
 
@@ -45,6 +47,7 @@ function MyProfilePage() {
         setIsPostMenuOpen(false);
         setSelectedPost(null);
         setSelectedPostIndex(null);
+        setSelectedImageIndex(0);
         return;
       }
 
@@ -59,6 +62,7 @@ function MyProfilePage() {
 
         setSelectedPost(myPosts[nextIndex]);
         setSelectedPostIndex(nextIndex);
+        setSelectedImageIndex(0);
       }
 
       if (event.key === "ArrowRight") {
@@ -67,6 +71,7 @@ function MyProfilePage() {
 
         setSelectedPost(myPosts[nextIndex]);
         setSelectedPostIndex(nextIndex);
+        setSelectedImageIndex(0);
       }
     };
 
@@ -98,6 +103,10 @@ function MyProfilePage() {
   const selectedPostAuthor = selectedPost?.author || myProfile;
   const selectedPostAvatar = selectedPostAuthor?.avatar || avatar;
   const selectedPostUsername = selectedPostAuthor?.username || myProfile.username;
+  const selectedPostImages = selectedPost ? getPostImages(selectedPost) : [];
+  const selectedPostImage =
+    selectedPostImages[selectedImageIndex] || selectedPostImages[0] || "";
+  const hasMultipleSelectedImages = selectedPostImages.length > 1;
 
   const handleCopyLink = async () => {
     if (!selectedPost) {
@@ -138,6 +147,19 @@ function MyProfilePage() {
     const nextIndex = Math.min(selectedPostIndex ?? 0, remainingPosts.length - 1);
     setSelectedPost(remainingPosts[nextIndex]);
     setSelectedPostIndex(nextIndex);
+    setSelectedImageIndex(0);
+  };
+
+  const showPreviousSelectedImage = () => {
+    setSelectedImageIndex((currentIndex) =>
+      currentIndex === 0 ? selectedPostImages.length - 1 : currentIndex - 1,
+    );
+  };
+
+  const showNextSelectedImage = () => {
+    setSelectedImageIndex((currentIndex) =>
+      currentIndex === selectedPostImages.length - 1 ? 0 : currentIndex + 1,
+    );
   };
 
   return (
@@ -220,11 +242,20 @@ function MyProfilePage() {
               onClick={() => {
                 setSelectedPost(post);
                 setSelectedPostIndex(index);
+                setSelectedImageIndex(0);
                 setIsPostMenuOpen(false);
                 setCopyStatus("idle");
               }}
             >
-              <img src={post.image} alt={post.description || "Profile post"} />
+              <img
+                src={getPostCoverImage(post)}
+                alt={post.description || "Profile post"}
+              />
+              {getPostImages(post).length > 1 && (
+                <span className={styles.galleryBadge}>
+                  1/{getPostImages(post).length}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -239,6 +270,7 @@ function MyProfilePage() {
             onClick={() => {
               setSelectedPost(null);
               setSelectedPostIndex(null);
+              setSelectedImageIndex(0);
               setIsPostMenuOpen(false);
             }}
           />
@@ -257,6 +289,7 @@ function MyProfilePage() {
 
                   setSelectedPost(myPosts[nextIndex]);
                   setSelectedPostIndex(nextIndex);
+                  setSelectedImageIndex(0);
                   setIsPostMenuOpen(false);
                   setCopyStatus("idle");
                 }}
@@ -275,6 +308,7 @@ function MyProfilePage() {
 
                   setSelectedPost(myPosts[nextIndex]);
                   setSelectedPostIndex(nextIndex);
+                  setSelectedImageIndex(0);
                   setIsPostMenuOpen(false);
                   setCopyStatus("idle");
                 }}
@@ -288,9 +322,32 @@ function MyProfilePage() {
             <div className={styles.postImageWrap}>
               <img
                 className={styles.postModalImage}
-                src={selectedPost.image}
+                src={selectedPostImage}
                 alt={selectedPost.description || "Selected post"}
               />
+              {hasMultipleSelectedImages && (
+                <>
+                  <button
+                    className={`${styles.imageNavButton} ${styles.imageNavButtonLeft}`}
+                    type="button"
+                    aria-label="Previous image"
+                    onClick={showPreviousSelectedImage}
+                  >
+                    &lt;
+                  </button>
+                  <button
+                    className={`${styles.imageNavButton} ${styles.imageNavButtonRight}`}
+                    type="button"
+                    aria-label="Next image"
+                    onClick={showNextSelectedImage}
+                  >
+                    &gt;
+                  </button>
+                  <span className={styles.imageCounter}>
+                    {selectedImageIndex + 1}/{selectedPostImages.length}
+                  </span>
+                </>
+              )}
             </div>
 
             <div className={styles.postDetails}>

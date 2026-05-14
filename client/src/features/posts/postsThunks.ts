@@ -31,6 +31,12 @@ const getAuthHeaders = () => {
   return token ? { Authorization: `Bearer ${token}` } : undefined;
 };
 
+const getErrorMessage = (error: any, fallback: string) =>
+  error.response?.data?.message ||
+  error.response?.data?.error ||
+  error.message ||
+  fallback;
+
 // GET /api/posts/explore
 export const fetchExplorePosts = createAsyncThunk(
   "posts/fetchExplorePosts",
@@ -42,9 +48,7 @@ export const fetchExplorePosts = createAsyncThunk(
 
       return response.data.posts;
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to load explore posts",
-      );
+      return rejectWithValue(getErrorMessage(error, "Failed to load explore posts"));
     }
   },
 );
@@ -58,9 +62,7 @@ export const fetchAllPosts = createAsyncThunk(
 
       return response.data.posts;
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to load posts",
-      );
+      return rejectWithValue(getErrorMessage(error, "Failed to load posts"));
     }
   },
 );
@@ -76,9 +78,7 @@ export const fetchPostById = createAsyncThunk(
 
       return response.data.post;
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to load post",
-      );
+      return rejectWithValue(getErrorMessage(error, "Failed to load post"));
     }
   },
 );
@@ -98,9 +98,7 @@ export const createPost = createAsyncThunk(
 
       return response.data.post;
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to create post",
-      );
+      return rejectWithValue(getErrorMessage(error, "Failed to create post"));
     }
   },
 );
@@ -123,9 +121,7 @@ export const updatePost = createAsyncThunk(
 
       return response.data.post;
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to update post",
-      );
+      return rejectWithValue(getErrorMessage(error, "Failed to update post"));
     }
   },
 );
@@ -141,9 +137,7 @@ export const deletePost = createAsyncThunk(
 
       return postId;
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to delete post",
-      );
+      return rejectWithValue(getErrorMessage(error, "Failed to delete post"));
     }
   },
 );

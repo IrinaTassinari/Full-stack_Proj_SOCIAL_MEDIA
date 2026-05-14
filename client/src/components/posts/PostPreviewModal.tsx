@@ -1,5 +1,6 @@
-import { useEffect, useRef, type TouchEvent } from "react";
+import { useEffect, useRef, useState, type TouchEvent } from "react";
 import type { Post } from "../../types/post";
+import { getPostImages } from "../../utils/postImages";
 import styles from "./PostPreviewModal.module.css";
 
 type PostPreviewModalProps = {
@@ -16,8 +17,16 @@ function PostPreviewModal({
   onNext,
 }: PostPreviewModalProps) {
   const avatar = post.author.avatar || "/icons/ICH_avatar.png";
+  const images = getPostImages(post);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const currentImage = images[currentImageIndex] ?? "";
+  const hasMultipleImages = images.length > 1;
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [post._id]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -80,6 +89,18 @@ function PostPreviewModal({
     onPrevious?.();
   };
 
+  const showPreviousImage = () => {
+    setCurrentImageIndex((current) =>
+      current === 0 ? images.length - 1 : current - 1,
+    );
+  };
+
+  const showNextImage = () => {
+    setCurrentImageIndex((current) =>
+      current === images.length - 1 ? 0 : current + 1,
+    );
+  };
+
   return (
     <div className={styles.overlay}>
       <button
@@ -119,9 +140,32 @@ function PostPreviewModal({
         <div className={styles.imageWrap}>
           <img
             className={styles.image}
-            src={post.image}
+            src={currentImage}
             alt={post.description || `${post.author.username} post`}
           />
+          {hasMultipleImages && (
+            <>
+              <button
+                className={`${styles.imageNavButton} ${styles.imageNavButtonLeft}`}
+                type="button"
+                aria-label="Previous image"
+                onClick={showPreviousImage}
+              >
+                &lt;
+              </button>
+              <button
+                className={`${styles.imageNavButton} ${styles.imageNavButtonRight}`}
+                type="button"
+                aria-label="Next image"
+                onClick={showNextImage}
+              >
+                &gt;
+              </button>
+              <span className={styles.imageCounter}>
+                {currentImageIndex + 1}/{images.length}
+              </span>
+            </>
+          )}
         </div>
 
         <div className={styles.details}>

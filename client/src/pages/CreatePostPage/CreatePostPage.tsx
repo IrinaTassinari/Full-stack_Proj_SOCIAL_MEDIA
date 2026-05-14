@@ -3,6 +3,7 @@ import {
   type FormEvent,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { useNavigate } from "react-router-dom";
@@ -13,6 +14,15 @@ import EmojiPicker, { type EmojiClickData } from "emoji-picker-react";
 import styles from "./CreatePostPage.module.css";
 
 const maxDescriptionLength = 200;
+const maxImagesCount = 10;
+const maxImageSizeBytes = 10 * 1024 * 1024;
+const maxImageSizeMb = maxImageSizeBytes / 1024 / 1024;
+
+type SelectedImage = {
+  id: string;
+  file: File;
+  preview: string;
+};
 
 function CreatePostPage() {
   const dispatch = useAppDispatch();
@@ -20,14 +30,19 @@ function CreatePostPage() {
   const { myProfile } = useAppSelector((state) => state.profile);
   const { createStatus, error } = useAppSelector((state) => state.posts);
   const [description, setDescription] = useState("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null); // Это state для превью картинки перед созданием поста
+  const [selectedImages, setSelectedImages] = useState<SelectedImage[]>([]);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isEmojiOpen, setIsEmojiOpen] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const selectedImagesRef = useRef<SelectedImage[]>([]);
 
   const avatar = myProfile?.avatar || "/icons/ICH_avatar.png";
   const username = myProfile?.username || "user";
   const isLoading = createStatus === "loading";
-  const canSubmit = Boolean(imageFile) && !isLoading;
+  const canSubmit = selectedImages.length > 0 && !isLoading;
+  const canAddMoreImages = selectedImages.length < maxImagesCount;
+  const activeImage = selectedImages[activeImageIndex] ?? selectedImages[0];
   const handleEmojiClick = (emojiData: EmojiClickData) => {
     setDescription((current) =>
       `${current}${emojiData.emoji}`.slice(0, maxDescriptionLength),
@@ -40,14 +55,17 @@ function CreatePostPage() {
     }
   }, [dispatch, myProfile]);
 
-    //  превью картинки перед созданием поста - огда ты выбираешь картинку, код делает:URL.createObjectURL(file) Это создает временную ссылку на файл
+  useEffect(() => {
+    selectedImagesRef.current = selectedImages;
+  }, [selectedImages]);
+
   useEffect(() => {
     return () => {
-      if (preview) {
-        URL.revokeObjectURL(preview); // очисти старую preview-ссылку
-      }
+      selectedImagesRef.current.forEach((image) =>
+        URL.revokeObjectURL(image.preview),
+      );
     };
-  }, [preview]);
+  }, []);
 
   // Счетчик символов 0/200
   const counterText = useMemo(
@@ -56,25 +74,85 @@ function CreatePostPage() {
   );
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+    const files = Array.from(event.target.files ?? []);
 
-    if (!file) {
+    if (files.length === 0) {
       return;
     }
 
-    setImageFile(file);
-    setPreview(URL.createObjectURL(file));
+    const validFiles = files.filter((file) => file.size <= maxImageSizeBytes);
+    const oversizedFiles = files.filter((file) => file.size > maxImageSizeBytes);
+
+    if (oversizedFiles.length > 0) {
+      setUploadError(
+        `Each image must be smaller than ${maxImageSizeMb} MB. ${oversizedFiles.length} file(s) were not added.`,
+      );
+    } else {
+      setUploadError(null);
+    }
+
+    if (validFiles.length === 0) {
+      event.target.value = "";
+      return;
+    }
+
+    setSelectedImages((currentImages) => {
+      const remainingSlots = maxImagesCount - currentImages.length;
+      const imagesToAdd = validFiles.slice(0, remainingSlots).map((file, index) => ({
+        id: `${file.name}-${file.size}-${file.lastModified}-${Date.now()}-${index}`,
+        file,
+        preview: URL.createObjectURL(file),
+      }));
+
+      const nextImages = [...currentImages, ...imagesToAdd];
+      setActiveImageIndex(currentImages.length);
+
+      return nextImages;
+    });
+
+    event.target.value = "";
+  };
+
+  const handleRemoveImage = (imageId: string) => {
+    setSelectedImages((currentImages) => {
+      const imageToRemove = currentImages.find((image) => image.id === imageId);
+
+      if (imageToRemove) {
+        URL.revokeObjectURL(imageToRemove.preview);
+      }
+
+      const nextImages = currentImages.filter((image) => image.id !== imageId);
+      setActiveImageIndex((currentIndex) =>
+        Math.min(currentIndex, Math.max(nextImages.length - 1, 0)),
+      );
+
+      return nextImages;
+    });
+  };
+
+  const showPreviousImage = () => {
+    setActiveImageIndex((currentIndex) =>
+      currentIndex === 0 ? selectedImages.length - 1 : currentIndex - 1,
+    );
+  };
+
+  const showNextImage = () => {
+    setActiveImageIndex((currentIndex) =>
+      currentIndex === selectedImages.length - 1 ? 0 : currentIndex + 1,
+    );
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!imageFile) {
+    if (selectedImages.length === 0) {
       return;
     }
 
     const formData = new FormData();
-    formData.append("image", imageFile);
+    selectedImages.forEach((image) => {
+      formData.append("images", image.file);
+    });
     formData.append("description", description.trim());
 
     const result = await dispatch(createPost(formData));
@@ -108,24 +186,108 @@ function CreatePostPage() {
         </header>
 
         <div className={styles.body}>
-          <label className={styles.uploadArea}>
+          <div className={styles.uploadArea}>
             <input
+              ref={fileInputRef}
               className={styles.fileInput}
               type="file"
               accept="image/*"
+              multiple
               onChange={handleImageChange}
             />
-            {preview ? (
-              <img className={styles.previewImage} src={preview} alt="" />
+            {selectedImages.length > 0 ? (
+              <div className={styles.previewPanel}>
+                <div className={styles.previewToolbar}>
+                  <span>
+                    Selected photos {selectedImages.length}/{maxImagesCount}
+                  </span>
+                  <button
+                    className={styles.secondaryButton}
+                    type="button"
+                    disabled={!canAddMoreImages}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    Add more
+                  </button>
+                </div>
+                {activeImage && (
+                  <div className={styles.carouselPreview}>
+                    <img
+                      className={styles.previewImage}
+                      src={activeImage.preview}
+                      alt=""
+                      aria-label={`Selected image ${activeImageIndex + 1}`}
+                    />
+                    {selectedImages.length > 1 && (
+                      <>
+                        <button
+                          className={`${styles.imageNavButton} ${styles.imageNavButtonLeft}`}
+                          type="button"
+                          aria-label="Previous selected image"
+                          onClick={showPreviousImage}
+                        >
+                          &lt;
+                        </button>
+                        <button
+                          className={`${styles.imageNavButton} ${styles.imageNavButtonRight}`}
+                          type="button"
+                          aria-label="Next selected image"
+                          onClick={showNextImage}
+                        >
+                          &gt;
+                        </button>
+                        <span className={styles.imageCounter}>
+                          {activeImageIndex + 1}/{selectedImages.length}
+                        </span>
+                      </>
+                    )}
+                    <button
+                      className={styles.removeImageButton}
+                      type="button"
+                      aria-label={`Remove image ${activeImageIndex + 1}`}
+                      onClick={() => handleRemoveImage(activeImage.id)}
+                    >
+                      &times;
+                    </button>
+                  </div>
+                )}
+                {selectedImages.length > 1 && (
+                  <div className={styles.thumbnailStrip}>
+                    {selectedImages.map((image, index) => (
+                      <button
+                        className={`${styles.thumbnailButton} ${
+                          index === activeImageIndex ? styles.thumbnailButtonActive : ""
+                        }`}
+                        type="button"
+                        key={image.id}
+                        aria-label={`Show selected image ${index + 1}`}
+                        onClick={() => setActiveImageIndex(index)}
+                      >
+                        <img src={image.preview} alt="" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             ) : (
-              <img
-                className={styles.uploadIcon}
-                src="/icons/icon-upload.png"
-                alt=""
-                aria-hidden="true"
-              />
+              <div className={styles.uploadPrompt}>
+                <img
+                  className={styles.uploadIcon}
+                  src="/icons/icon-upload.png"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <p>Select up to 10 photos</p>
+                <button
+                  className={styles.primaryButton}
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  Select photos
+                </button>
+              </div>
             )}
-          </label>
+          </div>
 
           <aside className={styles.details}>
             <div className={styles.author}>
@@ -161,7 +323,9 @@ function CreatePostPage() {
           </aside>
         </div>
 
-        {error && <p className={styles.error}>{error}</p>}
+        {(uploadError || error) && (
+          <p className={styles.error}>{uploadError || error}</p>
+        )}
       </form>
     </section>
   );

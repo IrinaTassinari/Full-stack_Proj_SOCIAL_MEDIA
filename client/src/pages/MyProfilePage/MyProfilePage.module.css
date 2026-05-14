@@ -146,6 +146,7 @@
 .postTile {
   width: 307px;
   height: 307px;
+  position: relative;
   overflow: hidden;
   padding: 0;
   border: 0;
@@ -162,6 +163,19 @@
 
 .postTile:hover img {
   opacity: 0.85;
+}
+
+.galleryBadge {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.58);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .stateText,
@@ -330,6 +344,7 @@
 
 .postImageWrap {
   min-height: 620px;
+  position: relative;
   background: #000000;
 }
 
@@ -338,6 +353,45 @@
   height: 100%;
   display: block;
   object-fit: cover;
+}
+
+.imageNavButton {
+  width: 34px;
+  height: 34px;
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.86);
+  color: #000000;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.imageNavButtonLeft {
+  left: 14px;
+}
+
+.imageNavButtonRight {
+  right: 14px;
+}
+
+.imageCounter {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .postDetails {

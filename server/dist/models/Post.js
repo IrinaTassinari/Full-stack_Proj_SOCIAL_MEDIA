@@ -2,23 +2,31 @@ import mongoose from "mongoose";
 const postSchema = new mongoose.Schema({
     author: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: "User",
         required: true,
     },
     description: {
         type: String,
         required: false,
         trim: true,
-        default: '',
+        default: "",
     },
     // массив картинок
     image: {
         type: String,
-        required: true,
-    }
+        required: false,
+    },
+    images: {
+        type: [String],
+        required: false,
+        validate: {
+            validator: (images) => images === undefined || images.length <= 10,
+            message: "Post must have maximum 10 images",
+        },
+    },
 }, {
     timestamps: true,
-    versionKey: false
+    versionKey: false,
 });
 postSchema.index({ createdAt: -1 });
-export const Post = mongoose.model('Post', postSchema);
+export const Post = mongoose.model("Post", postSchema);

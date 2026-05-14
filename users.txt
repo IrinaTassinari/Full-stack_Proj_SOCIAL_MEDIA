@@ -18,6 +18,7 @@
   "email": "satoru@gmail.com",
   "password": "123456789",
   "fullName": "Satoru Gojo"
+   photo - done
 }
 
 {
@@ -57,6 +58,7 @@
   "email": "yuta@gmail.com",
   "password": "12345",
   "fullName": "Yuta Okkotsu"
+  photo -done
 }
 
 {

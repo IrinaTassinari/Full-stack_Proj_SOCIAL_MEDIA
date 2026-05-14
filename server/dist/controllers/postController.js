@@ -2,6 +2,33 @@ import mongoose from "mongoose";
 import { Post } from "../models/Post.js";
 import { AppError } from "../utils/appError.js";
 import { uploadToCloudinary } from "../config/cloudinary.js";
+const getPostImageFiles = (req) => {
+    if (Array.isArray(req.files)) {
+        return req.files;
+    }
+    const files = req.files;
+    return [...(files?.images ?? []), ...(files?.image ?? [])];
+};
+const parseExistingImages = (value) => {
+    if (value === undefined) {
+        return undefined;
+    }
+    if (Array.isArray(value)) {
+        return value.filter((image) => typeof image === "string");
+    }
+    if (typeof value !== "string") {
+        return [];
+    }
+    try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed)
+            ? parsed.filter((image) => typeof image === "string")
+            : [];
+    }
+    catch {
+        return [value];
+    }
+};
 export const createPost = async (req, res, next) => {
     try {
         // Проверить req.user значит убедиться, что пользователь авторизован
@@ -11,15 +38,19 @@ export const createPost = async (req, res, next) => {
         }
         //Взять description из req.body
         const description = req.body?.description ?? "";
-        if (!req.file) {
-            throw new AppError("Image is required", 400);
+        const files = getPostImageFiles(req);
+        if (!files || files.length === 0) {
+            throw new AppError("At least one image is required", 400);
         }
-        const imageUrl = await uploadToCloudinary(req.file.buffer, "inst-project/posts");
+        if (files.length > 10) {
+            throw new AppError("Maximum 10 images allowed", 400);
+        }
+        const imageUrls = await Promise.all(files.map((file) => uploadToCloudinary(file.buffer, "inst-project/posts")));
         // Создать Post через Post.create
         const post = await Post.create({
             author: req.user._id,
             description,
-            image: imageUrl,
+            images: imageUrls,
         });
         await post.populate("author", "username fullName avatar");
         if (!post) {
@@ -117,10 +148,26 @@ export const updatePost = async (req, res, next) => {
         if (description !== undefined) {
             post.description = description;
         }
-        if (req.file) {
-            const imageUrl = await uploadToCloudinary(req.file.buffer, //  req.file - Это файл, который пришёл из Postman или frontend 
-            "inst-project/posts");
-            post.image = imageUrl;
+        const files = getPostImageFiles(req);
+        const existingImages = parseExistingImages(req.body?.existingImages);
+        if (files.length > 0 || existingImages !== undefined) {
+            const currentImages = post.images && post.images.length > 0
+                ? post.images
+                : post.image
+                    ? [post.image]
+                    : [];
+            const retainedImages = existingImages?.filter((imageUrl) => currentImages.includes(imageUrl)) ??
+                currentImages;
+            const imageUrls = await Promise.all(files.map((file) => uploadToCloudinary(file.buffer, "inst-project/posts")));
+            const nextImages = [...retainedImages, ...imageUrls];
+            if (nextImages.length === 0) {
+                throw new AppError("Post must have at least one image", 400);
+            }
+            if (nextImages.length > 10) {
+                throw new AppError("Maximum 10 images allowed", 400);
+            }
+            post.images = nextImages;
+            post.image = undefined;
         }
         // Сохранить пост
         await post.save();

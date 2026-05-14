@@ -4,7 +4,8 @@ export type Post = {
   _id: string;
   author: User;
   description?: string;
-  image: string;
+  image?: string;
+  images?: string[];
   createdAt: string;
   updatedAt: string;
 };

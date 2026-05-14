@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import PostPreviewModal from "../../components/posts/PostPreviewModal";
 import { fetchExplorePosts } from "../../features/posts/postsThunks";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { getPostCoverImage } from "../../utils/postImages";
 import styles from "./ExplorePage.module.css";
 
 function ExplorePage() {
@@ -42,7 +43,7 @@ function ExplorePage() {
           >
             <img
               className={styles.image}
-              src={post.image}
+              src={getPostCoverImage(post)}
               alt={post.description || `${post.author.username} post`}
             />
           </button>

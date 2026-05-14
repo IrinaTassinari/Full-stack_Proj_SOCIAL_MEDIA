@@ -3,6 +3,7 @@ import PostPreviewModal from "../../components/posts/PostPreviewModal";
 import { fetchAllPosts } from "../../features/posts/postsThunks";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import type { Post } from "../../types/post";
+import { getPostCoverImage } from "../../utils/postImages";
 import styles from "./HomePage.module.css";
 
 const getPostAgeLabel = (createdAt: string) => {
@@ -79,7 +80,11 @@ function HomePage() {
               type="button"
               onClick={() => setSelectedPost(post)}
             >
-              <img className={styles.postImage} src={post.image} alt="" />
+              <img
+                className={styles.postImage}
+                src={getPostCoverImage(post)}
+                alt=""
+              />
             </button>
 
             <div className={styles.actions}>
