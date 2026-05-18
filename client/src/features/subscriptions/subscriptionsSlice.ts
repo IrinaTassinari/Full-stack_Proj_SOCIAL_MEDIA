@@ -1,0 +1,117 @@
+import { createSlice } from "@reduxjs/toolkit";
+import { fetchSubscriptionSummary, followUser, unfollowUser } from "./subscriptionsThunks";
+
+type SubscriptionSummary = {
+  followersCount: number;
+  followingCount: number;
+  isFollowing: boolean;
+};
+
+/**
+ * Record<string, SubscriptionSummary>; // объект, где ключи — строки, а значения — SubscriptionSummary
+ * 
+ * byUserId выглядит примерно так
+ * {
+  "user1": {
+    followersCount: 10,
+    followingCount: 3,
+    isFollowing: true
+  },
+  "user2": {
+    followersCount: 5,
+    followingCount: 8,
+    isFollowing: false
+  }
+}
+ */
+type SubscriptionsState = {
+  byUserId: Record<string, SubscriptionSummary>; 
+  status: "idle" | "loading" | "succeeded" | "failed";
+  followStatus: "idle" | "loading";  //Отвечает отдельно за кнопку Follow/Unfollow
+  error: string | null;
+};
+
+const initialState: SubscriptionsState = {
+  // пока нет информации ни об одном пользователе - Потом, когда выполнится fetchSubscriptionSummary.fulfilled, сюда добавляется запись
+  byUserId: {}, 
+  status: "idle",
+  followStatus: "idle",
+  error: null,
+};
+
+// нужен на случай, если данных о пользователе еще нет в byUserId. Тогда создаются значения по умолчанию: 0, 0, false.
+const getDefaultSummary = (): SubscriptionSummary => ({
+  followersCount: 0,
+  followingCount: 0,
+  isFollowing: false,
+});
+
+const subscriptionsSlice = createSlice({
+  name: "subscriptions",
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchSubscriptionSummary.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(fetchSubscriptionSummary.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.byUserId[action.payload.userId] = {
+          followersCount: action.payload.followersCount,
+          followingCount: action.payload.followingCount,
+          isFollowing: action.payload.isFollowing,
+        };
+      })
+      .addCase(fetchSubscriptionSummary.rejected, (state, action) => {
+        state.status = "failed";
+        state.error =
+          typeof action.payload === "string"
+            ? action.payload
+            : action.error.message || "Failed to load subscriptions";
+      })
+      .addCase(followUser.pending, (state) => {
+        state.followStatus = "loading";
+        state.error = null;
+      })
+      .addCase(followUser.fulfilled, (state, action) => {
+        state.followStatus = "idle";
+        const summary = state.byUserId[action.payload] ?? getDefaultSummary();
+        state.byUserId[action.payload] = {
+          ...summary,
+          followersCount: summary.followersCount + 1,
+          isFollowing: true,
+        };
+      })
+      .addCase(followUser.rejected, (state, action) => {
+        state.followStatus = "idle";
+        state.error =
+          typeof action.payload === "string"
+            ? action.payload
+            : action.error.message || "Failed to follow user";
+      })
+      .addCase(unfollowUser.pending, (state) => {
+        state.followStatus = "loading";
+        state.error = null;
+      })
+      .addCase(unfollowUser.fulfilled, (state, action) => {
+        state.followStatus = "idle";
+        const summary = state.byUserId[action.payload] ?? getDefaultSummary();
+        state.byUserId[action.payload] = {
+          ...summary,
+          followersCount: Math.max(0, summary.followersCount - 1),
+          isFollowing: false,
+        };
+      })
+      .addCase(unfollowUser.rejected, (state, action) => {
+        state.followStatus = "idle";
+        state.error =
+          typeof action.payload === "string"
+            ? action.payload
+            : action.error.message || "Failed to unfollow user";
+      });
+  },
+});
+
+export default subscriptionsSlice.reducer;

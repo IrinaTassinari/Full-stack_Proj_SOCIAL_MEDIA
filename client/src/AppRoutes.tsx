@@ -7,6 +7,7 @@ import ExplorePage from "./pages/ExplorePage/ExplorePage";
 import HomePage from "./pages/HomePage/HomePage";
 import EditProfilePage from "./pages/EditProfilePage/EditProfilePage";
 import MyProfilePage from "./pages/MyProfilePage/MyProfilePage";
+import UserProfilePage from "./pages/UserProfilePage/UserProfilePage";
 import CreatePostPage from "./pages/CreatePostPage/CreatePostPage";
 import EditPostPage from "./pages/EditPostPage/EditPostPage";
 import GuestRoute from "./components/routes/GuestRoute";
@@ -36,6 +37,7 @@ function AppRoutes() {
           <Route path="/posts/:postId/edit" element={<EditPostPage />} />
           <Route path="/profile" element={<MyProfilePage />} />
           <Route path="/profile/edit" element={<EditProfilePage />} />
+          <Route path="/users/:userId" element={<UserProfilePage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Route>

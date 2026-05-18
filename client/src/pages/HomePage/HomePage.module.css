@@ -66,6 +66,10 @@
   line-height: 129%;
 }
 
+.username {
+  text-decoration: none;
+}
+
 .dot,
 .time {
   color: #737373;

@@ -1,5 +1,6 @@
 import { type ChangeEvent, type FormEvent, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Spinner from "../../components/ui/Spinner/Spinner";
 import {
   fetchMyProfile,
   updateMyProfile,
@@ -72,7 +73,7 @@ function EditProfilePage() {
   };
 
   if (!myProfile && isLoading) {
-    return <p className={styles.stateText}>Loading profile...</p>;
+    return <Spinner label="Loading profile..." />;
   }
 
   return (

@@ -8,6 +8,7 @@ import {
 } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import EmojiPicker, { type EmojiClickData } from "emoji-picker-react";
+import Spinner from "../../components/ui/Spinner/Spinner";
 import {
   fetchPostById,
   updatePost,
@@ -215,9 +216,7 @@ function EditPostPage() {
     return (
       <section className={styles.page} aria-label="Loading post">
         <form className={styles.modal}>
-          <header className={styles.header}>
-            <h1>Loading post...</h1>
-          </header>
+          <Spinner label="Loading post..." />
         </form>
       </section>
     );

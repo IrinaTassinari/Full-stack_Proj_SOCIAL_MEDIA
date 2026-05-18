@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import PostPreviewModal from "../../components/posts/PostPreviewModal";
+import Spinner from "../../components/ui/Spinner/Spinner";
 import { fetchExplorePosts } from "../../features/posts/postsThunks";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { getPostCoverImage } from "../../utils/postImages";
@@ -17,7 +18,7 @@ function ExplorePage() {
   }, [dispatch]);
 
   if (status === "loading") {
-    return <p className={styles.stateText}>Loading posts...</p>;
+    return <Spinner label="Loading posts..." />;
   }
 
   if (status === "failed") {

@@ -1,10 +1,10 @@
 import type { User } from "./user";
 
-export type Comment = {
+// Это один лайк
+export type Like = {
   _id: string;
   user: User;
   post: string;
-  text: string;
   createdAt: string;
   updatedAt: string;
 };

@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Spinner from "../../components/ui/Spinner/Spinner";
 import { deletePost } from "../../features/posts/postsThunks";
 import { fetchMyPosts, fetchMyProfile } from "../../features/profile/profileThunks";
+import { fetchSubscriptionSummary } from "../../features/subscriptions/subscriptionsThunks";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import type { Post } from "../../types/post";
 import { getPostCoverImage, getPostImages } from "../../utils/postImages";
@@ -17,6 +19,8 @@ function MyProfilePage() {
   const { myProfile, myPosts, status, postsStatus, error } = useAppSelector(
     (state) => state.profile,
   );
+  const { byUserId: subscriptionsByUserId, error: subscriptionsError } =
+    useAppSelector((state) => state.subscriptions);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -34,6 +38,7 @@ function MyProfilePage() {
 
     if (userId) {
       dispatch(fetchMyPosts(userId));
+      dispatch(fetchSubscriptionSummary({ userId, currentUserId: userId }));
     }
   }, [dispatch, myProfile]);
 
@@ -83,7 +88,7 @@ function MyProfilePage() {
   }, [isPostMenuOpen, myPosts, selectedPostIndex]);
 
   if (status === "loading") {
-    return <p className={styles.stateText}>Loading profile...</p>;
+    return <Spinner label="Loading profile..." />;
   }
 
   if (status === "failed") {
@@ -107,6 +112,10 @@ function MyProfilePage() {
   const selectedPostImage =
     selectedPostImages[selectedImageIndex] || selectedPostImages[0] || "";
   const hasMultipleSelectedImages = selectedPostImages.length > 1;
+  const myProfileId = getUserId(myProfile);
+  const subscriptionSummary = subscriptionsByUserId[myProfileId];
+  const followersCount = subscriptionSummary?.followersCount ?? 0;
+  const followingCount = subscriptionSummary?.followingCount ?? 0;
 
   const handleCopyLink = async () => {
     if (!selectedPost) {
@@ -183,14 +192,18 @@ function MyProfilePage() {
               <dd>posts</dd>
             </div>
             <div>
-              <dt>9 993</dt>
+              <dt>{followersCount}</dt>
               <dd>followers</dd>
             </div>
             <div>
-              <dt>59</dt>
+              <dt>{followingCount}</dt>
               <dd>following</dd>
             </div>
           </dl>
+
+          {subscriptionsError && (
+            <p className={styles.subscriptionError}>{subscriptionsError}</p>
+          )}
 
           {bio && (
             <p className={styles.bio}>
@@ -207,9 +220,7 @@ function MyProfilePage() {
         </div>
       </header>
 
-      {postsStatus === "loading" && (
-        <p className={styles.postsState}>Loading posts...</p>
-      )}
+      {postsStatus === "loading" && <Spinner label="Loading posts..." />}
 
       {postsStatus === "failed" && <p className={styles.errorText}>{error}</p>}
 

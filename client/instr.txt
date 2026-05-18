@@ -4,3 +4,38 @@
 Доделать SearchPanel через реальный API GET /api/users/search?query=....
 Сделать ExplorePage через GET /api/posts/explore.
 Потом переходить к Profile.
+
+
+in subscriptionsThunks.ts
+type FollowingResponse = {
+  success: boolean;
+  following: unknown[]; - лучше потом заменить
+  count: number;
+};
+
+
+
+Пустые/заглушечные места:
+client/src/features/search/* пустые
+client/src/features/notifications/* пустые
+client/src/features/messages/* пустые
+client/src/components/messages/ChatList.tsx пустой
+client/src/components/messages/ChatWindow.tsx пустой
+client/src/pages/MessagesPage пустая папка
+routes /search, /messages, /notifications сейчас просто <div>: AppRoutes.tsx (line 32)
+
+
+Также UI лайков/комментариев пока статичный:
+0 likes в HomePage.tsx (line 115)
+0 likes в PostPreviewModal.tsx (line 235)
+View all comments пока не открывает реальные комментарии.
+
+
+
+Конкретный порядок:
+
+В PostPreviewModal загрузить likes/comments по post._id.
+Сделать кнопку like настоящей.
+Сделать список комментариев и input для добавления комментария.
+Потом повторно использовать это в Home/Explore/Profile modal.
+После этого уже логично идти в Search + Notifications, и только потом в Messages/socket.io, потому что чат самый большой кусок.

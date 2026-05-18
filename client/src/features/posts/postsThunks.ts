@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import type { Post } from "../../types/post";
+import { getErrorMessage } from "../../utils/getErrorMessage";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -31,12 +32,6 @@ const getAuthHeaders = () => {
   return token ? { Authorization: `Bearer ${token}` } : undefined;
 };
 
-const getErrorMessage = (error: any, fallback: string) =>
-  error.response?.data?.message ||
-  error.response?.data?.error ||
-  error.message ||
-  fallback;
-
 // GET /api/posts/explore
 export const fetchExplorePosts = createAsyncThunk(
   "posts/fetchExplorePosts",
@@ -47,7 +42,7 @@ export const fetchExplorePosts = createAsyncThunk(
       );
 
       return response.data.posts;
-    } catch (error: any) {
+    } catch (error: unknown) {
       return rejectWithValue(getErrorMessage(error, "Failed to load explore posts"));
     }
   },
@@ -61,7 +56,7 @@ export const fetchAllPosts = createAsyncThunk(
       const response = await axios.get<PostsResponse>(`${API_URL}/api/posts`);
 
       return response.data.posts;
-    } catch (error: any) {
+    } catch (error: unknown) {
       return rejectWithValue(getErrorMessage(error, "Failed to load posts"));
     }
   },
@@ -77,7 +72,7 @@ export const fetchPostById = createAsyncThunk(
       );
 
       return response.data.post;
-    } catch (error: any) {
+    } catch (error: unknown) {
       return rejectWithValue(getErrorMessage(error, "Failed to load post"));
     }
   },
@@ -97,7 +92,7 @@ export const createPost = createAsyncThunk(
       );
 
       return response.data.post;
-    } catch (error: any) {
+    } catch (error: unknown) {
       return rejectWithValue(getErrorMessage(error, "Failed to create post"));
     }
   },
@@ -120,7 +115,7 @@ export const updatePost = createAsyncThunk(
       );
 
       return response.data.post;
-    } catch (error: any) {
+    } catch (error: unknown) {
       return rejectWithValue(getErrorMessage(error, "Failed to update post"));
     }
   },
@@ -136,7 +131,7 @@ export const deletePost = createAsyncThunk(
       });
 
       return postId;
-    } catch (error: any) {
+    } catch (error: unknown) {
       return rejectWithValue(getErrorMessage(error, "Failed to delete post"));
     }
   },

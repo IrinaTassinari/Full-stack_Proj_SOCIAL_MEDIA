@@ -99,6 +99,13 @@
   font-weight: 400;
 }
 
+.subscriptionError {
+  margin: -12px 0 16px;
+  color: #ed4956;
+  font-size: 12px;
+  line-height: 129%;
+}
+
 .bio {
   max-width: 560px;
   margin: 0 0 24px;

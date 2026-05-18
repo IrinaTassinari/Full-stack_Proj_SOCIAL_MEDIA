@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import type { Post } from "../../types/post";
 import type { User } from "../../types/user";
+import { getErrorMessage } from "../../utils/getErrorMessage";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -31,9 +32,9 @@ export const fetchMyProfile = createAsyncThunk(
       });
 
       return response.data.user;
-    } catch (error: any) {
+    } catch (error: unknown) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to load profile",
+        getErrorMessage(error, "Failed to load profile"),
       );
     }
   },
@@ -49,9 +50,9 @@ export const fetchMyPosts = createAsyncThunk(
       );
 
       return response.data.posts;
-    } catch (error: any) {
+    } catch (error: unknown) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to load profile posts",
+        getErrorMessage(error, "Failed to load profile posts"),
       );
     }
   },
@@ -71,9 +72,9 @@ export const updateMyProfile = createAsyncThunk(
       );
 
       return response.data.user;
-    } catch (error: any) {
+    } catch (error: unknown) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to update profile",
+        getErrorMessage(error, "Failed to update profile"),
       );
     }
   },

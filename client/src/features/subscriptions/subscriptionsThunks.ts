@@ -1,0 +1,120 @@
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+import { getErrorMessage } from "../../utils/getErrorMessage";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+type SubscriptionUser = {
+  _id?: string;
+  id?: string;
+  userId?: string;
+};
+
+type FollowerItem = {
+  follower: SubscriptionUser | string;
+};
+
+type FollowersResponse = {
+  success: boolean;
+  followers: FollowerItem[]; //означает, что followers должен быть массивом
+  count: number;
+};
+/**
+ * followers: [
+  { id: "1", username: "anna" },
+  { id: "2", username: "max" }
+]
+ */
+
+type FollowingResponse = {
+  success: boolean;
+  following: unknown[];
+  count: number;
+};
+
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("token");
+
+  return token ? { Authorization: `Bearer ${token}` } : undefined;
+};
+
+const getUserId = (user: SubscriptionUser | string) =>
+  typeof user === "string" ? user : user._id || user.userId || user.id || "";
+
+// Загружает с сервера информацию о подписках пользователя
+// GET /api/subscriptions/:userId/followers
+// GET /api/subscriptions/:userId/following
+export const fetchSubscriptionSummary = createAsyncThunk(
+  "subscriptions/fetchSummary",
+  async (
+    { userId, currentUserId }: { userId: string; currentUserId: string },
+    { rejectWithValue },
+  ) => {
+    try {
+      const headers = getAuthHeaders();
+      const [followersResponse, followingResponse] = await Promise.all([
+        axios.get<FollowersResponse>(
+          `${API_URL}/api/subscriptions/${userId}/followers`,
+          { headers },
+        ),
+        axios.get<FollowingResponse>(
+          `${API_URL}/api/subscriptions/${userId}/following`,
+          { headers },
+        ),
+      ]);
+
+      return {
+        userId,
+        followersCount: followersResponse.data.count,
+        followingCount: followingResponse.data.count,
+        isFollowing: followersResponse.data.followers.some(
+          (item) => getUserId(item.follower) === currentUserId,
+        ),
+      };
+    } catch (error: unknown) {
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to load subscriptions"),
+      );
+    }
+  },
+);
+
+// POST /api/subscriptions/:userId
+export const followUser = createAsyncThunk(
+  "subscriptions/followUser",
+  async (userId: string, { rejectWithValue }) => {
+    if (!userId) {
+      return rejectWithValue("User id is required");
+    }
+    try {
+      await axios.post(
+        `${API_URL}/api/subscriptions/${userId}`,
+        {},
+        { headers: getAuthHeaders() },
+      );
+
+      return userId;
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, "Failed to follow user"));
+    }
+  },
+);
+
+// DELETE /api/subscriptions/:userId
+export const unfollowUser = createAsyncThunk(
+  "subscriptions/unfollowUser",
+  async (userId: string, { rejectWithValue }) => {
+    if (!userId) {
+      return rejectWithValue("User id is required");
+    }
+    try {
+      await axios.delete(`${API_URL}/api/subscriptions/${userId}`, {
+        headers: getAuthHeaders(),
+      });
+
+      return userId;
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, "Failed to unfollow user"));
+    }
+  },
+);

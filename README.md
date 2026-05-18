@@ -381,3 +381,7 @@ https://documenter.getpostman.com/view/53300232/2sBXqJKLvf
 - The frontend validates selected image size before upload.
 - The backend also enforces the same 10 MB file-size limit.
 - Some UI pages are still being developed even though their backend APIs already exist.
+
+
+
+

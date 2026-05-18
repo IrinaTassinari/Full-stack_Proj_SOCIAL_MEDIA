@@ -10,6 +10,7 @@ PATCH /api/auth/reset-password/:token
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { getErrorMessage } from "../../utils/getErrorMessage";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -34,7 +35,6 @@ type ResetPasswordPayload = {
   password: string;
 };
 
-
 // POST /api/auth/login
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
@@ -42,12 +42,10 @@ export const loginUser = createAsyncThunk(
     try {
       const response = await axios.post(`${API_URL}/api/auth/login`, payload);
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Login failed"
-      );
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, "Login failed"));
     }
-  }
+  },
 );
 
 // POST /api/auth/register
@@ -55,34 +53,37 @@ export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async (payload: RegisterPayload, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/api/auth/register`, payload);
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Registration failed"
+      const response = await axios.post(
+        `${API_URL}/api/auth/register`,
+        payload,
       );
+      return response.data;
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, "Registration failed"));
     }
-  }
+  },
 );
 // rejectWithValue - это функция из createAsyncThunk, которая позволяет самой задать, что попадёт в action.payload, если запрос упал
 
-
-// POST /api/auth/forgot-password 
+// POST /api/auth/forgot-password
 export const forgotPassword = createAsyncThunk(
   "auth/forgotPassword",
   async (payload: ForgotPasswordPayload, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/api/auth/forgot-password`, payload);
+      const response = await axios.post(
+        `${API_URL}/api/auth/forgot-password`,
+        payload,
+      );
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       return rejectWithValue(
-        error.response?.data?.message || "Password reset request failed"
+        getErrorMessage(error, "Password reset request failed"),
       );
     }
-  }
+  },
 );
 
-// PATCH /api/auth/reset-password/:token  
+// PATCH /api/auth/reset-password/:token
 export const resetPassword = createAsyncThunk(
   "auth/resetPassword",
 
@@ -92,14 +93,15 @@ export const resetPassword = createAsyncThunk(
   const password = payload.password;
 }
    */
-  async ( { token, password }: ResetPasswordPayload, { rejectWithValue }) => {
+  async ({ token, password }: ResetPasswordPayload, { rejectWithValue }) => {
     try {
-      const response = await axios.patch(`${API_URL}/api/auth/reset-password/${token}`, {password});
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Password reset failed"
+      const response = await axios.patch(
+        `${API_URL}/api/auth/reset-password/${token}`,
+        { password },
       );
+      return response.data;
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, "Password reset failed"));
     }
-  }
+  },
 );

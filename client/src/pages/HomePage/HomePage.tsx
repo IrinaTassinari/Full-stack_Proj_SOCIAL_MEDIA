@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import PostPreviewModal from "../../components/posts/PostPreviewModal";
+import Spinner from "../../components/ui/Spinner/Spinner";
 import { fetchAllPosts } from "../../features/posts/postsThunks";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import type { Post } from "../../types/post";
@@ -30,6 +32,9 @@ const getPostAgeLabel = (createdAt: string) => {
   return `${Math.floor(diffDays / 7)}w`;
 };
 
+const getUserId = (user: { _id?: string; id?: string; userId?: string }) =>
+  user._id || user.userId || user.id || "";
+
 function HomePage() {
   const dispatch = useAppDispatch();
   const { allPosts, feedStatus, error } = useAppSelector((state) => state.posts);
@@ -40,7 +45,7 @@ function HomePage() {
   }, [dispatch]);
 
   if (feedStatus === "idle" || feedStatus === "loading") {
-    return <p className={styles.stateText}>Loading posts...</p>;
+    return <Spinner label="Loading posts..." />;
   }
 
   if (feedStatus === "failed") {
@@ -57,14 +62,21 @@ function HomePage() {
         {allPosts.map((post) => (
           <article className={styles.postCard} key={post._id}>
             <header className={styles.postHeader}>
-              <img
+              <Link to={`/users/${getUserId(post.author)}`} aria-label={post.author.username}>
+                <img
                 className={styles.avatar}
                 src={post.author.avatar || "/icons/ICH_avatar.png"}
                 alt={`${post.author.username} avatar`}
-              />
+                />
+              </Link>
 
               <div className={styles.authorMeta}>
-                <span className={styles.username}>{post.author.username}</span>
+                <Link
+                  className={styles.username}
+                  to={`/users/${getUserId(post.author)}`}
+                >
+                  {post.author.username}
+                </Link>
                 <span className={styles.dot}>.</span>
                 <span className={styles.time}>{getPostAgeLabel(post.createdAt)}</span>
                 <span className={styles.dot}>.</span>

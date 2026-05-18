@@ -1,13 +1,36 @@
-import { useEffect, useRef, useState, type TouchEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type TouchEvent,
+} from "react";
+import { Link } from "react-router-dom";
 import type { Post } from "../../types/post";
 import { getPostImages } from "../../utils/postImages";
 import styles from "./PostPreviewModal.module.css";
+import {
+  fetchPostLikes,
+  togglePostLike,
+} from "../../features/likes/likesThunks";
+import {
+  fetchPostComments,
+  addPostComment,
+} from "../../features/comments/commentsThunks";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+
+const getUserId = (user: { _id?: string; id?: string; userId?: string }) =>
+  user._id || user.userId || user.id || "";
 
 type PostPreviewModalProps = {
   post: Post;
   onClose: () => void;
   onPrevious?: () => void;
   onNext?: () => void;
+  showFollowButton?: boolean;
+  isFollowingAuthor?: boolean;
+  isFollowLoading?: boolean;
+  onToggleFollowAuthor?: () => void;
 };
 
 function PostPreviewModal({
@@ -15,14 +38,45 @@ function PostPreviewModal({
   onClose,
   onPrevious,
   onNext,
+  showFollowButton = false,
+  isFollowingAuthor = false,
+  isFollowLoading = false,
+  onToggleFollowAuthor,
 }: PostPreviewModalProps) {
+  const dispatch = useAppDispatch();
   const avatar = post.author.avatar || "/icons/ICH_avatar.png";
+  const authorProfileUrl = `/users/${getUserId(post.author)}`;
   const images = getPostImages(post);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const currentImage = images[currentImageIndex] ?? "";
   const hasMultipleImages = images.length > 1;
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
+  const [commentText, setCommentText] = useState("");
+
+  const handleAddComment = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!commentText.trim()) {
+      return;
+    }
+
+    dispatch(addPostComment({ postId: post._id, text: commentText }));
+    setCommentText("");
+  };
+
+  const postLikes = useAppSelector((state) => state.likes.byPostId[post._id]);
+  const postComments = useAppSelector(
+    (state) => state.comments.byPostId[post._id],
+  );
+
+  const likesCount = postLikes?.count ?? 0;
+  const comments = postComments?.comments ?? [];
+
+  useEffect(() => {
+    dispatch(fetchPostLikes(post._id));
+    dispatch(fetchPostComments(post._id));
+  }, [dispatch, post._id]);
 
   useEffect(() => {
     setCurrentImageIndex(0);
@@ -72,7 +126,10 @@ function PostPreviewModal({
     touchStartXRef.current = null;
     touchStartYRef.current = null;
 
-    if (Math.abs(horizontalDistance) > 70 && Math.abs(horizontalDistance) > Math.abs(swipeDistance)) {
+    if (
+      Math.abs(horizontalDistance) > 70 &&
+      Math.abs(horizontalDistance) > Math.abs(swipeDistance)
+    ) {
       onClose();
       return;
     }
@@ -170,12 +227,25 @@ function PostPreviewModal({
 
         <div className={styles.details}>
           <header className={styles.header}>
-            <div className={styles.author}>
+            <Link className={styles.author} to={authorProfileUrl}>
               <span className={styles.avatarRing}>
                 <img src={avatar} alt="" />
               </span>
               <strong>{post.author.username}</strong>
-            </div>
+            </Link>
+            {showFollowButton && (
+              <>
+                <span className={styles.authorDot}>.</span>
+                <button
+                  className={styles.followButton}
+                  type="button"
+                  disabled={isFollowLoading}
+                  onClick={onToggleFollowAuthor}
+                >
+                  {isFollowingAuthor ? "Following" : "Follow"}
+                </button>
+              </>
+            )}
 
             <button
               className={styles.closeButton}
@@ -192,19 +262,52 @@ function PostPreviewModal({
                   <img src={avatar} alt="" />
                 </span>
                 <p>
-                  <strong>{post.author.username}</strong> {post.description}
+                  <Link to={authorProfileUrl}>
+                    <strong>{post.author.username}</strong>
+                  </Link>{" "}
+                  {post.description}
                 </p>
               </div>
             )}
+
+            {comments.map((comment) => (
+              <div className={styles.captionRow} key={comment._id}>
+                <span className={styles.avatarRing}>
+                  <img
+                    src={comment.user.avatar || "/icons/ICH_avatar.png"}
+                    alt=""
+                  />
+                </span>
+                <p>
+                  <strong>{comment.user.username}</strong> {comment.text}
+                </p>
+              </div>
+            ))}
           </div>
 
           <footer className={styles.footer}>
             <div className={styles.actions}>
-              <img src="/icons/button-like.png" alt="" aria-hidden="true" />
+              <button
+                className={styles.actionButton}
+                type="button"
+                onClick={() => dispatch(togglePostLike(post._id))}
+              >
+                <img src="/icons/button-like.png" alt="" aria-hidden="true" />
+              </button>
               <img src="/icons/button-comments.png" alt="" aria-hidden="true" />
             </div>
-            <strong>0 likes</strong>
+            <strong>{likesCount} likes</strong>
           </footer>
+
+          <form className={styles.commentBar} onSubmit={handleAddComment}>
+            <input
+              type="text"
+              placeholder="Add comment"
+              value={commentText}
+              onChange={(event) => setCommentText(event.target.value)}
+            />
+            <button type="submit">Send</button>
+          </form>
         </div>
       </article>
     </div>
