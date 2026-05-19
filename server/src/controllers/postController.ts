@@ -300,7 +300,7 @@ export const getExplorePosts = async (
   next: NextFunction,
 ) => {
   try {
-    const posts = await Post.aggregate([{ $sample: { size: 50 } }]);
+    const posts = await Post.aggregate([{ $sample: { size: 200 } }]);
 
     await Post.populate(posts, {
       path: "author",

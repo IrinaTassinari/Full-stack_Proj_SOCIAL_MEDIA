@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { getErrorMessage } from "../../utils/getErrorMessage";
+import type { User } from "../../types/user";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -25,10 +26,30 @@ type FollowersResponse = {
   { id: "2", username: "max" }
 ]
  */
+type FollowingItem = {
+  following: SubscriptionUser | string;
+};
 
 type FollowingResponse = {
   success: boolean;
-  following: unknown[];
+  following: FollowingItem[];
+  count: number;
+};
+
+type SubscriptionListItem = {
+  follower?: User;
+  following?: User;
+};
+
+type FollowersListResponse = {
+  success: boolean;
+  followers: SubscriptionListItem[];
+  count: number;
+};
+
+type FollowingListResponse = {
+  success: boolean;
+  following: SubscriptionListItem[];
   count: number;
 };
 
@@ -115,6 +136,67 @@ export const unfollowUser = createAsyncThunk(
       return userId;
     } catch (error: unknown) {
       return rejectWithValue(getErrorMessage(error, "Failed to unfollow user"));
+    }
+  },
+);
+
+// GET /api/subscriptions/:userId/followers
+export const fetchUserFollowers = createAsyncThunk(
+  "subscriptions/fetchUserFollowers",
+  async (userId: string, { rejectWithValue }) => {
+    if (!userId) {
+      return rejectWithValue("User id is required");
+    }
+
+    try {
+      const response = await axios.get<FollowersListResponse>(
+        `${API_URL}/api/subscriptions/${userId}/followers`,
+        { headers: getAuthHeaders() },
+      );
+
+      return {
+        userId,
+        users: response.data.followers
+          .map((item) => item.follower)
+          .filter((user): user is User => Boolean(user)),
+        count: response.data.count,
+      };
+    } catch (error: unknown) {
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to load followers"),
+      );
+    }
+  },
+);
+
+// GET /api/subscriptions/:userId/following
+export const fetchUserFollowing = createAsyncThunk(
+  "subscriptions/fetchUserFollowing",
+  async (userId: string, { rejectWithValue }) => {
+    if (!userId) {
+      return rejectWithValue("User id is required");
+    }
+
+    try {
+      const response = await axios.get<FollowingListResponse>(
+        `${API_URL}/api/subscriptions/${userId}/following`,
+        { headers: getAuthHeaders() },
+      );
+
+      return {
+        userId,
+        users: response.data.following
+
+          // берёт из каждого объекта только пользователя. Было: [{ follower: user1 }, { follower: user2 }] стало: [user1, user2]
+          .map((item) => item.following)
+          // это TypeScript-подсказка:“после фильтра здесь точно остались только User, не undefined”.
+          .filter((user): user is User => Boolean(user)),
+        count: response.data.count,
+      };
+    } catch (error: unknown) {
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to load following"),
+      );
     }
   },
 );

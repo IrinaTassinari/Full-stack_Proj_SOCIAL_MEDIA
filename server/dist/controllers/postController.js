@@ -211,7 +211,7 @@ export const deletePost = async (req, res, next) => {
 // explore
 export const getExplorePosts = async (req, res, next) => {
     try {
-        const posts = await Post.aggregate([{ $sample: { size: 50 } }]);
+        const posts = await Post.aggregate([{ $sample: { size: 200 } }]);
         await Post.populate(posts, {
             path: "author",
             select: "username fullName avatar",

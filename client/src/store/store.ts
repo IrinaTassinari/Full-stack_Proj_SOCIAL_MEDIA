@@ -7,7 +7,7 @@ import likesReducer from "../features/likes/likesSlice";
 // import notificationsReducer from "../features/notifications/notificationsSlice";
 // import messagesReducer from "../features/messages/messagesSlice";
 // import messageNotificationsReducer from "../features/messageNotifications/messageNotificationsSlice";
-// import searchReducer from "../features/search/searchSlice";
+import searchReducer from "../features/search/searchSlice";
 import subscriptionsReducer from "../features/subscriptions/subscriptionsSlice";
 
  const store = configureStore({
@@ -20,7 +20,7 @@ import subscriptionsReducer from "../features/subscriptions/subscriptionsSlice";
     // notifications: notificationsReducer,
     // messages: messagesReducer,
     // messageNotifications: messageNotificationsReducer,
-    // search: searchReducer,
+    search: searchReducer,
     subscriptions: subscriptionsReducer,
   },
 });

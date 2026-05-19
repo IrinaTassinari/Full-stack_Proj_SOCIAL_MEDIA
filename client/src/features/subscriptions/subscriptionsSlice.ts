@@ -1,5 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchSubscriptionSummary, followUser, unfollowUser } from "./subscriptionsThunks";
+import type { User } from "../../types/user";
+import {
+  fetchSubscriptionSummary,
+  followUser,
+  unfollowUser,
+  fetchUserFollowers,
+  fetchUserFollowing,
+} from "./subscriptionsThunks";
 
 type SubscriptionSummary = {
   followersCount: number;
@@ -25,16 +32,22 @@ type SubscriptionSummary = {
 }
  */
 type SubscriptionsState = {
-  byUserId: Record<string, SubscriptionSummary>; 
+  byUserId: Record<string, SubscriptionSummary>;
+  followersByUserId: Record<string, User[]>;
+  followingByUserId: Record<string, User[]>;
   status: "idle" | "loading" | "succeeded" | "failed";
-  followStatus: "idle" | "loading";  //Отвечает отдельно за кнопку Follow/Unfollow
+  listStatus: "idle" | "loading" | "succeeded" | "failed";
+  followStatus: "idle" | "loading"; //Отвечает отдельно за кнопку Follow/Unfollow
   error: string | null;
 };
 
 const initialState: SubscriptionsState = {
   // пока нет информации ни об одном пользователе - Потом, когда выполнится fetchSubscriptionSummary.fulfilled, сюда добавляется запись
-  byUserId: {}, 
+  byUserId: {},
+  followersByUserId: {},
+  followingByUserId: {},
   status: "idle",
+  listStatus: "idle",
   followStatus: "idle",
   error: null,
 };
@@ -70,6 +83,52 @@ const subscriptionsSlice = createSlice({
           typeof action.payload === "string"
             ? action.payload
             : action.error.message || "Failed to load subscriptions";
+      })
+      .addCase(fetchUserFollowers.pending, (state) => {
+        state.listStatus = "loading";
+        state.error = null;
+      })
+      .addCase(fetchUserFollowers.fulfilled, (state, action) => {
+        state.listStatus = "succeeded";
+        state.followersByUserId[action.payload.userId] = action.payload.users;
+
+        const summary =
+          state.byUserId[action.payload.userId] ?? getDefaultSummary(); // Если такой информации ещё нет, берёт значения по умолчанию
+
+        state.byUserId[action.payload.userId] = {
+          ...summary, // оставляет старые данные: followingCount, isFollowing
+          followersCount: action.payload.count, // обновляет количество followers
+        };
+      })
+      .addCase(fetchUserFollowers.rejected, (state, action) => {
+        state.listStatus = "failed";
+        state.error =
+          typeof action.payload === "string"
+            ? action.payload
+            : action.error.message || "Failed to load followers";
+      })
+      .addCase(fetchUserFollowing.pending, (state) => {
+        state.listStatus = "loading";
+        state.error = null;
+      })
+      .addCase(fetchUserFollowing.fulfilled, (state, action) => {
+        state.listStatus = "succeeded";
+        state.followingByUserId[action.payload.userId] = action.payload.users;
+
+        const summary =
+          state.byUserId[action.payload.userId] ?? getDefaultSummary();
+
+        state.byUserId[action.payload.userId] = {
+          ...summary,
+          followingCount: action.payload.count,
+        };
+      })
+      .addCase(fetchUserFollowing.rejected, (state, action) => {
+        state.listStatus = "failed";
+        state.error =
+          typeof action.payload === "string"
+            ? action.payload
+            : action.error.message || "Failed to load following";
       })
       .addCase(followUser.pending, (state) => {
         state.followStatus = "loading";

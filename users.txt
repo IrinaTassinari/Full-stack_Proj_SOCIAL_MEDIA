@@ -85,5 +85,18 @@
   photo -done
 }
 
+{
+  "username": "Nobara Kugisaki",
+  "email": "nobara@gmail.com",
+  "password": "123456789",
+  "fullName": "Nobara Kugisaki"
+   photo - done
+}
 
+{
+  "username": "Irina THE CREATOR",
+  "email": "irinasmelova@gmail.com",
+  "password": "123456",
+  "fullName": ""
+}
 

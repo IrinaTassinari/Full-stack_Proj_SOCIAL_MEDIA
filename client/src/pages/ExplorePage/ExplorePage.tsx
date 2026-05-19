@@ -2,20 +2,75 @@ import { useEffect, useState } from "react";
 import PostPreviewModal from "../../components/posts/PostPreviewModal";
 import Spinner from "../../components/ui/Spinner/Spinner";
 import { fetchExplorePosts } from "../../features/posts/postsThunks";
+import { fetchMyProfile } from "../../features/profile/profileThunks";
+import {
+  fetchSubscriptionSummary,
+  followUser,
+  unfollowUser,
+} from "../../features/subscriptions/subscriptionsThunks";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { getPostCoverImage } from "../../utils/postImages";
 import styles from "./ExplorePage.module.css";
 
+const getUserId = (
+  user: { _id?: string; id?: string; userId?: string } | null | undefined,
+) => user?._id || user?.userId || user?.id || "";
+
 function ExplorePage() {
   const dispatch = useAppDispatch();
   const { explorePosts, status, error } = useAppSelector((state) => state.posts);
+  const { myProfile } = useAppSelector((state) => state.profile);
+  const { byUserId, followStatus } = useAppSelector(
+    (state) => state.subscriptions,
+  );
   const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
   const selectedPost =
     selectedPostIndex === null ? null : explorePosts[selectedPostIndex] ?? null;
+  const currentUserId = getUserId(myProfile);
+  const selectedAuthorId = getUserId(selectedPost?.author);
+  const isOwnPost = Boolean(
+    currentUserId && selectedAuthorId && currentUserId === selectedAuthorId,
+  );
+  const subscriptionSummary = selectedAuthorId
+    ? byUserId[selectedAuthorId]
+    : undefined;
+  const isFollowingAuthor = subscriptionSummary?.isFollowing ?? false;
 
   useEffect(() => {
     dispatch(fetchExplorePosts());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (!myProfile) {
+      dispatch(fetchMyProfile());
+    }
+  }, [dispatch, myProfile]);
+
+  useEffect(() => {
+    if (!selectedAuthorId || !currentUserId || isOwnPost) {
+      return;
+    }
+
+    dispatch(
+      fetchSubscriptionSummary({
+        userId: selectedAuthorId,
+        currentUserId,
+      }),
+    );
+  }, [currentUserId, dispatch, isOwnPost, selectedAuthorId]);
+
+  const handleToggleFollowAuthor = () => {
+    if (!selectedAuthorId || followStatus === "loading" || isOwnPost) {
+      return;
+    }
+
+    if (isFollowingAuthor) {
+      dispatch(unfollowUser(selectedAuthorId));
+      return;
+    }
+
+    dispatch(followUser(selectedAuthorId));
+  };
 
   if (status === "loading") {
     return <Spinner label="Loading posts..." />;
@@ -55,6 +110,10 @@ function ExplorePage() {
         <PostPreviewModal
           post={selectedPost}
           onClose={() => setSelectedPostIndex(null)}
+          showFollowButton={!isOwnPost}
+          isFollowingAuthor={isFollowingAuthor}
+          isFollowLoading={followStatus === "loading"}
+          onToggleFollowAuthor={handleToggleFollowAuthor}
           onPrevious={() =>
             setSelectedPostIndex((currentIndex) => {
               if (currentIndex === null) {

@@ -105,6 +105,7 @@
   font-weight: 700;
   line-height: 129%;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .userButton:hover {
@@ -116,6 +117,19 @@
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+.stateText,
+.errorText {
+  margin: 0;
+  color: #737373;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 129%;
+}
+
+.errorText {
+  color: #ed4956;
 }
 
 .visuallyHidden {

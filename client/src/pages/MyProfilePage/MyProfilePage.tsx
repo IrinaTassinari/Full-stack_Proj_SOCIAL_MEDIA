@@ -1,9 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import SubscriptionsModal from "../../components/subscriptions/SubscriptionsModal";
 import Spinner from "../../components/ui/Spinner/Spinner";
 import { deletePost } from "../../features/posts/postsThunks";
 import { fetchMyPosts, fetchMyProfile } from "../../features/profile/profileThunks";
-import { fetchSubscriptionSummary } from "../../features/subscriptions/subscriptionsThunks";
+import {
+  fetchSubscriptionSummary,
+  fetchUserFollowers,
+  fetchUserFollowing,
+  unfollowUser,
+} from "../../features/subscriptions/subscriptionsThunks";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import type { Post } from "../../types/post";
 import { getPostCoverImage, getPostImages } from "../../utils/postImages";
@@ -19,13 +25,23 @@ function MyProfilePage() {
   const { myProfile, myPosts, status, postsStatus, error } = useAppSelector(
     (state) => state.profile,
   );
-  const { byUserId: subscriptionsByUserId, error: subscriptionsError } =
-    useAppSelector((state) => state.subscriptions);
+  const {
+    byUserId: subscriptionsByUserId,
+    followersByUserId,
+    followingByUserId,
+    followStatus,
+    listStatus,
+    error: subscriptionsError,
+  } = useAppSelector((state) => state.subscriptions);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isPostMenuOpen, setIsPostMenuOpen] = useState(false);
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied">("idle");
+  const [subscriptionsModal, setSubscriptionsModal] = useState<
+    "followers" | "following" | null
+  >(null);
+  const myProfileId = getUserId(myProfile);
 
   // Он запускается один раз, когда открывается MyProfilePage - Он делает запрос: GET /api/users/me
   useEffect(() => {
@@ -41,6 +57,19 @@ function MyProfilePage() {
       dispatch(fetchSubscriptionSummary({ userId, currentUserId: userId }));
     }
   }, [dispatch, myProfile]);
+
+  useEffect(() => {
+    if (!myProfileId || !subscriptionsModal) {
+      return;
+    }
+
+    if (subscriptionsModal === "followers") {
+      dispatch(fetchUserFollowers(myProfileId));
+      return;
+    }
+
+    dispatch(fetchUserFollowing(myProfileId));
+  }, [dispatch, myProfileId, subscriptionsModal]);
 
 
   /**
@@ -112,10 +141,21 @@ function MyProfilePage() {
   const selectedPostImage =
     selectedPostImages[selectedImageIndex] || selectedPostImages[0] || "";
   const hasMultipleSelectedImages = selectedPostImages.length > 1;
-  const myProfileId = getUserId(myProfile);
   const subscriptionSummary = subscriptionsByUserId[myProfileId];
   const followersCount = subscriptionSummary?.followersCount ?? 0;
   const followingCount = subscriptionSummary?.followingCount ?? 0;
+  const followersList = followersByUserId[myProfileId] ?? [];
+  const followingList = followingByUserId[myProfileId] ?? [];
+
+  const handleStatKeyDown = (
+    event: ReactKeyboardEvent<HTMLDivElement>,
+    modal: "followers" | "following",
+  ) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setSubscriptionsModal(modal);
+    }
+  };
 
   const handleCopyLink = async () => {
     if (!selectedPost) {
@@ -126,6 +166,20 @@ function MyProfilePage() {
     // navigator.clipboard.writeText(postUrl) копирует текст в буфер обмена.
     await navigator.clipboard.writeText(postUrl);
     setCopyStatus("copied");
+  };
+
+  const handleUnfollowFromList = async (userId: string) => {
+    if (!myProfileId || followStatus === "loading") {
+      return;
+    }
+
+    const result = await dispatch(unfollowUser(userId));
+
+    if (!unfollowUser.fulfilled.match(result)) {
+      return;
+    }
+
+    dispatch(fetchUserFollowing(myProfileId));
   };
 
   const handleDeletePost = async () => {
@@ -191,11 +245,23 @@ function MyProfilePage() {
               <dt>{myPosts.length}</dt>
               <dd>posts</dd>
             </div>
-            <div>
+            <div
+              className={styles.statAction}
+              role="button"
+              tabIndex={0}
+              onClick={() => setSubscriptionsModal("followers")}
+              onKeyDown={(event) => handleStatKeyDown(event, "followers")}
+            >
               <dt>{followersCount}</dt>
               <dd>followers</dd>
             </div>
-            <div>
+            <div
+              className={styles.statAction}
+              role="button"
+              tabIndex={0}
+              onClick={() => setSubscriptionsModal("following")}
+              onKeyDown={(event) => handleStatKeyDown(event, "following")}
+            >
               <dt>{followingCount}</dt>
               <dd>following</dd>
             </div>
@@ -448,6 +514,21 @@ function MyProfilePage() {
             </>
           )}
         </div>
+      )}
+
+      {subscriptionsModal && (
+        <SubscriptionsModal
+          title={subscriptionsModal === "followers" ? "Followers" : "Following"}
+          users={
+            subscriptionsModal === "followers" ? followersList : followingList
+          }
+          isLoading={listStatus === "loading"}
+          isActionLoading={followStatus === "loading"}
+          error={subscriptionsError}
+          showUnfollowButton={subscriptionsModal === "following"}
+          onUnfollowUser={handleUnfollowFromList}
+          onClose={() => setSubscriptionsModal(null)}
+        />
       )}
     </section>
   );

@@ -99,6 +99,17 @@
   font-weight: 400;
 }
 
+.statAction {
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+}
+
+.statAction:hover dd,
+.statAction:focus-visible dd {
+  color: #737373;
+}
+
 .subscriptionError {
   margin: -12px 0 16px;
   color: #ed4956;

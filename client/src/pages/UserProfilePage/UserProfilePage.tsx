@@ -1,11 +1,14 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import PostPreviewModal from "../../components/posts/PostPreviewModal";
+import SubscriptionsModal from "../../components/subscriptions/SubscriptionsModal";
 import Spinner from "../../components/ui/Spinner/Spinner";
 import { fetchMyProfile } from "../../features/profile/profileThunks";
 import {
   fetchSubscriptionSummary,
+  fetchUserFollowers,
+  fetchUserFollowing,
   followUser,
   unfollowUser,
 } from "../../features/subscriptions/subscriptionsThunks";
@@ -36,9 +39,14 @@ function UserProfilePage() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { myProfile } = useAppSelector((state) => state.profile);
-  const { byUserId, followStatus, error: subscriptionError } = useAppSelector(
-    (state) => state.subscriptions,
-  );
+  const {
+    byUserId,
+    followersByUserId,
+    followingByUserId,
+    listStatus,
+    followStatus,
+    error: subscriptionError,
+  } = useAppSelector((state) => state.subscriptions);
   const [user, setUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [profileStatus, setProfileStatus] = useState<
@@ -46,6 +54,9 @@ function UserProfilePage() {
   >("idle");
   const [profileError, setProfileError] = useState<string | null>(null);
   const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
+  const [subscriptionsModal, setSubscriptionsModal] = useState<
+    "followers" | "following" | null
+  >(null);
   const selectedPost =
     selectedPostIndex === null ? null : posts[selectedPostIndex] ?? null;
   const currentUserId = getUserId(myProfile);
@@ -53,6 +64,8 @@ function UserProfilePage() {
   const followersCount = subscriptionSummary?.followersCount ?? 0;
   const followingCount = subscriptionSummary?.followingCount ?? 0;
   const isFollowing = subscriptionSummary?.isFollowing ?? false;
+  const followersList = userId ? followersByUserId[userId] ?? [] : [];
+  const followingList = userId ? followingByUserId[userId] ?? [] : [];
 
   useEffect(() => {
     if (!myProfile) {
@@ -100,6 +113,19 @@ function UserProfilePage() {
     }
   }, [currentUserId, dispatch, userId]);
 
+  useEffect(() => {
+    if (!userId || !subscriptionsModal) {
+      return;
+    }
+
+    if (subscriptionsModal === "followers") {
+      dispatch(fetchUserFollowers(userId));
+      return;
+    }
+
+    dispatch(fetchUserFollowing(userId));
+  }, [dispatch, subscriptionsModal, userId]);
+
   const handleToggleFollow = async () => {
     if (!userId || followStatus === "loading") {
       return;
@@ -111,6 +137,16 @@ function UserProfilePage() {
     }
 
     dispatch(followUser(userId));
+  };
+
+  const handleStatKeyDown = (
+    event: ReactKeyboardEvent<HTMLDivElement>,
+    modal: "followers" | "following",
+  ) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setSubscriptionsModal(modal);
+    }
   };
 
   if (profileStatus === "idle" || profileStatus === "loading") {
@@ -161,11 +197,23 @@ function UserProfilePage() {
               <dt>{posts.length}</dt>
               <dd>posts</dd>
             </div>
-            <div>
+            <div
+              className={styles.statAction}
+              role="button"
+              tabIndex={0}
+              onClick={() => setSubscriptionsModal("followers")}
+              onKeyDown={(event) => handleStatKeyDown(event, "followers")}
+            >
               <dt>{followersCount}</dt>
               <dd>followers</dd>
             </div>
-            <div>
+            <div
+              className={styles.statAction}
+              role="button"
+              tabIndex={0}
+              onClick={() => setSubscriptionsModal("following")}
+              onKeyDown={(event) => handleStatKeyDown(event, "following")}
+            >
               <dt>{followingCount}</dt>
               <dd>following</dd>
             </div>
@@ -233,6 +281,18 @@ function UserProfilePage() {
               return currentIndex === posts.length - 1 ? 0 : currentIndex + 1;
             })
           }
+        />
+      )}
+
+      {subscriptionsModal && (
+        <SubscriptionsModal
+          title={subscriptionsModal === "followers" ? "Followers" : "Following"}
+          users={
+            subscriptionsModal === "followers" ? followersList : followingList
+          }
+          isLoading={listStatus === "loading"}
+          error={subscriptionError}
+          onClose={() => setSubscriptionsModal(null)}
         />
       )}
     </section>

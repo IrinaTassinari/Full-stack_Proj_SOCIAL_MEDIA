@@ -1,8 +1,43 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { clearSearchResults } from "../../../features/search/searchSlice";
+import { searchUsers } from "../../../features/search/searchThunks";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import styles from "./SearchPanel.module.css";
 
+const getUserId = (
+  user: { _id?: string; id?: string; userId?: string } | null | undefined,
+) => user?._id || user?.userId || user?.id || "";
+
 function SearchPanel() {
-  const [searchValue, setSearchValue] = useState("");
+  const dispatch = useAppDispatch();
+  const { users, status, error } = useAppSelector((state) => state.search);
+
+  // Это состояние для текста, который пользователь вводит в поле поиска - текущее значение input
+  const [searchValue, setSearchValue] = useState(""); 
+
+  useEffect(() => {
+    const query = searchValue.trim();
+
+    if (!query) {
+      dispatch(clearSearchResults());
+      return;
+    }
+
+    // Это задержка перед поиском на 300 миллисекунд. setTimeout код ждёт 300 мс. Если пользователь продолжает печатать, старый timeout отменяется. И запрос отправится только когда пользователь чуть остановился.Это называется debounce.
+    const timeoutId = window.setTimeout(() => {
+      dispatch(searchUsers(query));
+    }, 300);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [dispatch, searchValue]);
+
+  const handleClear = () => {
+    setSearchValue("");
+    dispatch(clearSearchResults());
+  };
 
   return (
     <section className={styles.searchPanel}>
@@ -18,27 +53,49 @@ function SearchPanel() {
           onChange={(event) => setSearchValue(event.target.value)}
         />
 
-        <button
-          className={styles.clearButton}
-          type="button"
-          aria-label="Clear search"
-          onClick={() => setSearchValue("")}
-        />
+        {searchValue && (
+          <button
+            className={styles.clearButton}
+            type="button"
+            aria-label="Clear search"
+            onClick={handleClear}
+          />
+        )}
       </label>
 
-      <div className={styles.recentBlock}>
-        <h3 className={styles.subtitle}>Recent</h3>
+      {searchValue.trim() && (
+        <div className={styles.recentBlock}>
+          <h3 className={styles.subtitle}>Results</h3>
 
-        <button className={styles.userButton} type="button">
-          <img
-            className={styles.avatar}
-            src="/icons/ICH_Profile.png"
-            alt=""
-            aria-hidden="true"
-          />
-          <span>sashaa</span>
-        </button>
-      </div>
+          {status === "loading" && (
+            <p className={styles.stateText}>Searching...</p>
+          )}
+
+          {status === "failed" && (
+            <p className={styles.errorText}>{error}</p>
+          )}
+
+          {status === "succeeded" && users.length === 0 && (
+            <p className={styles.stateText}>No users found.</p>
+          )}
+
+          {users.map((user) => (
+            <Link
+              className={styles.userButton}
+              key={getUserId(user)}
+              to={`/users/${getUserId(user)}`}
+            >
+              <img
+                className={styles.avatar}
+                src={user.avatar || "/icons/ICH_avatar.png"}
+                alt=""
+                aria-hidden="true"
+              />
+              <span>{user.username}</span>
+            </Link>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

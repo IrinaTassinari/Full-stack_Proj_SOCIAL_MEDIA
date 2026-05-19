@@ -51,6 +51,7 @@
 
 .modal {
   width: min(1100px, calc(100vw - 80px));
+  height: min(720px, calc(100vh - 80px));
   max-height: calc(100vh - 80px);
   position: relative;
   z-index: 31;
@@ -62,7 +63,7 @@
 }
 
 .imageWrap {
-  min-height: 620px;
+  min-height: 0;
   position: relative;
   background: #000000;
 }
@@ -115,6 +116,7 @@
 
 .details {
   min-width: 0;
+  min-height: 0;
   display: grid;
   grid-template-rows: auto 1fr auto auto;
   border-left: 1px solid #dbdbdb;
@@ -227,16 +229,22 @@
 }
 
 .captionArea {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
   overflow: auto;
   padding: 18px;
 }
 
 .captionRow {
   align-items: flex-start;
+  min-height: 44px;
 }
 
 .captionRow p {
-  margin: 0;
+  flex: 1;
+  margin: 5px 0 0;
   white-space: pre-wrap;
   color: #000000;
   font-size: 14px;
@@ -244,9 +252,33 @@
   line-height: 129%;
 }
 
+.captionRow time {
+  display: block;
+  margin-top: 6px;
+  color: #737373;
+  font-size: 12px;
+  line-height: 133%;
+}
+
 .captionRow a {
   color: inherit;
   text-decoration: none;
+}
+
+.deleteCommentButton {
+  margin-top: 5px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #737373;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 133%;
+  cursor: pointer;
+}
+
+.deleteCommentButton:hover {
+  color: #ed4956;
 }
 
 .footer {
@@ -280,7 +312,27 @@
   display: block;
 }
 
+.actionButton svg {
+  width: 26px;
+  height: 26px;
+  display: block;
+  fill: transparent;
+  stroke: #000000;
+  stroke-width: 2;
+  transition: fill 0.12s ease, stroke 0.12s ease, transform 0.12s ease;
+}
+
+.likedButton svg {
+  fill: #ed4956;
+  stroke: #ed4956;
+}
+
+.actionButton:active svg {
+  transform: scale(0.92);
+}
+
 .commentBar {
+  position: relative;
   height: 54px;
   display: flex;
   align-items: center;
@@ -309,6 +361,35 @@
   font-weight: 700;
   line-height: 129%;
   cursor: pointer;
+}
+
+.smileButton {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.smileButton img {
+  width: 28px;
+  height: 28px;
+  display: block;
+}
+
+.emojiPicker {
+  position: absolute;
+  left: 12px;
+  bottom: 48px;
+  z-index: 4;
+  max-width: min(352px, calc(100vw - 120px));
+}
+
+.emojiPicker :global(.EmojiPickerReact) {
+  --epr-picker-border-radius: 8px;
+  --epr-picker-border-color: #dbdbdb;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
 }
 
 @media (max-width: 900px) {

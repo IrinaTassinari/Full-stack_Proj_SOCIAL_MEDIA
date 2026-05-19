@@ -12,6 +12,7 @@ function LoginPage() {
 
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const isLoading = status === "loading";
 
@@ -60,16 +61,30 @@ function LoginPage() {
               required
             />
 
-            <input
-              className={styles.input}
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              autoComplete="current-password"
-              required
-            />
+            <div className={styles.passwordField}>
+              <input
+                className={styles.input}
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                autoComplete="current-password"
+                required
+              />
+              <button
+                className={styles.passwordToggle}
+                type="button"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                onClick={() => setShowPassword((current) => !current)}
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                  <circle cx="12" cy="12" r="3" />
+                  {!showPassword && <line x1="4" y1="20" x2="20" y2="4" />}
+                </svg>
+              </button>
+            </div>
 
             {error && <p className={styles.error}>{error}</p>}
 

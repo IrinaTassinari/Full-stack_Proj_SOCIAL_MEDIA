@@ -74,6 +74,46 @@
   border-color: #a8a8a8;
 }
 
+.passwordField {
+  position: relative;
+}
+
+.passwordField .input {
+  padding-right: 42px;
+}
+
+.passwordToggle {
+  width: 36px;
+  height: 36px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #737373;
+  cursor: pointer;
+}
+
+.passwordToggle:hover,
+.passwordToggle:focus-visible {
+  color: #000000;
+}
+
+.passwordToggle svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
 .submitButton {
   width: 100%;
   height: 32px;
