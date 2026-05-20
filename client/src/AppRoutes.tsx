@@ -15,6 +15,8 @@ import ProtectedRoute from "./components/routes/ProtectedRoute";
 import MainLayout from "./components/layout/MainLayout/MainLayout";
 import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
 import MessagesPage  from "./pages/MessagesPage/MessagesPage"
+import NotificationsPage from "./pages/NotificationsPage/NotificationsPage";
+import SearchPage from "./pages/SearchPage/SearchPage";
 
 
 function AppRoutes() {
@@ -30,10 +32,10 @@ function AppRoutes() {
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/search" element={<div>Search page</div>} />
+          <Route path="/search" element={<SearchPage />} />
           <Route path="/explore" element={<ExplorePage />} />
           <Route path="/messages" element={<MessagesPage />} />
-          <Route path="/notifications" element={<div>Notifications page</div>} />
+          <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/create" element={<CreatePostPage />} />
           <Route path="/posts/:postId/edit" element={<EditPostPage />} />
           <Route path="/profile" element={<MyProfilePage />} />

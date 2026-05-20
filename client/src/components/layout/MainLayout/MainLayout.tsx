@@ -27,6 +27,7 @@ function MainLayout() {
         isNotificationsOpen={activePanel === "notifications"}
         onSearchClick={() => togglePanel("search")}
         onNotificationsClick={() => togglePanel("notifications")}
+        onNavigate={closePanel}
       />
       <main className={styles.content}>
         <div className={styles.pageContent}>

@@ -40,15 +40,6 @@
 
 @media (max-width: 760px) {
   .footer {
-    min-height: 138px;
-    padding: 30px 18px;
-  }
-
-  .nav {
-    gap: 22px;
-  }
-
-  .copy {
-    margin-top: 32px;
+    display: none;
   }
 }

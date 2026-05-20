@@ -16,17 +16,14 @@ import subscriptionRoutes from './routes/subscribeRoutes.js';
 import notificationsRoutes from './routes/notificationRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
 import notificationMessageRoutes from "./routes/notificationMessageRoutes.js";
+import { env } from './config/env.js';
 
 
 const app = express();
 
 app.use(
   cors({
-    // without Dockerfile
-    origin: 'http://localhost:5173' ,
-
-    //Dockerfile from server, ichgram - image name
-    //origin:  "http://ichgram:5173",
+    origin: env.clientUrl,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
@@ -50,9 +47,6 @@ app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/message-notifications", notificationMessageRoutes);
-
-
-
 
 
 app.use(notFound);

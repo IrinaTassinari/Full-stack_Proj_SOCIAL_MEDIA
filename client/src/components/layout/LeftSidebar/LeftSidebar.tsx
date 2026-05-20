@@ -16,6 +16,7 @@ type LeftSidebarProps = {
   isNotificationsOpen?: boolean;
   onSearchClick: () => void;
   onNotificationsClick: () => void;
+  onNavigate: () => void;
 };
 
 function LeftSidebar({
@@ -23,6 +24,7 @@ function LeftSidebar({
   isNotificationsOpen = false,
   onSearchClick,
   onNotificationsClick,
+  onNavigate,
 }: LeftSidebarProps) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -39,11 +41,13 @@ function LeftSidebar({
   }, [dispatch]);
 
   const handleLogout = () => {
+    onNavigate();
     dispatch(logout()); // в authSlice.ts есть reducers logout - Redux Toolkit из этого reducer автоматически создаёт функцию logout() и через dispatch её вызываем
     navigate("/login");
   };
 
   const handleMessagesClick = () => {
+    onNavigate();
     navigate(location.pathname === "/messages" ? "/" : "/messages");
   };
 
@@ -53,7 +57,12 @@ function LeftSidebar({
         location.pathname === "/messages" ? styles.messagesSidebar : ""
       }`}
     >
-      <NavLink className={styles.logoLink} to="/" aria-label="ICHgram home">
+      <NavLink
+        className={styles.logoLink}
+        to="/"
+        aria-label="ICHgram home"
+        onClick={onNavigate}
+      >
         <img
           className={styles.logo}
           src="/images/ICHGRAM_logo.png"
@@ -69,6 +78,7 @@ function LeftSidebar({
                 `${styles.navLink} ${isActive ? styles.active : ""}`
               }
               to="/"
+              onClick={onNavigate}
             >
               <img
                 className={styles.icon}
@@ -129,6 +139,7 @@ function LeftSidebar({
                     `${styles.navLink} ${isActive ? styles.active : ""}`
                   }
                   to={item.to}
+                  onClick={onNavigate}
                 >
                   <img
                     className={styles.icon}
@@ -166,6 +177,7 @@ function LeftSidebar({
                 `${styles.navLink} ${isActive ? styles.active : ""}`
               }
               to="/create"
+              onClick={onNavigate}
             >
               <img
                 className={styles.icon}
@@ -184,6 +196,7 @@ function LeftSidebar({
           `${styles.profileLink} ${isActive ? styles.active : ""}`
         }
         to="/profile"
+        onClick={onNavigate}
       >
         <img
           className={styles.profileIcon}

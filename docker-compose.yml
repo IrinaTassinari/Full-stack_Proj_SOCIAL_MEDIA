@@ -1,0 +1,42 @@
+services:
+  ichgram:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: ichgram
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./server/.env
+    environment:
+      CLIENT_URL: http://localhost:5173
+
+  front_ichgram:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: front_ichgram
+    # слева порт на твоем компьютере, справа порт внутри контейнера
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:3000
+
+# mongo-database:
+#    container_name: mongo-database
+#    image: mongo:7
+#    restart: always
+#    ports:
+#      - 27017:27017
+#    command: --auth --bind_ip 0.0.0.0
+#    environment:
+#       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+#       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+#       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+#    env_file:
+#      - .env
+#    volumes:
+#      - ./data/db:/data/db
+
+# volumes:
+#    mongo-data:
