@@ -63,7 +63,10 @@ function MyProfilePage() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isPostMenuOpen, setIsPostMenuOpen] = useState(false);
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied">("idle");
-  const [likedOverride, setLikedOverride] = useState<boolean | null>(null);
+  const [likedOverride, setLikedOverride] = useState<{
+    postId: string;
+    value: boolean;
+  } | null>(null);
   const [subscriptionsModal, setSubscriptionsModal] = useState<
     "followers" | "following" | null
   >(null);
@@ -104,7 +107,10 @@ function MyProfilePage() {
   const isSelectedPostLikedFromServer =
     selectedPostLikes?.likes.some((like) => getUserId(like.user) === myProfileId) ??
     false;
-  const isSelectedPostLiked = likedOverride ?? isSelectedPostLikedFromServer;
+  const isSelectedPostLiked =
+    likedOverride && selectedPost && likedOverride.postId === selectedPost._id
+      ? likedOverride.value
+      : isSelectedPostLikedFromServer;
   const selectedPostLikesLabel = `${selectedPostLikesCount} ${
     selectedPostLikesCount === 1 ? "like" : "likes"
   }`;
@@ -115,7 +121,6 @@ function MyProfilePage() {
     }
 
     dispatch(fetchPostLikes(selectedPost._id));
-    setLikedOverride(null);
   }, [dispatch, selectedPost]);
 
 
@@ -265,7 +270,7 @@ function MyProfilePage() {
       return;
     }
 
-    setLikedOverride(!isSelectedPostLiked);
+    setLikedOverride({ postId: selectedPost._id, value: !isSelectedPostLiked });
     dispatch(togglePostLike(selectedPost._id));
   };
 

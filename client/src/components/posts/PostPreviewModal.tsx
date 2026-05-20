@@ -78,7 +78,12 @@ function PostPreviewModal({
   // получает массив картинок поста ["img1.jpg", "img2.jpg", "img3.jpg"]
   const images = getPostImages(post);
   // хранит номер текущей картинки
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentImageState, setCurrentImageState] = useState({
+    postId: post._id,
+    index: 0,
+  });
+  const currentImageIndex =
+    currentImageState.postId === post._id ? currentImageState.index : 0;
   // берёт картинку по текущему индексу, Если пользователь нажал next: currentImageIndex = 1 тогда: currentImage = images[1]
   const currentImage = images[currentImageIndex] ?? "";
   const hasMultipleImages = images.length > 1;
@@ -86,7 +91,10 @@ function PostPreviewModal({
   const touchStartYRef = useRef<number | null>(null);
   const [commentText, setCommentText] = useState("");
   const [isEmojiOpen, setIsEmojiOpen] = useState(false);
-  const [likedOverride, setLikedOverride] = useState<boolean | null>(null);
+  const [likedOverride, setLikedOverride] = useState<{
+    postId: string;
+    value: boolean;
+  } | null>(null);
 
   const handleAddComment = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -122,14 +130,15 @@ function PostPreviewModal({
     postLikes?.likes.some((like) => getUserId(like.user) === currentUserId) ??
     false;
   // Если пользователь только что нажал лайк, используется likedOverride. Если ещё не нажимал, используется состояние с backend: isPostLikedFromServer
-  const isPostLiked = likedOverride ?? isPostLikedFromServer; 
+  const isPostLiked =
+    likedOverride?.postId === post._id ? likedOverride.value : isPostLikedFromServer; 
   const likesLabel = `${likesCount} ${likesCount === 1 ? "like" : "likes"}`;
 
   // Берёт комментарии поста. Если ещё не загружены, возвращает пустой массив.
   const comments = postComments?.comments ?? [];
 
   const handleToggleLike = () => {
-    setLikedOverride(!isPostLiked);
+    setLikedOverride({ postId: post._id, value: !isPostLiked });
     dispatch(togglePostLike(post._id));
   };
 
@@ -146,12 +155,7 @@ function PostPreviewModal({
   useEffect(() => {
     dispatch(fetchPostLikes(post._id));
     dispatch(fetchPostComments(post._id));
-    setLikedOverride(null);
   }, [dispatch, post._id]);
-
-  useEffect(() => {
-    setCurrentImageIndex(0);
-  }, [post._id]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -218,15 +222,17 @@ function PostPreviewModal({
   };
 
   const showPreviousImage = () => {
-    setCurrentImageIndex((current) =>
-      current === 0 ? images.length - 1 : current - 1,
-    );
+    setCurrentImageState({
+      postId: post._id,
+      index: currentImageIndex === 0 ? images.length - 1 : currentImageIndex - 1,
+    });
   };
 
   const showNextImage = () => {
-    setCurrentImageIndex((current) =>
-      current === images.length - 1 ? 0 : current + 1,
-    );
+    setCurrentImageState({
+      postId: post._id,
+      index: currentImageIndex === images.length - 1 ? 0 : currentImageIndex + 1,
+    });
   };
 
   return (

@@ -43,7 +43,10 @@ function ChatWindow({ currentUserId }: ChatWindowProps) {
   const messagesAreaRef = useRef<HTMLDivElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  const messages = selectedUserId ? byUserId[selectedUserId] ?? [] : [];
+  const messages = useMemo(
+    () => (selectedUserId ? byUserId[selectedUserId] ?? [] : []),
+    [byUserId, selectedUserId],
+  );
 
   const selectedUser = useMemo(() => {
     if (!selectedUserId) return null;

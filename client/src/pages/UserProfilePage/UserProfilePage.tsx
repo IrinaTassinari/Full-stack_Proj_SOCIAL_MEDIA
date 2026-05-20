@@ -17,6 +17,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import type { Post } from "../../types/post";
 import type { User } from "../../types/user";
+import { getErrorMessage } from "../../utils/getErrorMessage";
 import { getPostCoverImage, getPostImages } from "../../utils/postImages";
 import styles from "./UserProfilePage.module.css";
 
@@ -98,10 +99,10 @@ function UserProfilePage() {
         setUser(userResponse.data.user);
         setPosts(postsResponse.data.posts);
         setProfileStatus("succeeded");
-      } catch (requestError: any) {
+      } catch (requestError: unknown) {
         setProfileStatus("failed");
         setProfileError(
-          requestError.response?.data?.message || "Failed to load user profile",
+          getErrorMessage(requestError, "Failed to load user profile"),
         );
       }
     };

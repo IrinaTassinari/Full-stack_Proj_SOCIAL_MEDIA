@@ -44,7 +44,10 @@ function CommentRow({
   onDeleteComment,
 }: CommentRowProps) {
   const dispatch = useAppDispatch();
-  const [likedOverride, setLikedOverride] = useState<boolean | null>(null);
+  const [likedOverride, setLikedOverride] = useState<{
+    commentId: string;
+    value: boolean;
+  } | null>(null);
   const commentLikes = useAppSelector(
     (state) => state.commentLikes.byCommentId[comment._id],
   );
@@ -52,15 +55,17 @@ function CommentRow({
   const isCommentLikedFromServer =
     commentLikes?.likes.some((like) => getUserId(like.user) === currentUserId) ??
     false;
-  const isCommentLiked = likedOverride ?? isCommentLikedFromServer;
+  const isCommentLiked =
+    likedOverride?.commentId === comment._id
+      ? likedOverride.value
+      : isCommentLikedFromServer;
 
   useEffect(() => {
     dispatch(fetchCommentLikes(comment._id));
-    setLikedOverride(null);
   }, [comment._id, dispatch]);
 
   const handleToggleLike = () => {
-    setLikedOverride(!isCommentLiked);
+    setLikedOverride({ commentId: comment._id, value: !isCommentLiked });
     dispatch(toggleCommentLike(comment._id));
   };
 

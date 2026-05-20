@@ -41,6 +41,7 @@ function EditPostPage() {
   const [description, setDescription] = useState("");
   const [selectedImages, setSelectedImages] = useState<SelectedImage[]>([]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [formPostId, setFormPostId] = useState<string | null>(null);
   const [isEmojiOpen, setIsEmojiOpen] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -65,19 +66,18 @@ function EditPostPage() {
     }
   }, [dispatch, postId]);
 
-  useEffect(() => {
-    if (selectedPost) {
-      setDescription(selectedPost.description || "");
-      setSelectedImages(
-        getPostImages(selectedPost).map((imageUrl, index) => ({
-          id: `${imageUrl}-${index}`,
-          preview: imageUrl,
-          existingUrl: imageUrl,
-        })),
-      );
-      setActiveImageIndex(0);
-    }
-  }, [selectedPost]);
+  if (selectedPost && formPostId !== selectedPost._id) {
+    setFormPostId(selectedPost._id);
+    setDescription(selectedPost.description || "");
+    setSelectedImages(
+      getPostImages(selectedPost).map((imageUrl, index) => ({
+        id: `${imageUrl}-${index}`,
+        preview: imageUrl,
+        existingUrl: imageUrl,
+      })),
+    );
+    setActiveImageIndex(0);
+  }
 
   useEffect(() => {
     selectedImagesRef.current = selectedImages;

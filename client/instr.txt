@@ -1,12 +1,7 @@
-в LeftSidebar пункт Search теперь кнопка, а не ссылка на /search
-в LeftSidebar пункт Notifications теперь открывает overlay, как Search а не ссылка /notifications;
+в LeftSidebar пункт Search теперь кнопка, а не ссылка на /search - check
+в LeftSidebar пункт Notifications теперь открывает overlay, как Search а не ссылка /notifications; -check
 
 
 Пустые/заглушечные места:
-client/src/features/notifications/* пустые
-client/src/features/messages/* пустые
-client/src/components/messages/ChatList.tsx пустой
-client/src/components/messages/ChatWindow.tsx пустой
-client/src/pages/MessagesPage пустая папка
-routes /messages, /notifications сейчас просто <div>: AppRoutes.tsx (line 32)
+routes /messages, /notifications сейчас просто <div>: AppRoutes.tsx (line 32) - check
 

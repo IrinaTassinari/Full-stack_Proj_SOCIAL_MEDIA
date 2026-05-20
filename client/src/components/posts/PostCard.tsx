@@ -50,7 +50,10 @@ function PostCard({ post, onOpenPost }: PostCardProps) {
     (state) => state.subscriptions,
   );
 
-  const [likedOverride, setLikedOverride] = useState<boolean | null>(null);
+  const [likedOverride, setLikedOverride] = useState<{
+    postId: string;
+    value: boolean;
+  } | null>(null);
 
   const currentUserId = getUserId(myProfile);
   const authorId = getUserId(post.author);
@@ -61,7 +64,8 @@ function PostCard({ post, onOpenPost }: PostCardProps) {
   const isPostLikedFromServer =
     postLikes?.likes.some((like) => getUserId(like.user) === currentUserId) ??
     false;
-  const isPostLiked = likedOverride ?? isPostLikedFromServer;
+  const isPostLiked =
+    likedOverride?.postId === post._id ? likedOverride.value : isPostLikedFromServer;
   const likesLabel = `${likesCount} ${likesCount === 1 ? "like" : "likes"}`;
   const commentsCount = postComments?.count ?? 0;
   const latestComment = postComments?.comments[0];
@@ -69,7 +73,6 @@ function PostCard({ post, onOpenPost }: PostCardProps) {
   useEffect(() => {
     dispatch(fetchPostLikes(post._id));
     dispatch(fetchPostComments(post._id));
-    setLikedOverride(null);
   }, [dispatch, post._id]);
 
   useEffect(() => {
@@ -79,7 +82,7 @@ function PostCard({ post, onOpenPost }: PostCardProps) {
   }, [authorId, currentUserId, dispatch, isOwnPost]);
 
   const handleToggleLike = () => {
-    setLikedOverride(!isPostLiked);
+    setLikedOverride({ postId: post._id, value: !isPostLiked });
     dispatch(togglePostLike(post._id));
   };
 

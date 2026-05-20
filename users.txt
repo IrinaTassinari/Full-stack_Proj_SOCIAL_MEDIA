@@ -99,4 +99,3 @@
   "password": "123456",
   "fullName": ""
 }
-

@@ -6,56 +6,45 @@ import {
   updateMyProfile,
 } from "../../features/profile/profileThunks";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import type { User } from "../../types/user";
 import styles from "./EditProfilePage.module.css";
 
 const maxBioLength = 150;
 
-function EditProfilePage() {
+type EditProfileFormProps = {
+  myProfile: User;
+  status: "idle" | "loading" | "succeeded" | "failed";
+  error: string | null;
+};
+
+function EditProfileForm({ myProfile, status, error }: EditProfileFormProps) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const { myProfile, status, error } = useAppSelector((state) => state.profile);
-
-  const [username, setUsername] = useState("");
-  const [website, setWebsite] = useState("");
-  const [bio, setBio] = useState("");
+  const [username, setUsername] = useState(myProfile.username || "");
+  const [website, setWebsite] = useState(myProfile.website || "");
+  const [bio, setBio] = useState(myProfile.bio || "");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [avatarPreview, setAvatarPreview] = useState("");
-
-  useEffect(() => {
-    if (!myProfile) {
-      dispatch(fetchMyProfile());
-    }
-  }, [dispatch, myProfile]);
-
-  useEffect(() => {
-    if (!myProfile) return;
-
-    setUsername(myProfile.username || "");
-    setWebsite(myProfile.website || "");
-    setBio(myProfile.bio || "");
-    setAvatarPreview(myProfile.avatar || "/icons/ICH_avatar.png");
-  }, [myProfile]);
+  const [avatarPreview, setAvatarPreview] = useState(
+    myProfile.avatar || "/icons/ICH_avatar.png",
+  );
 
   const isLoading = status === "loading";
 
-  // handlePhotoChange срабатывает сразу, когда пользователь выбрал файл
   const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
     setAvatarFile(file);
-    setAvatarPreview(URL.createObjectURL(file)); //идёт вот сюда <img className={styles.avatar} src={avatarPreview} alt="" />
-
+    setAvatarPreview(URL.createObjectURL(file));
   };
 
-
-  //  handleSubmit срабатывает позже, когда пользователь нажал Save
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // FormData — это специальный объект браузера для отправки данных формы на backend, особенно когда есть файлы. Обычный JSON хорошо подходит для текста. Но когда нужно отправить картинку, аватарку, файл поста, лучше использовать FormData.
     const formData = new FormData();
     formData.append("username", username.trim());
     formData.append("website", website.trim());
@@ -71,10 +60,6 @@ function EditProfilePage() {
       navigate("/profile");
     }
   };
-
-  if (!myProfile && isLoading) {
-    return <Spinner label="Loading profile..." />;
-  }
 
   return (
     <section className={styles.page}>
@@ -161,6 +146,30 @@ function EditProfilePage() {
         </div>
       </form>
     </section>
+  );
+}
+
+function EditProfilePage() {
+  const dispatch = useAppDispatch();
+  const { myProfile, status, error } = useAppSelector((state) => state.profile);
+
+  useEffect(() => {
+    if (!myProfile) {
+      dispatch(fetchMyProfile());
+    }
+  }, [dispatch, myProfile]);
+
+  if (!myProfile) {
+    return <Spinner label="Loading profile..." />;
+  }
+
+  return (
+    <EditProfileForm
+      key={myProfile._id || myProfile.userId || myProfile.id}
+      myProfile={myProfile}
+      status={status}
+      error={error}
+    />
   );
 }
 

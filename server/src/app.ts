@@ -22,7 +22,11 @@ const app = express();
 
 app.use(
   cors({
-    origin: 'http://localhost:5173',
+    // without Dockerfile
+    origin: 'http://localhost:5173' ,
+
+    //Dockerfile from server, ichgram - image name
+    //origin:  "http://ichgram:5173",
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })

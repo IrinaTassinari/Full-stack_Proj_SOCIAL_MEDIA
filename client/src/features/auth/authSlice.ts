@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { loginUser, registerUser, forgotPassword, resetPassword, } from "./authThunks";
 import { isTokenExpired } from "./tokenUtils";
+import type { User } from "../../types/user";
 
 const storedToken = localStorage.getItem("token");
 const token = isTokenExpired(storedToken) ? null : storedToken;
@@ -10,7 +11,7 @@ if (storedToken && !token) {
 }
 
 type AuthState = {
-  user: any | null;
+  user: User | null;
   token: string | null;
   isAuthenticated: boolean;
   status: "idle" | "loading" | "succeeded" | "failed";

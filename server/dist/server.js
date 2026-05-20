@@ -10,6 +10,7 @@ const startServer = async () => {
         const server = http.createServer(app);
         initSocket(server);
         server.listen(env.port, () => {
+            //console.log(`Server is running on http://ichgram:${env.port}`);
             console.log(`Server is running on http://localhost:${env.port}`);
         });
     }
