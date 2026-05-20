@@ -1,74 +1,190 @@
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
+import {
+  fetchNotifications,
+  markAllNotificationsAsRead,
+  markNotificationAsRead,
+  type Notification,
+} from "../../../features/notifications/notificationsThunks";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import styles from "./NotificationsPanel.module.css";
 
-type NotificationItem = {
-  id: string;
-  username: string;
-  action: string;
-  time: string;
-  avatar: string;
-  postImage: string;
+const getUserId = (
+  user:
+    | { _id?: string; id?: string; userId?: string }
+    | string
+    | null
+    | undefined,
+) =>
+  typeof user === "string" ? user : user?._id || user?.userId || user?.id || "";
+
+const getSenderUsername = (notification: Notification) =>
+  typeof notification.sender === "string"
+    ? ""
+    : notification.sender.username || "";
+
+const getSenderAvatar = (notification: Notification) =>
+  typeof notification.sender === "string"
+    ? "/icons/ICH_avatar.png"
+    : notification.sender.avatar || "/icons/ICH_avatar.png";
+
+const getNotificationAgeLabel = (createdAt: string) => {
+  const diffMinutes = Math.max(
+    1,
+    Math.floor((Date.now() - new Date(createdAt).getTime()) / 60000),
+  );
+
+  if (diffMinutes < 60) {
+    return `${diffMinutes}m`;
+  }
+
+  const diffHours = Math.floor(diffMinutes / 60);
+
+  if (diffHours < 24) {
+    return `${diffHours}h`;
+  }
+
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffDays < 7) {
+    return `${diffDays}d`;
+  }
+
+  return `${Math.floor(diffDays / 7)}w`;
 };
 
-const notifications: NotificationItem[] = [
-  {
-    id: "liked-photo",
-    username: "sashaa",
-    action: "liked your photo.",
-    time: "2 d",
-    avatar: "/icons/ICH_Profile.png",
-    postImage:
-      "https://res.cloudinary.com/demo/image/upload/w_80,h_80,c_fill,g_auto/sample.jpg",
-  },
-  {
-    id: "commented-photo",
-    username: "sashaa",
-    action: "commented your photo.",
-    time: "2 wek",
-    avatar: "/icons/ICH_Profile.png",
-    postImage:
-      "https://res.cloudinary.com/demo/image/upload/w_80,h_80,c_fill,g_auto/sample.jpg",
-  },
-  {
-    id: "started-following",
-    username: "sashaa",
-    action: "started following.",
-    time: "2 d",
-    avatar: "/icons/ICH_Profile.png",
-    postImage:
-      "https://res.cloudinary.com/demo/image/upload/w_80,h_80,c_fill,g_auto/sample.jpg",
-  },
-];
+const getNotificationAction = (notification: Notification) => {
+  if (notification.type === "like") {
+    return "liked your photo.";
+  }
+
+  if (notification.type === "comment") {
+    return "commented your photo.";
+  }
+
+  return "started following.";
+};
+
+const getNotificationPostImage = (notification: Notification) => {
+  const post = notification.post;
+
+  if (!post || typeof post === "string") {
+    return "";
+  }
+
+  return post.images?.[0] || post.image || "";
+};
 
 function NotificationsPanel() {
+  const dispatch = useAppDispatch();
+  const { items, status, error, unreadCount, updateStatus } = useAppSelector(
+    (state) => state.notifications,
+  );
+
+  useEffect(() => {
+    dispatch(fetchNotifications());
+  }, [dispatch]);
+
+  const handleNotificationClick = (notification: Notification) => {
+    if (!notification.isRead) {
+      dispatch(markNotificationAsRead(notification._id));
+    }
+  };
+
+  const handleMarkAllRead = () => {
+    if (unreadCount > 0 && updateStatus !== "loading") {
+      dispatch(markAllNotificationsAsRead());
+    }
+  };
+
   return (
     <section className={styles.notificationsPanel}>
-      <h2 className={styles.title}>Notifications</h2>
-      <h3 className={styles.subtitle}>New</h3>
+      <div className={styles.header}>
+        <h2 className={styles.title}>Notifications</h2>
+        {items.length > 0 && (
+          <button
+            className={styles.readAllButton}
+            type="button"
+            disabled={unreadCount === 0 || updateStatus === "loading"}
+            onClick={handleMarkAllRead}
+          >
+            Mark all read
+          </button>
+        )}
+      </div>
 
-      <ul className={styles.list}>
-        {notifications.map((notification) => (
-          <li className={styles.item} key={notification.id}>
-            <img
-              className={styles.avatar}
-              src={notification.avatar}
-              alt=""
-              aria-hidden="true"
-            />
+      <h3 className={styles.subtitle}>
+        {unreadCount > 0 ? `New (${unreadCount})` : "New"}
+      </h3>
 
-            <p className={styles.text}>
-              <span>{notification.username}</span> {notification.action}{" "}
-              <time>{notification.time}</time>
-            </p>
+      {status === "loading" && (
+        <p className={styles.stateText}>Loading notifications...</p>
+      )}
 
-            <img
-              className={styles.postImage}
-              src={notification.postImage}
-              alt=""
-              aria-hidden="true"
-            />
-          </li>
-        ))}
-      </ul>
+      {status === "failed" && <p className={styles.errorText}>{error}</p>}
+
+      {status === "succeeded" && items.length === 0 && (
+        <p className={styles.stateText}>No notifications yet.</p>
+      )}
+
+      {items.length > 0 && (
+        <ul className={styles.list}>
+          {items.map((notification) => {
+            const senderId = getUserId(notification.sender);
+            const senderUsername = getSenderUsername(notification);
+            const postImage = getNotificationPostImage(notification);
+
+            if (!senderId || !senderUsername) {
+              return null;
+            }
+
+            return (
+              <li
+                className={`${styles.item} ${
+                  notification.isRead ? "" : styles.unread
+                }`}
+                key={notification._id}
+              >
+                <Link
+                  className={styles.avatarLink}
+                  to={`/users/${senderId}`}
+                  onClick={() => handleNotificationClick(notification)}
+                >
+                  <img
+                    className={styles.avatar}
+                    src={getSenderAvatar(notification)}
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </Link>
+
+                <button
+                  className={styles.textButton}
+                  type="button"
+                  onClick={() => handleNotificationClick(notification)}
+                >
+                  <span>{senderUsername}</span>{" "}
+                  {getNotificationAction(notification)}{" "}
+                  <time dateTime={notification.createdAt}>
+                    {getNotificationAgeLabel(notification.createdAt)}
+                  </time>
+                </button>
+
+                {postImage ? (
+                  <img
+                    className={styles.postImage}
+                    src={postImage}
+                    alt=""
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <span className={styles.postImagePlaceholder} />
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </section>
   );
 }

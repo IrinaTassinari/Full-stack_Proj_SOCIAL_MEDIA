@@ -7,6 +7,7 @@ import {
 } from "react";
 import { Link } from "react-router-dom";
 import EmojiPicker, { type EmojiClickData } from "emoji-picker-react";
+import CommentRow from "./CommentRow";
 import type { Post } from "../../types/post";
 import { getPostImages } from "../../utils/postImages";
 import styles from "./PostPreviewModal.module.css";
@@ -341,29 +342,12 @@ function PostPreviewModal({
             )}
 
             {comments.map((comment) => (
-              <div className={styles.captionRow} key={comment._id}>
-                <span className={styles.avatarRing}>
-                  <img
-                    src={comment.user.avatar || "/icons/ICH_avatar.png"}
-                    alt=""
-                  />
-                </span>
-                <p>
-                  <strong>{comment.user.username}</strong> {comment.text}
-                  <time dateTime={comment.createdAt}>
-                    {getAgeLabel(comment.createdAt)}
-                  </time>
-                </p>
-                {getUserId(comment.user) === currentUserId && (
-                  <button
-                    className={styles.deleteCommentButton}
-                    type="button"
-                    onClick={() => handleDeleteComment(comment._id)}
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
+              <CommentRow
+                key={comment._id}
+                comment={comment}
+                currentUserId={currentUserId}
+                onDeleteComment={handleDeleteComment}
+              />
             ))}
           </div>
 
@@ -388,6 +372,7 @@ function PostPreviewModal({
               <img src="/icons/button-comments.png" alt="" aria-hidden="true" />
             </div>
             <strong>{likesLabel}</strong>
+            <time dateTime={post.createdAt}>{getAgeLabel(post.createdAt)}</time>
           </footer>
 
           <form className={styles.commentBar} onSubmit={handleAddComment}>

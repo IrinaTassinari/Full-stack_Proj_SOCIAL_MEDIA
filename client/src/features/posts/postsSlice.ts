@@ -108,9 +108,10 @@ const postsSlice = createSlice({
       .addCase(updatePost.fulfilled, (state, action) => {
         state.updateStatus = "succeeded";
         state.selectedPost = action.payload;
-        state.allPosts = state.allPosts.map((post) =>
-          post._id === action.payload._id ? action.payload : post,
-        );
+        state.allPosts = [
+          action.payload,
+          ...state.allPosts.filter((post) => post._id !== action.payload._id),
+        ];
         state.explorePosts = state.explorePosts.map((post) =>
           post._id === action.payload._id ? action.payload : post,
         );

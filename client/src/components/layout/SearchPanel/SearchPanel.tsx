@@ -9,7 +9,11 @@ const getUserId = (
   user: { _id?: string; id?: string; userId?: string } | null | undefined,
 ) => user?._id || user?.userId || user?.id || "";
 
-function SearchPanel() {
+type SearchPanelProps = {
+  onClose?: () => void;
+};
+
+function SearchPanel({ onClose }: SearchPanelProps) {
   const dispatch = useAppDispatch();
   const { users, status, error } = useAppSelector((state) => state.search);
 
@@ -37,6 +41,11 @@ function SearchPanel() {
   const handleClear = () => {
     setSearchValue("");
     dispatch(clearSearchResults());
+  };
+
+  const handleUserClick = () => {
+    handleClear();
+    onClose?.();
   };
 
   return (
@@ -84,6 +93,7 @@ function SearchPanel() {
               className={styles.userButton}
               key={getUserId(user)}
               to={`/users/${getUserId(user)}`}
+              onClick={handleUserClick}
             >
               <img
                 className={styles.avatar}

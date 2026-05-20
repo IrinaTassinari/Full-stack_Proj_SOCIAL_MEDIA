@@ -10,7 +10,7 @@ export const getMyNotifications = async (req, res, next) => {
             recipient: req.user._id,
         })
             .populate("sender", "username fullName avatar")
-            .populate("post", "description image")
+            .populate("post", "description image images")
             .populate("comment", "text")
             .populate("subscription")
             .sort({ createdAt: -1 });

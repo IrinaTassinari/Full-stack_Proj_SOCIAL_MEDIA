@@ -2,6 +2,10 @@ import { useEffect, useState, type KeyboardEvent as ReactKeyboardEvent } from "r
 import { Link, useNavigate } from "react-router-dom";
 import SubscriptionsModal from "../../components/subscriptions/SubscriptionsModal";
 import Spinner from "../../components/ui/Spinner/Spinner";
+import {
+  fetchPostLikes,
+  togglePostLike,
+} from "../../features/likes/likesThunks";
 import { deletePost } from "../../features/posts/postsThunks";
 import { fetchMyPosts, fetchMyProfile } from "../../features/profile/profileThunks";
 import {
@@ -18,6 +22,27 @@ import styles from "./MyProfilePage.module.css";
 const getUserId = (user: { _id?: string; id?: string; userId?: string } | null) =>
   user?._id || user?.userId || user?.id || "";
 const collapsedBioLength = 120;
+
+const getPostAgeLabel = (createdAt: string) => {
+  const diffMinutes = Math.max(
+    1,
+    Math.floor((Date.now() - new Date(createdAt).getTime()) / 60000),
+  );
+
+  if (diffMinutes < 60) {
+    return `${diffMinutes}m`;
+  }
+
+  const diffHours = Math.floor(diffMinutes / 60);
+
+  if (diffHours < 24) {
+    return `${diffHours}h`;
+  }
+
+  const diffDays = Math.floor(diffHours / 24);
+
+  return diffDays === 1 ? "1 day" : `${diffDays} days`;
+};
 
 function MyProfilePage() {
   const dispatch = useAppDispatch();
@@ -38,6 +63,7 @@ function MyProfilePage() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isPostMenuOpen, setIsPostMenuOpen] = useState(false);
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied">("idle");
+  const [likedOverride, setLikedOverride] = useState<boolean | null>(null);
   const [subscriptionsModal, setSubscriptionsModal] = useState<
     "followers" | "following" | null
   >(null);
@@ -70,6 +96,27 @@ function MyProfilePage() {
 
     dispatch(fetchUserFollowing(myProfileId));
   }, [dispatch, myProfileId, subscriptionsModal]);
+
+  const selectedPostLikes = useAppSelector((state) =>
+    selectedPost ? state.likes.byPostId[selectedPost._id] : undefined,
+  );
+  const selectedPostLikesCount = selectedPostLikes?.count ?? 0;
+  const isSelectedPostLikedFromServer =
+    selectedPostLikes?.likes.some((like) => getUserId(like.user) === myProfileId) ??
+    false;
+  const isSelectedPostLiked = likedOverride ?? isSelectedPostLikedFromServer;
+  const selectedPostLikesLabel = `${selectedPostLikesCount} ${
+    selectedPostLikesCount === 1 ? "like" : "likes"
+  }`;
+
+  useEffect(() => {
+    if (!selectedPost) {
+      return;
+    }
+
+    dispatch(fetchPostLikes(selectedPost._id));
+    setLikedOverride(null);
+  }, [dispatch, selectedPost]);
 
 
   /**
@@ -211,6 +258,15 @@ function MyProfilePage() {
     setSelectedPost(remainingPosts[nextIndex]);
     setSelectedPostIndex(nextIndex);
     setSelectedImageIndex(0);
+  };
+
+  const handleToggleSelectedPostLike = () => {
+    if (!selectedPost) {
+      return;
+    }
+
+    setLikedOverride(!isSelectedPostLiked);
+    dispatch(togglePostLike(selectedPost._id));
   };
 
   const showPreviousSelectedImage = () => {
@@ -460,15 +516,34 @@ function MyProfilePage() {
 
               <footer className={styles.postModalFooter}>
                 <div className={styles.postActions}>
-                  <img src="/icons/button-like.png" alt="" aria-hidden="true" />
+                  <button
+                    className={`${styles.actionButton} ${
+                      isSelectedPostLiked ? styles.likedButton : ""
+                    }`}
+                    type="button"
+                    aria-label={
+                      isSelectedPostLiked ? "Unlike post" : "Like post"
+                    }
+                    onClick={handleToggleSelectedPostLike}
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <path d="M16.8 3.8c-1.8 0-3.3 1-4.2 2.4C11.7 4.8 10.2 3.8 8.4 3.8 5.5 3.8 3.2 6 3.2 8.8c0 5.2 8.8 10.4 9.2 10.6.1.1.3.1.4 0 .4-.2 9.2-5.4 9.2-10.6 0-2.8-2.3-5-5.2-5Z" />
+                    </svg>
+                  </button>
                   <img
                     src="/icons/button-comments.png"
                     alt=""
                     aria-hidden="true"
                   />
                 </div>
-                <strong>25 likes</strong>
-                <span>1 day</span>
+                <strong>{selectedPostLikesLabel}</strong>
+                <time dateTime={selectedPost.createdAt}>
+                  {getPostAgeLabel(selectedPost.createdAt)}
+                </time>
               </footer>
 
               <div className={styles.commentBar}>
@@ -500,9 +575,6 @@ function MyProfilePage() {
                   onClick={() => navigate(`/posts/${selectedPost._id}/edit`)}
                 >
                   Edit
-                </button>
-                <button type="button" onClick={() => setIsPostMenuOpen(false)}>
-                  Go to post
                 </button>
                 <button type="button" onClick={handleCopyLink}>
                   {copyStatus === "copied" ? "Copied!" : "Copy link"}

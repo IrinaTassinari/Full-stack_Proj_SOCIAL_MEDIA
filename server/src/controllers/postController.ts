@@ -165,7 +165,7 @@ export const getAllPosts = async (
     const posts = await Post.find()
       // подставь данные автора поста, но верни только username, fullName и avatar
       .populate("author", "username fullName avatar")
-      .sort({ createdAt: -1 });
+      .sort({ updatedAt: -1 });
 
     res.status(200).json({
       success: true,

@@ -4,6 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import PostPreviewModal from "../../components/posts/PostPreviewModal";
 import SubscriptionsModal from "../../components/subscriptions/SubscriptionsModal";
 import Spinner from "../../components/ui/Spinner/Spinner";
+import { selectChat, selectChatUser } from "../../features/messages/messagesSlice";
+import { fetchConversation } from "../../features/messages/messagesThunks";
 import { fetchMyProfile } from "../../features/profile/profileThunks";
 import {
   fetchSubscriptionSummary,
@@ -139,6 +141,17 @@ function UserProfilePage() {
     dispatch(followUser(userId));
   };
 
+  const handleOpenMessages = () => {
+    if (!userId || !user) {
+      return;
+    }
+
+    dispatch(selectChat(userId));
+    dispatch(selectChatUser(user));
+    dispatch(fetchConversation(userId));
+    navigate("/messages");
+  };
+
   const handleStatKeyDown = (
     event: ReactKeyboardEvent<HTMLDivElement>,
     modal: "followers" | "following",
@@ -187,7 +200,11 @@ function UserProfilePage() {
             >
               {isFollowing ? "Following" : "Follow"}
             </button>
-            <button className={styles.messageButton} type="button">
+            <button
+              className={styles.messageButton}
+              type="button"
+              onClick={handleOpenMessages}
+            >
               Message
             </button>
           </div>

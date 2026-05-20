@@ -252,11 +252,18 @@
   line-height: 129%;
 }
 
-.captionRow time {
-  display: block;
+.commentMeta {
+  display: flex;
+  align-items: center;
+  gap: 18px;
   margin-top: 6px;
+}
+
+.commentMeta,
+.commentMeta time {
   color: #737373;
   font-size: 12px;
+  font-weight: 400;
   line-height: 133%;
 }
 
@@ -266,7 +273,6 @@
 }
 
 .deleteCommentButton {
-  margin-top: 5px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -281,11 +287,46 @@
   color: #ed4956;
 }
 
+.commentLikeButton {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 5px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.commentLikeButton svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+  fill: transparent;
+  stroke: #000000;
+  stroke-width: 2;
+  transition: fill 0.12s ease, stroke 0.12s ease, transform 0.12s ease;
+}
+
+.commentLikeButton:active svg {
+  transform: scale(0.92);
+}
+
 .footer {
   display: grid;
   gap: 8px;
   padding: 14px 18px;
   border-top: 1px solid #dbdbdb;
+}
+
+.footer time {
+  color: #737373;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 133%;
 }
 
 .actions {

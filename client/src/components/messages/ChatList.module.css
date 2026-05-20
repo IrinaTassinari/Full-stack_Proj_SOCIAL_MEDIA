@@ -1,0 +1,91 @@
+.sidebar {
+  min-width: 0;
+  border-right: 1px solid #dbdbdb;
+  background: #ffffff;
+}
+
+.header {
+  height: 96px;
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  border-bottom: 1px solid #efefef;
+}
+
+.header h1 {
+  margin: 0;
+  color: #000000;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 125%;
+}
+
+.list {
+  margin: 0;
+  padding: 24px 0;
+  list-style: none;
+}
+
+.chatButton {
+  width: 100%;
+  min-height: 76px;
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 28px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.chatButton:hover,
+.active {
+  background: #efefef;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.chatMeta {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.chatMeta strong {
+  overflow: hidden;
+  color: #000000;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 129%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chatMeta span {
+  overflow: hidden;
+  color: #737373;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 123%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stateText,
+.errorText {
+  margin: 24px 28px;
+  color: #737373;
+  font-size: 14px;
+  line-height: 129%;
+}
+
+.errorText {
+  color: #ed4956;
+}

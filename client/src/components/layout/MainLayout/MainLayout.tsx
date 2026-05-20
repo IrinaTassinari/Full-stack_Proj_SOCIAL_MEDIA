@@ -37,7 +37,7 @@ function MainLayout() {
 
       {activePanel === "search" && (
         <OverlayPanel onClose={closePanel}>
-          <SearchPanel />
+          <SearchPanel onClose={closePanel} />
         </OverlayPanel>
       )}
 

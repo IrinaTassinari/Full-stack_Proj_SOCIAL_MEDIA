@@ -1,0 +1,201 @@
+.chatWindow,
+.emptyState {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: 96px minmax(0, 1fr) 76px;
+  background: #ffffff;
+}
+
+.emptyState {
+  place-items: center;
+  grid-template-rows: 1fr;
+  text-align: center;
+}
+
+.emptyState h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+}
+
+.emptyState p {
+  margin: 0;
+  color: #737373;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  border-bottom: 1px solid #efefef;
+}
+
+.headerAvatar,
+.messageAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.header strong {
+  color: #000000;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.messagesArea {
+  min-height: 0;
+  overflow: auto;
+  padding: 36px 32px 24px;
+}
+
+.profilePreview {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  margin-bottom: 70px;
+  text-align: center;
+}
+
+.profileAvatar {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profilePreview strong {
+  color: #000000;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.profilePreview span {
+  color: #737373;
+  font-size: 14px;
+}
+
+.profilePreview a {
+  min-width: 160px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: #efefef;
+  color: #000000;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.timestamp {
+  display: block;
+  margin: 32px 0;
+  color: #737373;
+  font-size: 12px;
+  text-align: center;
+}
+
+.messageRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.ownMessageRow {
+  justify-content: flex-end;
+}
+
+.messageBubble {
+  max-width: min(520px, 70%);
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: #efefef;
+  color: #000000;
+  font-size: 14px;
+  line-height: 129%;
+}
+
+.ownBubble {
+  background: #4f00ff;
+  color: #ffffff;
+}
+
+.messageForm {
+  position: relative;
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px 24px;
+}
+
+.messageForm input {
+  height: 44px;
+  min-width: 0;
+  padding: 0 24px;
+  border: 1px solid #dbdbdb;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #000000;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+}
+
+.messageForm button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #0095f6;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.messageForm button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.smileButton {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.smileButton img {
+  width: 28px;
+  height: 28px;
+  display: block;
+}
+
+.emojiPicker {
+  position: absolute;
+  left: 24px;
+  bottom: 70px;
+  z-index: 4;
+  max-width: min(352px, calc(100vw - 120px));
+}
+
+.emojiPicker :global(.EmojiPickerReact) {
+  --epr-picker-border-radius: 8px;
+  --epr-picker-border-color: #dbdbdb;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.stateText {
+  margin: 0 0 20px;
+  color: #737373;
+  font-size: 14px;
+  text-align: center;
+}

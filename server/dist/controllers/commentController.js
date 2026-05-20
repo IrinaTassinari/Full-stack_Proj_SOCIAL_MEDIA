@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { Post } from "../models/Post.js";
 import { Comment } from "../models/Comment.js";
 import { Notification } from "../models/Notification.js";
+import { CommentLike } from "../models/CommentLike.js";
 import { AppError } from "../utils/appError.js";
 export const addComment = async (req, res, next) => {
     try {
@@ -96,6 +97,8 @@ export const deleteComment = async (req, res, next) => {
             text,
           });
          */
+        // при удалении комментария его лайки тоже удалятся
+        await CommentLike.deleteMany({ comment: comment._id });
         await comment.deleteOne();
         if (post) {
             await Notification.deleteOne({

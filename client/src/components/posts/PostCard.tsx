@@ -1,11 +1,7 @@
 // отвечает за лайк/комментарий прямо в ленте
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import EmojiPicker, { type EmojiClickData } from "emoji-picker-react";
-import {
-  addPostComment,
-  fetchPostComments,
-} from "../../features/comments/commentsThunks";
+import { fetchPostComments } from "../../features/comments/commentsThunks";
 import { fetchPostLikes, togglePostLike } from "../../features/likes/likesThunks";
 import {
   fetchSubscriptionSummary,
@@ -54,8 +50,6 @@ function PostCard({ post, onOpenPost }: PostCardProps) {
     (state) => state.subscriptions,
   );
 
-  const [commentText, setCommentText] = useState("");
-  const [isEmojiOpen, setIsEmojiOpen] = useState(false);
   const [likedOverride, setLikedOverride] = useState<boolean | null>(null);
 
   const currentUserId = getUserId(myProfile);
@@ -87,22 +81,6 @@ function PostCard({ post, onOpenPost }: PostCardProps) {
   const handleToggleLike = () => {
     setLikedOverride(!isPostLiked);
     dispatch(togglePostLike(post._id));
-  };
-
-  const handleAddComment = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!commentText.trim()) {
-      return;
-    }
-
-    dispatch(addPostComment({ postId: post._id, text: commentText }));
-    setCommentText("");
-    setIsEmojiOpen(false);
-  };
-
-  const handleEmojiClick = (emojiData: EmojiClickData) => {
-    setCommentText((current) => `${current}${emojiData.emoji}`);
   };
 
   const handleToggleFollow = () => {
@@ -211,30 +189,6 @@ function PostCard({ post, onOpenPost }: PostCardProps) {
         </p>
       )}
 
-      <form className={styles.commentForm} onSubmit={handleAddComment}>
-        <button
-          className={styles.smileButton}
-          type="button"
-          aria-label="Choose emoji"
-          onClick={() => setIsEmojiOpen((current) => !current)}
-        >
-          <img src="/icons/smile_btn.png" alt="" aria-hidden="true" />
-        </button>
-        {isEmojiOpen && (
-          <div className={styles.emojiPicker}>
-            <EmojiPicker onEmojiClick={handleEmojiClick} />
-          </div>
-        )}
-        <input
-          type="text"
-          placeholder="Add comment"
-          value={commentText}
-          onChange={(event) => setCommentText(event.target.value)}
-        />
-        <button type="submit" disabled={!commentText.trim()}>
-          Send
-        </button>
-      </form>
     </article>
   );
 }

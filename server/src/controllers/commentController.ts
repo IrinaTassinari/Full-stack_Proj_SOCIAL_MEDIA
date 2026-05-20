@@ -3,6 +3,7 @@ import type { Request, Response, NextFunction } from "express";
 import { Post } from "../models/Post.js";
 import { Comment } from "../models/Comment.js";
 import { Notification } from "../models/Notification.js";
+import { CommentLike } from "../models/CommentLike.js";
 import { AppError } from "../utils/appError.js";
 
 export const addComment = async (
@@ -133,6 +134,8 @@ export const deleteComment = async (
       });
      */
 
+    // при удалении комментария его лайки тоже удалятся
+    await CommentLike.deleteMany({ comment: comment._id });
     await comment.deleteOne();
 
     if (post) {
