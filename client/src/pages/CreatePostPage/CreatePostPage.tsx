@@ -169,7 +169,7 @@ function CreatePostPage() {
           <h1>Create new post</h1>
           <div className={styles.headerActions}>
             <button
-              className={styles.shareButton}
+              className={`${styles.shareButton} ${styles.headerShareButton}`}
               type="submit"
               disabled={!canSubmit}
             >
@@ -178,9 +178,13 @@ function CreatePostPage() {
             <button
               className={styles.closeButton}
               type="button"
+              aria-label="Close"
               onClick={() => navigate("/profile")}
             >
-              Close
+              <span className={styles.closeText}>Close</span>
+              <span className={styles.closeIcon} aria-hidden="true">
+                &times;
+              </span>
             </button>
           </div>
         </header>
@@ -319,6 +323,13 @@ function CreatePostPage() {
                   <EmojiPicker onEmojiClick={handleEmojiClick} />
                 </div>
               )}
+              <button
+                className={`${styles.shareButton} ${styles.footerShareButton}`}
+                type="submit"
+                disabled={!canSubmit}
+              >
+                {isLoading ? "Sharing..." : "Share"}
+              </button>
             </div>
           </aside>
         </div>

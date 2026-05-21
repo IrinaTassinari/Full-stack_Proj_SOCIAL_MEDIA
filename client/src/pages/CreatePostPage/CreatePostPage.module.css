@@ -17,26 +17,32 @@
 .header {
   height: 44px;
   position: relative;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   justify-content: center;
   border-bottom: 1px solid #dbdbdb;
 }
 
 .header h1 {
+  grid-column: 2;
   margin: 0;
   color: #000000;
   font-size: 14px;
   font-weight: 700;
   line-height: 150%;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .headerActions {
-  position: absolute;
+  grid-column: 3;
+  justify-self: end;
   right: 16px;
   display: inline-flex;
   align-items: center;
   gap: 14px;
+  padding-right: 16px;
 }
 
 .closeButton,
@@ -47,11 +53,21 @@
 }
 
 .closeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 0;
   color: #ed4956;
   font-size: 14px;
   font-weight: 700;
   line-height: 150%;
+}
+
+.closeIcon {
+  display: none;
+  font-size: 24px;
+  line-height: 1;
+  transform: translateY(-1px);
 }
 
 .shareButton {
@@ -65,6 +81,10 @@
 .shareButton:disabled {
   opacity: 0.45;
   cursor: default;
+}
+
+.footerShareButton {
+  display: none;
 }
 
 .body {
@@ -319,6 +339,7 @@
   height: 44px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 0 18px;
   border-top: 1px solid #dbdbdb;
 }
@@ -381,5 +402,64 @@
   .details {
     border-left: 0;
     border-top: 1px solid #dbdbdb;
+  }
+}
+
+@media (max-width: 890px) {
+  .closeButton {
+    width: 28px;
+    height: 28px;
+    font-size: 24px;
+    line-height: 1;
+  }
+
+  .closeText {
+    display: none;
+  }
+
+  .closeIcon {
+    display: block;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 32px 12px;
+  }
+
+  .header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    height: 44px;
+    min-height: 44px;
+    padding: 0 10px;
+  }
+
+  .header h1 {
+    grid-column: 1;
+    justify-self: center;
+    font-size: 13px;
+    min-width: 0;
+  }
+
+  .headerActions {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    gap: 10px;
+    padding-right: 0;
+  }
+
+  .shareButton {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 450px) {
+  .headerShareButton {
+    display: none;
+  }
+
+  .footerShareButton {
+    display: inline-flex;
   }
 }

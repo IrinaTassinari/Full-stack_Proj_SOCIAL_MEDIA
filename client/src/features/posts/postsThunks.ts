@@ -3,12 +3,20 @@ import axios from "axios";
 import type { Post } from "../../types/post";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+
 
 type ExplorePostsResponse = {
   success: boolean;
   posts: Post[];
   count: number;
+  limit: number;
+  hasMore: boolean;
+};
+
+type FetchExplorePostsArgs = {
+  limit?: number;
+  exclude?: string[];
 };
 
 type PostsResponse = {
@@ -32,18 +40,30 @@ const getAuthHeaders = () => {
   return token ? { Authorization: `Bearer ${token}` } : undefined;
 };
 
+// пагинация
 // GET /api/posts/explore
 export const fetchExplorePosts = createAsyncThunk(
   "posts/fetchExplorePosts",
-  async (_, { rejectWithValue }) => {
+  async (
+    { limit = 50, exclude = [] }: FetchExplorePostsArgs = {},
+    { rejectWithValue },
+  ) => {
     try {
       const response = await axios.get<ExplorePostsResponse>(
         `${API_URL}/api/posts/explore`,
+        {
+          params: {
+            limit,
+            exclude: exclude.join(","),
+          },
+        },
       );
 
-      return response.data.posts;
+      return response.data;
     } catch (error: unknown) {
-      return rejectWithValue(getErrorMessage(error, "Failed to load explore posts"));
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to load explore posts"),
+      );
     }
   },
 );

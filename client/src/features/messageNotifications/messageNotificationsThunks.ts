@@ -4,7 +4,7 @@ import type { User } from "../../types/user";
 import type { Message } from "../messages/messagesThunks";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
 export type MessageNotification = {
   _id: string;

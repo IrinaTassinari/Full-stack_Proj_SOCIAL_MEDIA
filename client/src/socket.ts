@@ -1,7 +1,7 @@
 import { io, type Socket } from "socket.io-client";
 
 // Берём адрес backend
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
 // Создаём переменную, где будет храниться socket-соединение. Сначала соединения нет - null
 let socket: Socket | null = null;

@@ -217,7 +217,7 @@
 
 @media (max-width: 900px) {
   .page {
-    width: calc(100vw - 72px - 32px);
+    width: min(944px, calc(100vw - 244px - 48px));
   }
 
   .form,
@@ -228,8 +228,9 @@
 
 @media (max-width: 640px) {
   .page {
-    width: calc(100vw - 24px);
+    width: calc(100vw - 72px - 24px);
     margin-top: 32px;
+    padding: 0 24px;
   }
 
   .title {
@@ -253,6 +254,8 @@
 
   .saveButton,
   .exitButton {
+    height: 32px;
+    padding: 10px;
     width: 100%;
   }
 }

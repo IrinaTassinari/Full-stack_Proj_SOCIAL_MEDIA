@@ -14,6 +14,7 @@ const navItems = [
 type LeftSidebarProps = {
   isSearchOpen?: boolean;
   isNotificationsOpen?: boolean;
+  isMobileOpen?: boolean;
   onSearchClick: () => void;
   onNotificationsClick: () => void;
   onNavigate: () => void;
@@ -22,6 +23,7 @@ type LeftSidebarProps = {
 function LeftSidebar({
   isSearchOpen = false,
   isNotificationsOpen = false,
+  isMobileOpen = false,
   onSearchClick,
   onNotificationsClick,
   onNavigate,
@@ -55,7 +57,7 @@ function LeftSidebar({
     <aside
       className={`${styles.sidebar} ${
         location.pathname === "/messages" ? styles.messagesSidebar : ""
-      }`}
+      } ${isMobileOpen ? styles.mobileOpen : ""}`}
     >
       <NavLink
         className={styles.logoLink}

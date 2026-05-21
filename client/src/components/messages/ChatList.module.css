@@ -89,3 +89,141 @@
 .errorText {
   color: #ed4956;
 }
+
+.emptyState {
+  padding: 24px 28px;
+}
+
+.emptyState h2 {
+  margin: 0 0 8px;
+  color: #000000;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 125%;
+}
+
+.emptyState > p {
+  margin: 0 0 20px;
+  color: #737373;
+  font-size: 14px;
+  line-height: 129%;
+}
+
+.suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.suggestionButton {
+  width: 100%;
+  min-height: 64px;
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.suggestionButton:hover {
+  opacity: 0.7;
+}
+
+.suggestionAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.suggestionButton span {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.suggestionButton strong,
+.suggestionButton small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.suggestionButton strong {
+  color: #000000;
+  font-size: 14px;
+  line-height: 129%;
+}
+
+.suggestionButton small {
+  color: #737373;
+  font-size: 12px;
+  line-height: 133%;
+}
+
+@media (max-width: 900px) {
+  .header {
+    padding: 0 24px;
+  }
+
+  .chatButton {
+    grid-template-columns: 48px 1fr;
+    gap: 12px;
+    padding: 10px 20px;
+  }
+
+  .avatar {
+    width: 48px;
+    height: 48px;
+  }
+
+  .emptyState,
+  .stateText,
+  .errorText {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+}
+
+@media (max-width: 760px) {
+  .header {
+    padding: 0 16px;
+  }
+
+  .chatButton {
+    grid-template-columns: 42px 1fr;
+    gap: 10px;
+    padding: 10px 14px;
+  }
+
+  .avatar {
+    width: 42px;
+    height: 42px;
+  }
+
+  .chatMeta strong {
+    font-size: 13px;
+  }
+
+  .chatMeta span {
+    font-size: 12px;
+  }
+}
+
+
+
+@media (max-width: 600px) {
+  .header {
+    height: 35px;
+  }
+  .list {
+  padding: 4px 0;
+}
+}

@@ -1,7 +1,0 @@
-в LeftSidebar пункт Search теперь кнопка, а не ссылка на /search - check
-в LeftSidebar пункт Notifications теперь открывает overlay, как Search а не ссылка /notifications; -check
-
-
-Пустые/заглушечные места:
-routes /messages, /notifications сейчас просто <div>: AppRoutes.tsx (line 32) - check
-

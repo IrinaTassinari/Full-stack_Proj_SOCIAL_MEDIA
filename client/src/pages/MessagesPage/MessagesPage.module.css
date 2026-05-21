@@ -51,6 +51,43 @@
 
 @media (max-width: 900px) {
   .page {
-    grid-template-columns: 1fr;
+    grid-template-columns: 300px minmax(0, 1fr);
   }
+}
+
+@media (max-width: 760px) {
+  .page {
+    grid-template-columns: 240px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .page {
+    grid-template-columns: 1fr;
+    margin-bottom: 0;
+  }
+.closeButton::before,
+.closeButton {
+  width: 36px;
+  height: 36px;
+  position: absolute;
+  right: 20px;
+  top: 2px;
+  z-index: 2;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.closeButton::before,
+.closeButton::after {
+  width: 20px;
+  height: 2px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 999px;
+  background: #000000;
+  content: "";
+}
 }

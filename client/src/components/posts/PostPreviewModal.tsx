@@ -341,8 +341,8 @@ function PostPreviewModal({
                 <p>
                   <Link to={authorProfileUrl}>
                     <strong>{post.author.username}</strong>
-                  </Link>{" "}
-                  {post.description}
+                  </Link>
+                  <span>{post.description}</span>
                 </p>
               </div>
             )}

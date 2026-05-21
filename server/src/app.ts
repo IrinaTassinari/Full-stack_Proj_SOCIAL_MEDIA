@@ -20,10 +20,15 @@ import { env } from './config/env.js';
 
 
 const app = express();
+const allowedOrigins = [
+  env.clientUrl,
+  env.clientUrl.replace("localhost", "127.0.0.1"),
+  env.clientUrl.replace("127.0.0.1", "localhost"),
+];
 
 app.use(
   cors({
-    origin: env.clientUrl,
+    origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })

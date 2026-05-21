@@ -78,3 +78,13 @@
     grid-template-columns: minmax(280px, 548px);
   }
 }
+
+@media (max-width: 420px) {
+  .page {
+    padding: 28px 12px 48px;
+  }
+
+  .feedGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

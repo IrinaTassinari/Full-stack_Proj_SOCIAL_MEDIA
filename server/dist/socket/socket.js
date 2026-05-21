@@ -6,9 +6,14 @@ let io;
 // И только после этого вызывается: initSocket(server);
 // Потом уже присваиваем значение io
 export const initSocket = (server) => {
+    const allowedOrigins = [
+        env.clientUrl,
+        env.clientUrl.replace("localhost", "127.0.0.1"),
+        env.clientUrl.replace("127.0.0.1", "localhost"),
+    ];
     io = new Server(server, {
         cors: {
-            origin: env.clientUrl,
+            origin: allowedOrigins,
             credentials: true,
         },
     });

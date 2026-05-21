@@ -1,20 +1,20 @@
 .page {
-  width: min(1084px, calc(100vw - 244px - 72px));
+  width: min(1128px, calc(100vw - 244px - 48px));
   margin: 54px auto 96px;
 }
 
 .header {
-  width: 921px;
+  width: 1080px;
   display: grid;
-  grid-template-columns: 190px minmax(0, 1fr);
-  column-gap: 88px;
+  grid-template-columns: 210px minmax(0, 1fr);
+  column-gap: 126px;
   align-items: center;
   margin: 0 auto 72px;
 }
 
 .avatarRing {
-  width: 174px;
-  height: 174px;
+  width: 190px;
+  height: 190px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -23,8 +23,8 @@
 }
 
 .avatar {
-  width: 162px;
-  height: 162px;
+  width: 180px;
+  height: 180px;
   border: 3px solid #ffffff;
   border-radius: 50%;
   background: #efefef;
@@ -156,16 +156,16 @@
 }
 
 .postsGrid {
-  width: 921px;
+  width: 1080px;
   display: grid;
-  grid-template-columns: repeat(3, 307px);
+  grid-template-columns: repeat(3, 358px);
   gap: 3px;
   margin: 0 auto;
 }
 
 .postTile {
-  width: 307px;
-  height: 307px;
+  width: 358px;
+  height: 358px;
   position: relative;
   overflow: hidden;
   padding: 0;
@@ -213,16 +213,53 @@
 }
 
 .inlineError {
-  width: 921px;
+  width: 1080px;
   margin: -48px auto 32px;
   color: #ed4956;
   font-size: 14px;
   text-align: center;
 }
 
+@media (max-width: 1355px) {
+  .page {
+    width: min(921px, calc(100vw - 244px - 48px));
+  }
+
+  .header,
+  .postsGrid,
+  .inlineError {
+    width: min(921px, 100%);
+  }
+
+  .header {
+    grid-template-columns: 190px minmax(0, 1fr);
+    column-gap: 64px;
+  }
+
+  .avatarRing {
+    width: 174px;
+    height: 174px;
+  }
+
+  .avatar {
+    width: 162px;
+    height: 162px;
+  }
+
+  .postsGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .postTile {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+}
+
 @media (max-width: 1200px) {
   .page {
-    width: min(921px, calc(100vw - 72px - 48px));
+    width: min(921px, calc(100vw - 244px - 48px));
   }
 
   .header,
@@ -241,29 +278,40 @@
   }
 }
 
+@media (max-width: 980px) {
+  .page {
+    width: min(921px, calc(100vw - 72px - 48px));
+  }
+}
+
 @media (max-width: 900px) {
   .header {
-    grid-template-columns: 130px minmax(0, 1fr);
-    column-gap: 32px;
-    align-items: start;
+    width: min(620px, 100%);
+    grid-template-columns: 136px minmax(0, 1fr);
+    column-gap: 54px;
+    align-items: center;
+    margin: 0 auto 56px;
   }
 
   .avatarRing {
-    width: 130px;
-    height: 130px;
+    width: 136px;
+    height: 136px;
   }
 
   .avatar {
-    width: 120px;
-    height: 120px;
+    width: 126px;
+    height: 126px;
   }
 
   .topRow {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    gap: 12px;
   }
 
   .username {
-    width: 100%;
+    width: auto;
+    min-width: 0;
+    margin-right: 0;
   }
 
   .stats {
@@ -278,19 +326,30 @@
   }
 
   .header {
-    grid-template-columns: 86px minmax(0, 1fr);
-    column-gap: 18px;
+    grid-template-columns: 164px minmax(0, 1fr);
+    column-gap: clamp(18px, calc(-186px + 30vw), 30px);
     margin-bottom: 48px;
   }
 
   .avatarRing {
-    width: 86px;
-    height: 86px;
+    width: 124px;
+    height: 124px;
+    justify-self: end;
   }
 
   .avatar {
-    width: 80px;
-    height: 80px;
+    width: 116px;
+    height: 116px;
+  }
+
+  .topRow {
+    display: grid;
+    grid-template-columns: repeat(2, 128px);
+    gap: 12px;
+  }
+
+  .username {
+    grid-column: 1 / -1;
   }
 
   .followButton,
@@ -306,6 +365,67 @@
 
 @media (max-width: 520px) {
   .page {
-    width: calc(100vw - 24px);
+    width: calc(100vw - 72px - 24px);
+  }
+}
+
+@media (max-width: 560px) {
+  .header {
+    align-items: start;
+    grid-template-columns: 124px minmax(0, 1fr);
+    column-gap: 24px;
+  }
+
+  .avatarRing {
+    justify-self: start;
+  }
+
+  .topRow {
+    grid-template-columns: repeat(2, 96px);
+    gap: 8px;
+  }
+
+  .followButton,
+  .messageButton {
+    width: 96px;
+    height: 32px;
+    font-size: 13px;
+  }
+
+  .postsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .page {
+    width: calc(100vw - 56px - 16px);
+  }
+}
+
+@media (max-width: 445px) {
+  .header {
+    grid-template-columns: 96px minmax(0, 1fr);
+    column-gap: 16px;
+  }
+
+  .avatarRing {
+    width: 96px;
+    height: 96px;
+  }
+
+  .avatar {
+    width: 88px;
+    height: 88px;
+  }
+
+  .topRow {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .followButton,
+  .messageButton {
+    width: min(128px, 100%);
   }
 }

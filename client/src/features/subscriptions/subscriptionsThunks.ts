@@ -3,7 +3,7 @@ import axios from "axios";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import type { User } from "../../types/user";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
 type SubscriptionUser = {
   _id?: string;

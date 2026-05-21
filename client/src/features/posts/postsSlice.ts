@@ -13,6 +13,7 @@ type PostsState = {
   allPosts: Post[];
   explorePosts: Post[];
   selectedPost: Post | null;
+  exploreHasMore: boolean;
   feedStatus: "idle" | "loading" | "succeeded" | "failed";
   status: "idle" | "loading" | "succeeded" | "failed";
   selectedStatus: "idle" | "loading" | "succeeded" | "failed";
@@ -25,6 +26,7 @@ const initialState: PostsState = {
   allPosts: [],
   explorePosts: [],
   selectedPost: null,
+  exploreHasMore: true,
   feedStatus: "idle",
   status: "idle",
   selectedStatus: "idle",
@@ -36,7 +38,14 @@ const initialState: PostsState = {
 const postsSlice = createSlice({
   name: "posts",
   initialState,
-  reducers: {},
+  reducers: {
+  resetExplorePosts: (state) => {
+    state.explorePosts = [];
+    state.exploreHasMore = true;
+    state.status = "idle";
+    state.error = null;
+  },
+},
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllPosts.pending, (state) => {
@@ -60,7 +69,14 @@ const postsSlice = createSlice({
       })
       .addCase(fetchExplorePosts.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.explorePosts = action.payload;
+
+        const existingIds = new Set(state.explorePosts.map((post) => post._id));
+        const newPosts = action.payload.posts.filter(
+          (post) => !existingIds.has(post._id),
+        );
+
+        state.explorePosts = [...state.explorePosts, ...newPosts];
+        state.exploreHasMore = action.payload.hasMore;
       })
       .addCase(fetchExplorePosts.rejected, (state, action) => {
         state.status = "failed";
@@ -142,5 +158,5 @@ const postsSlice = createSlice({
       });
   },
 });
-
+export const { resetExplorePosts } = postsSlice.actions;
 export default postsSlice.reducer;

@@ -1,15 +1,15 @@
-import {
-  fetchConversation,
-  type Message,
-} from "../../features/messages/messagesThunks";
+import { useEffect } from "react";
+import { fetchConversation, type Message } from "../../features/messages/messagesThunks";
 import { selectChat, selectChatUser } from "../../features/messages/messagesSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import type { User } from "../../types/user";
+import { fetchUserFollowing } from "../../features/subscriptions/subscriptionsThunks";
 import styles from "./ChatList.module.css";
 
 const getUserId = (
   user: { _id?: string; id?: string; userId?: string } | null | undefined,
 ) => user?._id || user?.userId || user?.id || "";
+
 
 const getChatPartner = (message: Message, currentUserId: string) => {
   const senderId = getUserId(message.sender);
@@ -44,12 +44,25 @@ function ChatList({ currentUserId }: ChatListProps) {
     (state) => state.messages,
   );
   const { myProfile } = useAppSelector((state) => state.profile);
+  const { followingByUserId, listStatus } = useAppSelector(
+    (state) => state.subscriptions,
+  );
+  const following = currentUserId ? followingByUserId[currentUserId] ?? [] : [];
+
 
   const handleSelectChat = (userId: string, user: User) => {
     dispatch(selectChat(userId));
     dispatch(selectChatUser(user));
     dispatch(fetchConversation(userId));
   };
+
+  useEffect(() => {
+    const userId = getUserId(myProfile);
+
+    if (userId) {
+      dispatch(fetchUserFollowing(userId));
+    }
+  }, [dispatch, myProfile]);
 
   return (
     <aside className={styles.sidebar}>
@@ -64,7 +77,53 @@ function ChatList({ currentUserId }: ChatListProps) {
       {status === "failed" && <p className={styles.errorText}>{error}</p>}
 
       {status === "succeeded" && chats.length === 0 && (
-        <p className={styles.stateText}>No chats yet.</p>
+        <div className={styles.emptyState}>
+          <h2>Start a conversation</h2>
+          <p>Choose someone you follow to send a message.</p>
+
+          {listStatus === "loading" && (
+            <p className={styles.stateText}>Loading people...</p>
+          )}
+
+          {listStatus === "succeeded" && following.length === 0 && (
+            <p className={styles.stateText}>
+              Follow people from Explore to start messaging them.
+            </p>
+          )}
+
+          {following.length > 0 && (
+            <ul className={styles.suggestions}>
+              {following.map((user) => {
+                const userId = getUserId(user);
+
+                if (!userId) {
+                  return null;
+                }
+
+                return (
+                  <li key={userId}>
+                    <button
+                      className={styles.suggestionButton}
+                      type="button"
+                      onClick={() => handleSelectChat(userId, user)}
+                    >
+                      <img
+                        className={styles.suggestionAvatar}
+                        src={user.avatar || "/icons/ICH_avatar.png"}
+                        alt=""
+                        aria-hidden="true"
+                      />
+                      <span>
+                        <strong>{user.username}</strong>
+                        {user.fullName && <small>{user.fullName}</small>}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
       )}
 
       <ul className={styles.list}>

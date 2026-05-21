@@ -1,20 +1,20 @@
 .page {
-  width: min(1196px, calc(100vw - 244px - 48px));
+  width: min(1128px, calc(100vw - 244px - 48px));
   margin: 54px auto 96px;
 }
 
 .header {
-  width: 921px;
+  width: 938px;
   display: grid;
-  grid-template-columns: 150px minmax(0, 1fr);
-  column-gap: 168px;
+  grid-template-columns: 190px minmax(0, 1fr);
+  column-gap: 189px;
   align-items: start;
   margin: 0 auto 64px;
 }
 
 .avatarRing {
-  width: 150px;
-  height: 150px;
+  width: 190px;
+  height: 190px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -23,9 +23,9 @@
 }
 
 .avatar {
-  width: 142px;
-  height: 142px;
-  border: 2px solid #ffffff;
+  width: 180px;
+  height: 180px;
+  border: 3px solid #ffffff;
   border-radius: 50%;
   background: #efefef;
   object-fit: cover;
@@ -154,16 +154,16 @@
 }
 
 .postsGrid {
-  width: 921px;
+  width: 1080px;
   display: grid;
-  grid-template-columns: repeat(3, 307px);
+  grid-template-columns: repeat(3, 358px);
   gap: 3px;
   margin: 0 auto;
 }
 
 .postTile {
-  width: 307px;
-  height: 307px;
+  width: 358px;
+  height: 358px;
   position: relative;
   overflow: hidden;
   padding: 0;
@@ -211,7 +211,7 @@
 }
 
 .createPostBlock {
-  width: 921px;
+  width: 1080px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -633,9 +633,48 @@
   font-weight: 700;
 }
 
+@media (max-width: 1355px) {
+  .page {
+    width: min(921px, calc(100vw - 244px - 48px));
+  }
+
+  .header,
+  .createPostBlock,
+  .postsGrid {
+    width: min(921px, 100%);
+  }
+
+  .header {
+    grid-template-columns: 150px minmax(0, 1fr);
+    column-gap: 167px;
+  }
+
+  .avatarRing {
+    width: 150px;
+    height: 150px;
+    margin-left: 60px;
+  }
+
+  .avatar {
+    width: 142px;
+    height: 142px;
+    border-width: 2px;
+  }
+
+  .postsGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .postTile {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+}
+
 @media (max-width: 1200px) {
   .page {
-    width: min(921px, calc(100vw - 72px - 48px));
+    width: min(921px, calc(100vw - 244px - 48px));
   }
 
   .header,
@@ -652,6 +691,12 @@
     width: 100%;
     height: auto;
     aspect-ratio: 1;
+  }
+}
+
+@media (max-width: 980px) {
+  .page {
+    width: min(921px, calc(100vw - 72px - 48px));
   }
 }
 
@@ -693,7 +738,7 @@
 @media (max-width: 900px) {
   .header {
     grid-template-columns: 120px minmax(0, 1fr);
-    column-gap: 40px;
+    column-gap: 142px;
   }
 
   .avatarRing {
@@ -718,14 +763,15 @@
   }
 
   .header {
-    grid-template-columns: 86px minmax(0, 1fr);
-    column-gap: 18px;
-    margin-bottom: 48px;
+    grid-template-columns: 164px minmax(0, 1fr);
+    column-gap: clamp(3px, calc(34.36px - 4.36vw), 18px);
+    margin-bottom: clamp(14px, calc(20.55px - 0.91vw), 16px);
   }
 
   .avatarRing {
     width: 86px;
     height: 86px;
+    margin-left: clamp(21px, calc(-17.73px + 7.73vw), 38px);
   }
 
   .avatar {
@@ -734,14 +780,18 @@
   }
 
   .topRow {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
+    flex-direction: row;
+    align-items: center;
+    gap: clamp(40px, calc(194px - 21.39vw), 70px);
     margin-bottom: 18px;
   }
 
   .username {
     font-size: 24px;
+  }
+
+  .editButton {
+    width: 140px;
   }
 
   .stats {
@@ -752,6 +802,91 @@
 
 @media (max-width: 520px) {
   .page {
-    width: calc(100vw - 24px);
+    width: calc(100vw - 72px - 24px);
+  }
+}
+
+@media (max-width: 560px) {
+  .editButton {
+    position: relative;
+    width: 44px;
+    font-size: 0;
+  }
+
+  .editButton::before {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    content: "...";
+    color: #000000;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    transform: translate(-50%, -72%);
+  }
+
+  .postsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stats {
+    flex-wrap: nowrap;
+    gap: 14px;
+  }
+
+  .stats dt,
+  .stats dd {
+    font-size: 13px;
+  }
+
+  .newPostButton {
+    width: 58px;
+    height: 58px;
+    border-width: 4px;
+  }
+
+  .newPostButton span {
+    width: 28px;
+    height: 28px;
+  }
+
+  .newPostButton span::before,
+  .newPostButton span::after {
+    width: 28px;
+    height: 3px;
+  }
+}
+
+@media (max-width: 470px) {
+  .header {
+    grid-template-columns: 120px minmax(0, 1fr);
+    column-gap: 8px;
+  }
+
+  .avatarRing {
+    margin-left: 10px;
+  }
+
+  .topRow {
+    gap: 44px;
+  }
+
+  .stats {
+    gap: 8px;
+  }
+
+  .stats div {
+    gap: 3px;
+  }
+
+  .stats dt,
+  .stats dd {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 420px) {
+  .page {
+    width: calc(100vw - 56px - 16px);
   }
 }

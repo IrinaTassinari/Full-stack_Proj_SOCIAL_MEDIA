@@ -156,8 +156,7 @@ export const updatePost = async (req, res, next) => {
                 : post.image
                     ? [post.image]
                     : [];
-            const retainedImages = existingImages?.filter((imageUrl) => currentImages.includes(imageUrl)) ??
-                currentImages;
+            const retainedImages = existingImages?.filter((imageUrl) => currentImages.includes(imageUrl)) ?? currentImages;
             const imageUrls = await Promise.all(files.map((file) => uploadToCloudinary(file.buffer, "inst-project/posts")));
             const nextImages = [...retainedImages, ...imageUrls];
             if (nextImages.length === 0) {
@@ -211,15 +210,44 @@ export const deletePost = async (req, res, next) => {
 // explore
 export const getExplorePosts = async (req, res, next) => {
     try {
-        const posts = await Post.aggregate([{ $sample: { size: 200 } }]);
+        const limit = Math.min(Math.max(Number(req.query.limit) || 50, 1), 50);
+        const excludeIds = typeof req.query.exclude === "string" && req.query.exclude.length > 0
+            ? req.query.exclude
+                .split(",")
+                .filter((id) => mongoose.Types.ObjectId.isValid(id))
+                .map((id) => new mongoose.Types.ObjectId(id))
+            : [];
+        const matchStage = excludeIds.length > 0
+            ? {
+                $match: {
+                    _id: {
+                        $nin: excludeIds,
+                    },
+                },
+            }
+            : null;
+        const pipeline = [
+            ...(matchStage ? [matchStage] : []),
+            { $sample: { size: limit } },
+        ];
+        const posts = await Post.aggregate(pipeline);
         await Post.populate(posts, {
             path: "author",
             select: "username fullName avatar",
         });
+        const remainingCount = await Post.countDocuments(excludeIds.length > 0
+            ? {
+                _id: {
+                    $nin: excludeIds,
+                },
+            }
+            : {});
         res.status(200).json({
             success: true,
             posts,
             count: posts.length,
+            limit,
+            hasMore: posts.length < remainingCount,
         });
     }
     catch (error) {

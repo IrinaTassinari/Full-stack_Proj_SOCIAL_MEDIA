@@ -101,6 +101,12 @@ function NotificationsPanel() {
     <section className={styles.notificationsPanel}>
       <div className={styles.header}>
         <h2 className={styles.title}>Notifications</h2>
+      </div>
+
+      <div className={styles.subHeader}>
+        <h3 className={styles.subtitle}>
+          {unreadCount > 0 ? `New (${unreadCount})` : "New"}
+        </h3>
         {items.length > 0 && (
           <button
             className={styles.readAllButton}
@@ -112,10 +118,6 @@ function NotificationsPanel() {
           </button>
         )}
       </div>
-
-      <h3 className={styles.subtitle}>
-        {unreadCount > 0 ? `New (${unreadCount})` : "New"}
-      </h3>
 
       {status === "loading" && (
         <p className={styles.stateText}>Loading notifications...</p>

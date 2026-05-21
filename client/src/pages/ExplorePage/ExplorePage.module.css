@@ -55,6 +55,24 @@
   color: #ed4956;
 }
 
+.loadMoreButton {
+  display: block;
+  margin: 32px auto 0;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 8px;
+  background: #0095f6;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.loadMoreButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 @media (max-width: 1100px) {
   .page,
   .stateText,
@@ -84,10 +102,23 @@
   .page,
   .stateText,
   .errorText {
-    width: calc(100vw - 24px);
+    width: calc(100vw - 72px - 24px);
   }
 
   .grid {
     grid-auto-rows: 120px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .wide {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 420px) {
+  .page,
+  .stateText,
+  .errorText {
+    width: calc(100vw - 56px - 24px);
   }
 }

@@ -1,10 +1,8 @@
 // отвечает за лайк/комментарий прямо в ленте
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchPostComments } from "../../features/comments/commentsThunks";
-import { fetchPostLikes, togglePostLike } from "../../features/likes/likesThunks";
+import { togglePostLike } from "../../features/likes/likesThunks";
 import {
-  fetchSubscriptionSummary,
   followUser,
   unfollowUser,
 } from "../../features/subscriptions/subscriptionsThunks";
@@ -69,17 +67,6 @@ function PostCard({ post, onOpenPost }: PostCardProps) {
   const likesLabel = `${likesCount} ${likesCount === 1 ? "like" : "likes"}`;
   const commentsCount = postComments?.count ?? 0;
   const latestComment = postComments?.comments[0];
-
-  useEffect(() => {
-    dispatch(fetchPostLikes(post._id));
-    dispatch(fetchPostComments(post._id));
-  }, [dispatch, post._id]);
-
-  useEffect(() => {
-    if (authorId && currentUserId && !isOwnPost) {
-      dispatch(fetchSubscriptionSummary({ userId: authorId, currentUserId }));
-    }
-  }, [authorId, currentUserId, dispatch, isOwnPost]);
 
   const handleToggleLike = () => {
     setLikedOverride({ postId: post._id, value: !isPostLiked });
@@ -176,6 +163,12 @@ function PostCard({ post, onOpenPost }: PostCardProps) {
         </p>
       )}
 
+      {latestComment && (
+        <p className={styles.previewComment}>
+          <span>{latestComment.user.username}</span> {latestComment.text}
+        </p>
+      )}
+
       {commentsCount > 0 && (
         <button
           className={styles.commentsButton}
@@ -184,12 +177,6 @@ function PostCard({ post, onOpenPost }: PostCardProps) {
         >
           View all {commentsCount} {commentsCount === 1 ? "comment" : "comments"}
         </button>
-      )}
-
-      {latestComment && (
-        <p className={styles.previewComment}>
-          <span>{latestComment.user.username}</span> {latestComment.text}
-        </p>
       )}
 
     </article>

@@ -8,6 +8,7 @@ import {
   followUser,
   unfollowUser,
 } from "../../features/subscriptions/subscriptionsThunks";
+import { resetExplorePosts } from "../../features/posts/postsSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { getPostCoverImage } from "../../utils/postImages";
 import styles from "./ExplorePage.module.css";
@@ -18,16 +19,24 @@ const getUserId = (
 
 function ExplorePage() {
   const dispatch = useAppDispatch();
-  const { explorePosts, status, error } = useAppSelector((state) => state.posts);
+  const { explorePosts, status, error, exploreHasMore } = useAppSelector(
+    (state) => state.posts,
+  );
   const { myProfile } = useAppSelector((state) => state.profile);
   const { byUserId, followStatus } = useAppSelector(
     (state) => state.subscriptions,
   );
-  const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
+  const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(
+    null,
+  );
   const selectedPost =
-    selectedPostIndex === null ? null : explorePosts[selectedPostIndex] ?? null;
+    selectedPostIndex === null
+      ? null
+      : (explorePosts[selectedPostIndex] ?? null);
   const currentUserId = getUserId(myProfile);
   const selectedAuthorId = getUserId(selectedPost?.author);
+  const isLoading = status === "loading";
+  const isInitialLoading = isLoading && explorePosts.length === 0;
   const isOwnPost = Boolean(
     currentUserId && selectedAuthorId && currentUserId === selectedAuthorId,
   );
@@ -36,15 +45,29 @@ function ExplorePage() {
     : undefined;
   const isFollowingAuthor = subscriptionSummary?.isFollowing ?? false;
 
+  const handleLoadMore = () => {
+    if (isLoading || !exploreHasMore) {
+      return;
+    }
+
+    dispatch(
+      fetchExplorePosts({
+        limit: 50,
+        exclude: explorePosts.map((post) => post._id),
+      }),
+    );
+  };
+
   useEffect(() => {
-    dispatch(fetchExplorePosts());
+    dispatch(resetExplorePosts());
+    dispatch(fetchExplorePosts({ limit: 50 }));
   }, [dispatch]);
 
   useEffect(() => {
-    if (!myProfile) {
+    if (selectedPost && !myProfile) {
       dispatch(fetchMyProfile());
     }
-  }, [dispatch, myProfile]);
+  }, [dispatch, myProfile, selectedPost]);
 
   useEffect(() => {
     if (!selectedAuthorId || !currentUserId || isOwnPost) {
@@ -72,7 +95,7 @@ function ExplorePage() {
     dispatch(followUser(selectedAuthorId));
   };
 
-  if (status === "loading") {
+  if (isInitialLoading) {
     return <Spinner label="Loading posts..." />;
   }
 
@@ -106,11 +129,22 @@ function ExplorePage() {
         ))}
       </div>
 
+      {exploreHasMore && explorePosts.length > 0 && (
+        <button
+          className={styles.loadMoreButton}
+          type="button"
+          disabled={isLoading}
+          onClick={handleLoadMore}
+        >
+          {isLoading ? "Loading..." : "Load more"}
+        </button>
+      )}
+
       {selectedPost && (
         <PostPreviewModal
           post={selectedPost}
           onClose={() => setSelectedPostIndex(null)}
-          showFollowButton={!isOwnPost}
+          showFollowButton={Boolean(currentUserId && !isOwnPost)}
           isFollowingAuthor={isFollowingAuthor}
           isFollowLoading={followStatus === "loading"}
           onToggleFollowAuthor={handleToggleFollowAuthor}

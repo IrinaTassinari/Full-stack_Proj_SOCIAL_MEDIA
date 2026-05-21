@@ -3,7 +3,7 @@ import axios from "axios";
 import type { Comment } from "../../types/comment";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
 type CommentsResponse = {
   success: boolean;
