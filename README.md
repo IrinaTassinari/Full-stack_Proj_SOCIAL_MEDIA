@@ -4,6 +4,11 @@ ICHGRAM is a full-stack Instagram-style social media application built with Reac
 
 The app supports authentication, profile management, post galleries, home and explore feeds, likes, comments, subscriptions, notifications, user search, and private messaging.
 
+## Live Application
+
+- Frontend: [https://full-stack-proj-social-media.vercel.app](https://full-stack-proj-social-media.vercel.app)
+- Backend API: [https://ichgram-backend-yhji.onrender.com](https://ichgram-backend-yhji.onrender.com)
+
 ## Tech Stack
 
 ### Frontend
