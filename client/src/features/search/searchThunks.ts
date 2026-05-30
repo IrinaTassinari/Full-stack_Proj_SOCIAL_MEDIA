@@ -26,7 +26,6 @@ export const searchUsers = createAsyncThunk(
       const response = await axios.get<SearchUsersResponse>(
         `${API_URL}/api/users/search`,
         {
-            // Это способ axios добавить query-параметр в URL
           params: {
             query: query.trim(),
           },

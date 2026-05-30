@@ -14,4 +14,3 @@ router.delete("/:commentId", authMiddleware, deleteComment);
 
 
 export default router;
-

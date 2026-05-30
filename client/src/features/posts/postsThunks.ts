@@ -40,7 +40,6 @@ const getAuthHeaders = () => {
   return token ? { Authorization: `Bearer ${token}` } : undefined;
 };
 
-// пагинация
 // GET /api/posts/explore
 export const fetchExplorePosts = createAsyncThunk(
   "posts/fetchExplorePosts",

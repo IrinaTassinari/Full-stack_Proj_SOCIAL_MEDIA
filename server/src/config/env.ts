@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 
+// Load environment variables from server/.env for local development.
 dotenv.config();
 
 if (!process.env.JWT_SECRET) {
@@ -42,7 +43,7 @@ if (!process.env.EMAIL_FROM) {
   throw new Error("EMAIL_FROM is not defined in .env");
 }
 
-
+// Centralized typed environment configuration for the backend.
 export const env = {
     port: Number(process.env.PORT) || 3000,
     mongoUrl: process.env.MONGO_URL || '',
@@ -59,17 +60,3 @@ export const env = {
     emailFrom: process.env.EMAIL_FROM,
 
 };
-
-/**
- * // Загружаем переменные окружения из файла .env
-// После этого значения из .env будут доступны через process.env
- * 
- * Единый объект с настройками приложения.
- * Почему так удобно:
- * 1. Все env-переменные собраны в одном месте.
- * 2. В остальных файлах мы импортируем уже готовый объект env.
- * 3. Это делает код чище и понятнее.
- * 
- * // Порт, на котором будет запускаться сервер.
-    // process.env.PORT всегда строка, поэтому приводим к Number.
- */

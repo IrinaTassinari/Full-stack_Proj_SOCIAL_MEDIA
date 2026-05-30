@@ -1,4 +1,3 @@
-// ф-я генерации JWT  - эта ф-я принимает пользователя и возвращает токен
 
 import jwt from 'jsonwebtoken'
 import {env} from '../config/env.js'

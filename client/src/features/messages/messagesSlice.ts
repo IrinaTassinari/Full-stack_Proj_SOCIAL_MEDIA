@@ -32,14 +32,11 @@ const initialState: MessagesState = {
 const getUserId = (user: { _id?: string; id?: string; userId?: string }) =>
   user._id || user.userId || user.id || "";
 
-// Эта функция нужна, чтобы понять: с кем именно открыт чат, независимо от того, кто отправил сообщение
-// Если текущий пользователь отправил сообщение, то собеседник это receiver.
-// Если текущий пользователь получил сообщение, то собеседник это sender.
+// Determine the chat partner regardless of who sent the message.
 const getChatPartnerId = (message: Message, currentUserId: string) => {
   const senderId = getUserId(message.sender);
   const receiverId = getUserId(message.receiver);
 
-  // Если отправитель сообщения — это я,то собеседник = получатель.Иначе собеседник = отправитель.
   return senderId === currentUserId ? receiverId : senderId;
 };
 
@@ -63,16 +60,17 @@ const messagesSlice = createSlice({
       const { message, currentUserId } = action.payload;
       const partnerId = getChatPartnerId(message, currentUserId);
 
-      //обновления Redux state -  добавляет новое сообщение в историю конкретного чата.  хранит переписку по id собеседника
+      // Add the incoming message to the conversation history for this partner.
       state.byUserId[partnerId] = [
-        ...(state.byUserId[partnerId] ?? []), //  если чата ещё нет, возьми пустой массив
+        ...(state.byUserId[partnerId] ?? []),
         message,
       ];
 
+      // Move the updated chat to the top of the chat list.
       state.chats = [
-        message, // Поставить новое сообщение первым
+        message,
         ...state.chats.filter(
-          (chat) => getChatPartnerId(chat, currentUserId) !== partnerId, // Убрать старую запись этого же чата из списка
+          (chat) => getChatPartnerId(chat, currentUserId) !== partnerId,
         ),
       ];
     },
@@ -116,13 +114,13 @@ const messagesSlice = createSlice({
         state.sendStatus = "idle";
         const receiverId = getUserId(action.payload.receiver);
 
-        // добавляет новое сообщение в историю переписки с получателем
+        // Add the sent message to the current conversation.
         state.byUserId[receiverId] = [
           ...(state.byUserId[receiverId] ?? []),
           action.payload,
         ];
 
-        //  обновляет список чатов слевa -state.chats хранит не всю переписку, а последние сообщения по каждому чату
+        // Store only the latest message per chat in the left chat list.
         state.chats = [
           action.payload,
           ...state.chats.filter(

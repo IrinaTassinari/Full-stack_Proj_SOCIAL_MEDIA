@@ -8,7 +8,6 @@ type SendEmailOptions = {
 };
 
 export const sendEmail = async ({ to, subject, text }: SendEmailOptions) => {
-  // nodemailer.createTransport(...) создаёт объект transporter
     const transporter = nodemailer.createTransport({
     host: env.emailHost,
     port: env.emailPort,
@@ -18,7 +17,6 @@ export const sendEmail = async ({ to, subject, text }: SendEmailOptions) => {
     },
   });
 
-  // sendMail - метод принимает объект письма:
   await transporter.sendMail({
     from: env.emailFrom,
     to,

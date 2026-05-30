@@ -1,8 +1,7 @@
 import mongoose, { Document, Model } from "mongoose";
 import bcrypt from 'bcrypt';
 
-//Это значит: IUser — это пользователь плюс всё, что умеет Mongoose-документ: _id, save(), deleteOne(), isModified(), createdAt, updatedAt
-
+// Mongoose document type for application users.
 export interface IUser extends Document {
   username: string;
   email: string;
@@ -36,7 +35,8 @@ const userSchema = new mongoose.Schema<IUser>(
         password: {
             type: String,
             required: true,
-            select: false, //  Mongoose по умолчанию не будет возвращать password при запросах
+            // Password hashes are excluded from queries unless explicitly selected.
+            select: false,
         },
         fullName: {
             type: String,
@@ -64,24 +64,24 @@ const userSchema = new mongoose.Schema<IUser>(
         }
     },
     {
-        timestamps: true, // разрешаем создание полей createdAt и updatedAt
-        versionKey: false // запрещаем создание поля __v
+        // Adds createdAt and updatedAt fields.
+        timestamps: true,
+        // Do not include the default __v version key.
+        versionKey: false
     }
 );
 
 
-// candidatePassword: string  - это пароль, который пользователь ввёл при логине
-// this.password -  это хэшированный пароль из базы данных.
 userSchema.methods.comparePassword = async function (
-  candidatePassword: string 
+  candidatePassword: string
 ): Promise<boolean> {
-  return bcrypt.compare(candidatePassword, this.password);   
+  // Compare the plain login password with the stored password hash.
+  return bcrypt.compare(candidatePassword, this.password);
 };
 
 
-//Это Mongoose middleware. Он запускается перед сохранением пользователя
 userSchema.pre('save', async function () {
-//проверяет: изменился ли пароль?
+  // Hash the password only when it was created or changed.
   if (!this.isModified('password')) {
     return;
   }
@@ -91,7 +91,3 @@ userSchema.pre('save', async function () {
 
 
 export const User: Model<IUser> = mongoose.model<IUser>('User', userSchema);
-
-
-
-

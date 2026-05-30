@@ -8,34 +8,21 @@ const startServer = async (): Promise<void> => {
   try {
     await connectDB();
 
-    // Создаём HTTP-сервер на базе Express
+    // Create one HTTP server so Express routes and Socket.io share the same port.
     const server = http.createServer(app);
 
     initSocket(server);
 
     server.listen(env.port, () => {
-      console.log(`Server is running on http://ichgram:${env.port}`);
-      // console.log(`Server is running on http://localhost:${env.port}`);
+      console.log(`Server is running on http://localhost:${env.port}`);
     });
   } catch (error) {
-    // Логируем понятную ошибку
     const message = error instanceof Error ? error.message : "Unknown error";
     console.error("Failed to start server:", message);
 
-    // ВАЖНО: завершаем процесс, чтобы не висел "полумёртвый" сервер
+    // Exit instead of leaving a half-started server process running.
     process.exit(1);
   }
 };
 startServer();
 export default app;
-
-/*
-app.ts = настройки Express-приложения
-server.ts = запуск приложения
-
-server.ts запускает сервер
-То есть server.ts отвечает за:
-загрузку .env
-подключение MongoDB
-запуск порта
-*/

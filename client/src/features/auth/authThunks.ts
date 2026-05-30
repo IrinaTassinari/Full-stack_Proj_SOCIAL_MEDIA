@@ -1,12 +1,5 @@
-/**
- *  API-запросы пишутся в authThunks.ts
-
-Туда идут запросы к backend:
-POST /api/auth/login
-POST /api/auth/register
-POST /api/auth/forgot-password
-PATCH /api/auth/reset-password/:token
- */
+// Auth API requests are kept in Redux thunks so pages can dispatch them
+// and receive consistent loading/error states from the auth slice.
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
@@ -63,7 +56,6 @@ export const registerUser = createAsyncThunk(
     }
   },
 );
-// rejectWithValue - это функция из createAsyncThunk, которая позволяет самой задать, что попадёт в action.payload, если запрос упал
 
 // POST /api/auth/forgot-password
 export const forgotPassword = createAsyncThunk(
@@ -86,13 +78,6 @@ export const forgotPassword = createAsyncThunk(
 // PATCH /api/auth/reset-password/:token
 export const resetPassword = createAsyncThunk(
   "auth/resetPassword",
-
-  /** same
-  async (payload: ResetPasswordPayload, { rejectWithValue }) => {
-  const token = payload.token;
-  const password = payload.password;
-}
-   */
   async ({ token, password }: ResetPasswordPayload, { rejectWithValue }) => {
     try {
       const response = await axios.patch(

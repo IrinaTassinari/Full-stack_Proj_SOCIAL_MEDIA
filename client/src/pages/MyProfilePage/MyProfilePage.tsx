@@ -72,12 +72,12 @@ function MyProfilePage() {
   >(null);
   const myProfileId = getUserId(myProfile);
 
-  // Он запускается один раз, когда открывается MyProfilePage - Он делает запрос: GET /api/users/me
+  // Load the current user's profile when the profile page opens.
   useEffect(() => {
     dispatch(fetchMyProfile());
   }, [dispatch]);
 
-  // Он срабатывает, когда изменился myProfile
+  // Once the profile is available, load that user's posts and subscription counts.
   useEffect(() => {
     const userId = getUserId(myProfile);
 
@@ -124,9 +124,7 @@ function MyProfilePage() {
   }, [dispatch, selectedPost]);
 
 
-  /**
-   * отвечает за открытый пост в модалке: закрытие по Escape, переключение стрелками, копирование ссылки и выбор следующего поста после удаления
-   */
+  // Handle keyboard controls for the open post modal.
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -137,7 +135,6 @@ function MyProfilePage() {
         return;
       }
 
-      // если пост не выбран или пост всего один, переключать некуда или открыто меню Delete/Edit/Copy,то стрелки не трогаем
       if (selectedPostIndex === null || myPosts.length < 2 || isPostMenuOpen) {
         return;
       }
@@ -215,7 +212,7 @@ function MyProfilePage() {
     }
 
     const postUrl = `${window.location.origin}/posts/${selectedPost._id}`;
-    // navigator.clipboard.writeText(postUrl) копирует текст в буфер обмена.
+    // Copy the direct post URL to the clipboard.
     await navigator.clipboard.writeText(postUrl);
     setCopyStatus("copied");
   };
@@ -255,10 +252,7 @@ function MyProfilePage() {
       return;
     }
 
-    //  Выбор следующего поста после удаления
-    /**
-     * Смысл у него такой: после удаления поста модалка должна показать какой-то другой оставшийся пост, а не сломаться.
-     */
+    // Keep the modal open on the next available post after deleting one.
     const nextIndex = Math.min(selectedPostIndex ?? 0, remainingPosts.length - 1);
     setSelectedPost(remainingPosts[nextIndex]);
     setSelectedPostIndex(nextIndex);

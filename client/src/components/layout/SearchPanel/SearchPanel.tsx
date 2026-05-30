@@ -17,8 +17,7 @@ function SearchPanel({ onClose }: SearchPanelProps) {
   const dispatch = useAppDispatch();
   const { users, status, error } = useAppSelector((state) => state.search);
 
-  // Это состояние для текста, который пользователь вводит в поле поиска - текущее значение input
-  const [searchValue, setSearchValue] = useState(""); 
+  const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
     const query = searchValue.trim();
@@ -28,7 +27,7 @@ function SearchPanel({ onClose }: SearchPanelProps) {
       return;
     }
 
-    // Это задержка перед поиском на 300 миллисекунд. setTimeout код ждёт 300 мс. Если пользователь продолжает печатать, старый timeout отменяется. И запрос отправится только когда пользователь чуть остановился.Это называется debounce.
+    // Debounce search requests while the user is typing.
     const timeoutId = window.setTimeout(() => {
       dispatch(searchUsers(query));
     }, 300);

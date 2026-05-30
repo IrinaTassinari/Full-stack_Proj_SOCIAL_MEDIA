@@ -14,35 +14,19 @@ type SubscriptionSummary = {
   isFollowing: boolean;
 };
 
-/**
- * Record<string, SubscriptionSummary>; // объект, где ключи — строки, а значения — SubscriptionSummary
- * 
- * byUserId выглядит примерно так
- * {
-  "user1": {
-    followersCount: 10,
-    followingCount: 3,
-    isFollowing: true
-  },
-  "user2": {
-    followersCount: 5,
-    followingCount: 8,
-    isFollowing: false
-  }
-}
- */
+
 type SubscriptionsState = {
+  // Summary data is keyed by user id so profile pages can reuse cached counts.
   byUserId: Record<string, SubscriptionSummary>;
   followersByUserId: Record<string, User[]>;
   followingByUserId: Record<string, User[]>;
   status: "idle" | "loading" | "succeeded" | "failed";
   listStatus: "idle" | "loading" | "succeeded" | "failed";
-  followStatus: "idle" | "loading"; //Отвечает отдельно за кнопку Follow/Unfollow
+  followStatus: "idle" | "loading";
   error: string | null;
 };
 
 const initialState: SubscriptionsState = {
-  // пока нет информации ни об одном пользователе - Потом, когда выполнится fetchSubscriptionSummary.fulfilled, сюда добавляется запись
   byUserId: {},
   followersByUserId: {},
   followingByUserId: {},
@@ -52,7 +36,6 @@ const initialState: SubscriptionsState = {
   error: null,
 };
 
-// нужен на случай, если данных о пользователе еще нет в byUserId. Тогда создаются значения по умолчанию: 0, 0, false.
 const getDefaultSummary = (): SubscriptionSummary => ({
   followersCount: 0,
   followingCount: 0,
@@ -92,12 +75,13 @@ const subscriptionsSlice = createSlice({
         state.listStatus = "succeeded";
         state.followersByUserId[action.payload.userId] = action.payload.users;
 
+        // Create a default summary if the profile counters were not loaded yet.
         const summary =
-          state.byUserId[action.payload.userId] ?? getDefaultSummary(); // Если такой информации ещё нет, берёт значения по умолчанию
+          state.byUserId[action.payload.userId] ?? getDefaultSummary();
 
         state.byUserId[action.payload.userId] = {
-          ...summary, // оставляет старые данные: followingCount, isFollowing
-          followersCount: action.payload.count, // обновляет количество followers
+          ...summary,
+          followersCount: action.payload.count,
         };
       })
       .addCase(fetchUserFollowers.rejected, (state, action) => {
@@ -115,6 +99,7 @@ const subscriptionsSlice = createSlice({
         state.listStatus = "succeeded";
         state.followingByUserId[action.payload.userId] = action.payload.users;
 
+        // Preserve the existing follower count and update only following count.
         const summary =
           state.byUserId[action.payload.userId] ?? getDefaultSummary();
 

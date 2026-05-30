@@ -21,11 +21,10 @@ const subscribeSchema = new mongoose.Schema<ISubscribe>(
         },
     },
     {
-        timestamps: true, 
-        versionKey: false 
+        timestamps: true,
+        versionKey: false
     }
 );
-// чтобы один пользователь не мог подписаться на другого несколько раз
 subscribeSchema.index({ follower: 1, following: 1 }, { unique: true });
 
 export const Subscribe: Model<ISubscribe> = mongoose.model<ISubscribe>('Subscribe', subscribeSchema);

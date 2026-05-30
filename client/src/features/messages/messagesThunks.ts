@@ -15,14 +15,12 @@ export type Message = {
   updatedAt: string;
 };
 
-// возвращает список чатов, но каждый чат представлен последним сообщением с этим пользователем
 // GET /api/messages/allchats
 type ChatsResponse = {
   success: boolean;
   allChats: Message[];
   count: number;
 };
-// возвращает всю переписку с конкретным пользователем.
 // GET /api/messages/:userId
 type ConversationResponse = {
   success: boolean;
@@ -30,7 +28,6 @@ type ConversationResponse = {
   count: number;
 };
 
-// возвращает одно новое отправленное сообщение, не массив
 // POST /api/messages/:receiverId
 type SendMessageResponse = {
   success: boolean;

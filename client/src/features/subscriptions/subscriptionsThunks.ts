@@ -17,15 +17,10 @@ type FollowerItem = {
 
 type FollowersResponse = {
   success: boolean;
-  followers: FollowerItem[]; //означает, что followers должен быть массивом
+  followers: FollowerItem[];
   count: number;
 };
-/**
- * followers: [
-  { id: "1", username: "anna" },
-  { id: "2", username: "max" }
-]
- */
+
 type FollowingItem = {
   following: SubscriptionUser | string;
 };
@@ -62,7 +57,7 @@ const getAuthHeaders = () => {
 const getUserId = (user: SubscriptionUser | string) =>
   typeof user === "string" ? user : user._id || user.userId || user.id || "";
 
-// Загружает с сервера информацию о подписках пользователя
+// Load follower/following counts and whether the current user follows this profile.
 // GET /api/subscriptions/:userId/followers
 // GET /api/subscriptions/:userId/following
 export const fetchSubscriptionSummary = createAsyncThunk(
@@ -157,6 +152,7 @@ export const fetchUserFollowers = createAsyncThunk(
       return {
         userId,
         users: response.data.followers
+          // Convert [{ follower: user }] into [user].
           .map((item) => item.follower)
           .filter((user): user is User => Boolean(user)),
         count: response.data.count,
@@ -186,10 +182,8 @@ export const fetchUserFollowing = createAsyncThunk(
       return {
         userId,
         users: response.data.following
-
-          // берёт из каждого объекта только пользователя. Было: [{ follower: user1 }, { follower: user2 }] стало: [user1, user2]
+          // Convert [{ following: user }] into [user].
           .map((item) => item.following)
-          // это TypeScript-подсказка:“после фильтра здесь точно остались только User, не undefined”.
           .filter((user): user is User => Boolean(user)),
         count: response.data.count,
       };

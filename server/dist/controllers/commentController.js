@@ -22,7 +22,6 @@ export const addComment = async (req, res, next) => {
         if (typeof text !== "string" || !text.trim()) {
             throw new AppError("Text is required", 400);
         }
-        // Создать Post через Post.create
         const comment = await Comment.create({
             user: req.user._id,
             post: postId,
@@ -89,7 +88,7 @@ export const deleteComment = async (req, res, next) => {
         if (comment.user.toString() !== req.user._id.toString()) {
             throw new AppError("You are not allowed to delete this comment", 403);
         }
-        const post = await Post.findById(comment.post); // id поста, под которым был оставлен комментарий
+        const post = await Post.findById(comment.post);
         /**
          * const comment = await Comment.create({
             user: req.user._id,
@@ -97,7 +96,6 @@ export const deleteComment = async (req, res, next) => {
             text,
           });
          */
-        // при удалении комментария его лайки тоже удалятся
         await CommentLike.deleteMany({ comment: comment._id });
         await comment.deleteOne();
         if (post) {

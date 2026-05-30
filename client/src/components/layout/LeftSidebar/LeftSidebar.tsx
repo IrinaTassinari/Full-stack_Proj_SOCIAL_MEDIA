@@ -44,7 +44,7 @@ function LeftSidebar({
 
   const handleLogout = () => {
     onNavigate();
-    dispatch(logout()); // в authSlice.ts есть reducers logout - Redux Toolkit из этого reducer автоматически создаёт функцию logout() и через dispatch её вызываем
+    dispatch(logout());
     navigate("/login");
   };
 

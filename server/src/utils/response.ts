@@ -1,32 +1,12 @@
-/**!!!!! этот код пока вообзе не применяется - потом можно наверное удалить
- * 
- * 
- * 
- * Это утилита, чтобы все ответы API были в одном стиле.
- * Например вместо того, чтобы в каждом контроллере писать:
-  res.status(200).json({
-  success: true,
-  message: 'User created',
-  data: user,
-});
-можно  писать короче:
-sendSuccess(res, 200, 'User created', user);
-
- Единый формат успешного ответа - Это помогает держать API аккуратным и предсказуемым
- Дженерик <T> позволяет передавать любые данные:объект, массив, null и т.д.
- 
- */
-
 import type { Response } from "express";
 
-// Тип для успешного ответа
+// Optional response helpers for controllers that want a shared response shape.
 interface SuccessResponse<T> {
     success: boolean;
     message: string;
     data: null | T;
 }
 
-// Тип для ответа с ошибкой
 interface ErrorResponse {
     success: boolean;
     message: string;
@@ -47,7 +27,6 @@ export const sendSuccess = <T>(
 };
 
 
-// Единый формат ответа с ошибкой
 export const sendError = (
     res: Response,
     statusCode: number,

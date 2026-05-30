@@ -22,7 +22,6 @@ const postSchema = new mongoose.Schema<IPost>(
       trim: true,
       default: "",
     },
-    // массив картинок
     image: {
       type: String,
       required: false,

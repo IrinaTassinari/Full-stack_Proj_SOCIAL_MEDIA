@@ -5,14 +5,13 @@ import { getErrorMessage } from "../../utils/getErrorMessage";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
-// ответ backend со списком лайков
 type LikesResponse = {
   success: boolean;
-  likes: Like[]; // likes: Like[] — массив лайков
+  // List of users who liked the post.
+  likes: Like[];
   count: number;
 };
 
-// ответ backend после нажатия на лайк/убрать лайк
 type ToggleLikeResponse = {
   success: boolean;
   liked: boolean;

@@ -26,7 +26,7 @@ const getUserId = (
   user: { _id?: string; id?: string; userId?: string } | null | undefined,
 ) => user?._id || user?.userId || user?.id || "";
 
-// это функция для отображения времени комментария
+// Convert a post or comment timestamp into a compact age label.
 const getAgeLabel = (createdAt: string) => {
   const diffMinutes = Math.max(
     1,
@@ -72,19 +72,18 @@ function PostPreviewModal({
   const dispatch = useAppDispatch();
   const avatar = post.author.avatar || "/icons/ICH_avatar.png";
 
-  // Это ссылка на профиль автора постa. То есть когда пользователь нажимает на имя автора или его аватар в модалке, его перекидывает на страницу профиля автора
+  // Link the post author avatar/name to the author's profile page.
   const authorProfileUrl = `/users/${getUserId(post.author)}`;
 
-  // получает массив картинок поста ["img1.jpg", "img2.jpg", "img3.jpg"]
   const images = getPostImages(post);
-  // хранит номер текущей картинки
+  // Keep the selected image index tied to the currently opened post.
+  // This prevents a stale index from a previous gallery from leaking into a new post.
   const [currentImageState, setCurrentImageState] = useState({
     postId: post._id,
     index: 0,
   });
   const currentImageIndex =
     currentImageState.postId === post._id ? currentImageState.index : 0;
-  // берёт картинку по текущему индексу, Если пользователь нажал next: currentImageIndex = 1 тогда: currentImage = images[1]
   const currentImage = images[currentImageIndex] ?? "";
   const hasMultipleImages = images.length > 1;
   const touchStartXRef = useRef<number | null>(null);
@@ -98,7 +97,7 @@ function PostPreviewModal({
 
   const handleAddComment = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Это проверка, чтобы нельзя было отправить пустой комментарий
+    // Do not submit empty comments.
     if (!commentText.trim()) {
       return;
     }
@@ -112,29 +111,24 @@ function PostPreviewModal({
     setCommentText((current) => `${current}${emojiData.emoji}`);
   };
 
-  // Это чтение данных из Redux store - Берём текущего залогиненного пользователя из profile
   const { myProfile } = useAppSelector((state) => state.profile);
-  // Берём лайки именно для этого поста 
-  // postLikes — лайки открытого поста - берутся из Redux
+  // Likes and comments are stored per post id in Redux.
   const postLikes = useAppSelector((state) => state.likes.byPostId[post._id]);
-  // postComments — комментарии открытого поста - берутся из Redux
   const postComments = useAppSelector(
     (state) => state.comments.byPostId[post._id],
   );
 
   const likesCount = postLikes?.count ?? 0;
   const currentUserId = getUserId(myProfile);
-  
-  // Проверяет: есть ли лайк текущего пользователя среди лайков поста - .some(...) проверяет, есть ли хотя бы один подходящий элемент. Если совпало — значит текущий пользователь уже лайкнул пост. ?? false значит: если postLikes ещё не загружены, считать, что лайка нет
+
   const isPostLikedFromServer =
     postLikes?.likes.some((like) => getUserId(like.user) === currentUserId) ??
     false;
-  // Если пользователь только что нажал лайк, используется likedOverride. Если ещё не нажимал, используется состояние с backend: isPostLikedFromServer
+  // Optimistically reflect a click before the server response arrives.
   const isPostLiked =
-    likedOverride?.postId === post._id ? likedOverride.value : isPostLikedFromServer; 
+    likedOverride?.postId === post._id ? likedOverride.value : isPostLikedFromServer;
   const likesLabel = `${likesCount} ${likesCount === 1 ? "like" : "likes"}`;
 
-  // Берёт комментарии поста. Если ещё не загружены, возвращает пустой массив.
   const comments = postComments?.comments ?? [];
 
   const handleToggleLike = () => {
@@ -146,13 +140,9 @@ function PostPreviewModal({
     dispatch(deletePostComment({ postId: post._id, commentId }));
   };
 
-  /**
-   * при смене поста:
-   * 1. Загружает лайки нового поста
-   * 2. Загружает комментарии нового поста
-   * 3. Сбрасывает временное состояние лайка null значит: “не используй старое временное значение, жди/используй данные с backend”.
-   */
+
   useEffect(() => {
+    // Reload likes and comments whenever a different post is opened.
     dispatch(fetchPostLikes(post._id));
     dispatch(fetchPostComments(post._id));
   }, [dispatch, post._id]);

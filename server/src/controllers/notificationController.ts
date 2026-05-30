@@ -16,6 +16,7 @@ export const getMyNotifications = async (
     const notifications = await Notification.find({
       recipient: req.user._id,
     })
+      // Populate the entities needed to render a notification item in the UI.
       .populate("sender", "username fullName avatar")
       .populate("post", "description image images")
       .populate("comment", "text")
@@ -88,6 +89,7 @@ export const markAllNotificationsAsRead = async (
       throw new AppError("Unauthorized", 401);
     }
 
+    // updateMany returns how many unread notifications were changed.
     const result = await Notification.updateMany(
       {
         recipient: req.user._id,
@@ -101,41 +103,9 @@ export const markAllNotificationsAsRead = async (
     res.status(200).json({
       success: true,
       message: "All notifications marked as read",
-      modifiedCount: result.modifiedCount, //см ниже
+      modifiedCount: result.modifiedCount,
     });
   } catch (error) {
     next(error);
   }
 };
-
-
-/**
- * updateMany() - Это метод Mongoose: “обнови много документов сразу”
-Первый объект — это условие поиска:
-{
-  recipient: req.user._id,
-  isRead: false,
-}
-  найди все уведомления,
-где recipient = текущий пользователь
-и isRead = false
-
-
-Второй объект — это что изменить:
-{
-  isRead: true,
-}
-
-
-   //modifiedCount - приходит из результата Mongoose Notification.updateMany(...)
-Метод updateMany() возвращает объект с информацией о выполненном обновлении.
-Примерно такой:
-{
-  acknowledged: true,
-  matchedCount: 5,
-  modifiedCount: 5,
-  upsertedCount: 0,
-  upsertedId: null
-}
-
- */

@@ -5,6 +5,7 @@ import { AppError } from "../utils/appError.js";
 import { uploadToCloudinary } from "../config/cloudinary.js";
 
 const getPostImageFiles = (req: Request): Express.Multer.File[] => {
+  // Multer can return either an array or an object keyed by field name.
   if (Array.isArray(req.files)) {
     return req.files;
   }
@@ -17,6 +18,7 @@ const getPostImageFiles = (req: Request): Express.Multer.File[] => {
 };
 
 const parseExistingImages = (value: unknown): string[] | undefined => {
+  // undefined means the client did not ask to replace the existing gallery.
   if (value === undefined) {
     return undefined;
   }
@@ -46,14 +48,10 @@ export const createPost = async (
   next: NextFunction,
 ) => {
   try {
-    // Проверить req.user значит убедиться, что пользователь авторизован
-    // если пользователя нет в req.user, значит запрос не авторизован
-
     if (!req.user) {
       throw new AppError("Unauthorized", 401);
     }
 
-    //Взять description из req.body
     const description = req.body?.description ?? "";
 
     const files = getPostImageFiles(req);
@@ -72,7 +70,7 @@ export const createPost = async (
       ),
     );
 
-    // Создать Post через Post.create
+    // Store only Cloudinary URLs in MongoDB, not the uploaded file data.
     const post = await Post.create({
       author: req.user._id,
       description,
@@ -84,7 +82,6 @@ export const createPost = async (
       throw new AppError("Post is not created", 400);
     }
 
-    //Вернуть 201
     res.status(201).json({
       success: true,
       post,
@@ -106,7 +103,6 @@ export const getPostById = async (
       throw new AppError("Invalid post id", 400);
     }
 
-    // С populate Mongoose идёт в коллекцию пользователей, находит автора по userId и подставляет его данные: 'username fullName avatar'
     const post = await Post.findById(id).populate(
       "author",
       "username fullName avatar",
@@ -125,7 +121,6 @@ export const getPostById = async (
   }
 };
 
-//Получение всех постов пользователя
 export const getUserPosts = async (
   req: Request,
   res: Response,
@@ -141,7 +136,6 @@ export const getUserPosts = async (
       throw new AppError("Invalid user id", 400);
     }
 
-    // С populate Mongoose идёт в коллекцию пользователей, находит автора по userId и подставляет его данные: 'username fullName avatar'
     const posts = await Post.find({ author: userId })
       .populate("author", "username fullName avatar")
       .sort({ createdAt: -1 });
@@ -155,7 +149,7 @@ export const getUserPosts = async (
   }
 };
 
-// getAllPosts from all Users
+// Return posts from all users for the home feed.
 export const getAllPosts = async (
   req: Request,
   res: Response,
@@ -163,7 +157,6 @@ export const getAllPosts = async (
 ) => {
   try {
     const posts = await Post.find()
-      // подставь данные автора поста, но верни только username, fullName и avatar
       .populate("author", "username fullName avatar")
       .sort({ updatedAt: -1 });
 
@@ -182,31 +175,26 @@ export const updatePost = async (
   next: NextFunction,
 ) => {
   try {
-    //Проверить req.user.
     if (!req.user) {
       throw new AppError("Unauthorized", 401);
     }
 
-    // Взять id из req.params и проверить, что id валидный ObjectId
     const { id } = req.params;
 
     if (typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
       throw new AppError("Invalid post id", 400);
     }
 
-    // Найти пост по id. Если поста нет — 404.
     const post = await Post.findById(id);
 
     if (!post) {
       throw new AppError("Post is not found", 404);
     }
 
-    // Проверить, что текущий пользователь является автором поста.Если не автор — 403.
     if (post.author.toString() !== req.user._id.toString()) {
       throw new AppError("You are not allowed to update this post", 403);
     }
 
-    // Если пришёл description — обновить описание
     const { description } = req.body ?? {};
     if (description !== undefined) {
       post.description = description;
@@ -216,6 +204,7 @@ export const updatePost = async (
     const existingImages = parseExistingImages(req.body?.existingImages);
 
     if (files.length > 0 || existingImages !== undefined) {
+      // Keep selected existing images and append newly uploaded Cloudinary images.
       const currentImages =
         post.images && post.images.length > 0
           ? post.images
@@ -245,11 +234,9 @@ export const updatePost = async (
       post.image = undefined;
     }
 
-    // Сохранить пост
     await post.save();
     await post.populate("author", "username fullName avatar");
 
-    // Вернуть обновлённый пост
     res.status(200).json({
       success: true,
       post,
@@ -355,4 +342,3 @@ export const getExplorePosts = async (
     next(error);
   }
 };
-

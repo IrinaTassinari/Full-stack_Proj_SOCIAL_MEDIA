@@ -14,6 +14,5 @@ const subscribeSchema = new mongoose.Schema({
     timestamps: true,
     versionKey: false
 });
-// чтобы один пользователь не мог подписаться на другого несколько раз
 subscribeSchema.index({ follower: 1, following: 1 }, { unique: true });
 export const Subscribe = mongoose.model('Subscribe', subscribeSchema);

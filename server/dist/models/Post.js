@@ -11,7 +11,6 @@ const postSchema = new mongoose.Schema({
         trim: true,
         default: "",
     },
-    // массив картинок
     image: {
         type: String,
         required: false,

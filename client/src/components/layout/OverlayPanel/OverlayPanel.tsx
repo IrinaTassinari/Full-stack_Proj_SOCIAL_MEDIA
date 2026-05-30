@@ -3,23 +3,11 @@ import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
 import styles from "./OverlayPanel.module.css";
 
-/**
- * Это тип пропсов компонента.
-children: ReactNode означает: внутрь OverlayPanel можно передать любой JSX.
-Например потом будет так:
-<OverlayPanel onClose={closePanel}>
-  <SearchPanel />
-</OverlayPanel>
-
-onClose: () => void означает: компонент ждёт функцию, которую надо вызвать, когда панель закрывается
- */
 type OverlayPanelProps = {
   children: ReactNode;
   onClose: () => void;
 };
 
-// KeyboardEvent — это встроенный тип браузера из TypeScript - это событие клавиатуры.
-// То есть если нажали клавишу Escape, закрываем панель
 function OverlayPanel({ children, onClose }: OverlayPanelProps) {
   useEffect(() => {
     const scrollY = window.scrollY;
@@ -28,6 +16,7 @@ function OverlayPanel({ children, onClose }: OverlayPanelProps) {
     const originalWidth = document.body.style.width;
     const originalOverflow = document.body.style.overflow;
 
+    // Lock background scrolling while the overlay panel is open.
     document.body.style.position = "fixed";
     document.body.style.top = `-${scrollY}px`;
     document.body.style.width = "100%";
@@ -43,6 +32,7 @@ function OverlayPanel({ children, onClose }: OverlayPanelProps) {
   }, []);
 
   useEffect(() => {
+    // Allow Escape to close the overlay from anywhere in the panel.
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         onClose();
@@ -58,8 +48,6 @@ function OverlayPanel({ children, onClose }: OverlayPanelProps) {
 
   return createPortal(
     <div className={styles.overlay}>
-
-        {/* элемент для клика по затемнённой области */}
       <button
         className={styles.backdrop}
         type="button"
@@ -67,7 +55,6 @@ function OverlayPanel({ children, onClose }: OverlayPanelProps) {
         onClick={onClose}
       />
 
-     {/* сама белая боковая панель */}
       <aside className={styles.panel}>
         <button
           className={styles.closeButton}

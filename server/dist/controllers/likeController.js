@@ -21,7 +21,6 @@ export const toggleLike = async (req, res, next) => {
             user: req.user._id,
             post: postId,
         });
-        //Если лайк уже есть, удалить его.
         if (existingLike) {
             await existingLike.deleteOne();
             await Notification.deleteOne({
@@ -36,12 +35,10 @@ export const toggleLike = async (req, res, next) => {
                 message: "Like removed",
             });
         }
-        // Если лайка нет, создать его
         const like = await Like.create({
             user: req.user._id,
             post: postId,
         });
-        // чтобы автор не мог получать уведомления от самого себя
         if (post.author.toString() !== req.user._id.toString()) {
             await Notification.create({
                 recipient: post.author,

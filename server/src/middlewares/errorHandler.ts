@@ -1,13 +1,10 @@
-/**
- * Глобальный обработчик ошибок.
- * Любая ошибка, переданная через next(error), придёт сюда.
-    AppError — для ошибок, которые мы сами ожидаемо создаём
-*/
+
 
 import type { NextFunction, Request, Response } from 'express';
 import multer from 'multer';
 import { AppError } from '../utils/appError.js';
 
+// Global Express error handler. Expected API errors use AppError; all others become 500.
 export const errorHandler = (
     err: Error | AppError,
     _req: Request,
@@ -22,8 +19,6 @@ export const errorHandler = (
         return;
     }
 
-    // Если это наша кастомная ошибка, берём её statusCode.
-    // Иначе ставим 500.
     const statusCode = err instanceof AppError ? err.statusCode : 500;
 
     res.status(statusCode).json({

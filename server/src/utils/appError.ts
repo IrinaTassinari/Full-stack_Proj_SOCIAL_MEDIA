@@ -1,14 +1,4 @@
-/**
-AppError нужен для своих “ожидаемых” ошибок API.
-Например, если пользователь запрашивает несуществующий маршрут, это не ошибка сервера 500, а нормальная API-ошибка 404.
-Без AppError в errorHandler трудно понять, какой статус отправлять клиенту
-
-  // Восстанавливаем корректную цепочку прототипов.
-  // Это полезно при работе с наследованием Error в TypeScript.
-  Object.setPrototypeOf(this, AppError.prototype);
- */
-
-// AppError наследуется от стандартной ошибки Error
+// Error type for expected API failures where the response status is known.
 export class AppError extends Error {
   statusCode: number;
 
@@ -16,8 +6,7 @@ export class AppError extends Error {
     super(message);
     this.statusCode = statusCode;
 
+    // Restore the prototype chain for custom Error subclasses in TypeScript.
     Object.setPrototypeOf(this, AppError.prototype);
   }
 }
-
-

@@ -33,6 +33,7 @@ const profileSlice = createSlice({
       .addCase(fetchMyProfile.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.myProfile = action.payload;
+        state.error = null;
       })
       .addCase(fetchMyProfile.rejected, (state, action) => {
         state.status = "failed";
@@ -48,6 +49,7 @@ const profileSlice = createSlice({
       .addCase(fetchMyPosts.fulfilled, (state, action) => {
         state.postsStatus = "succeeded";
         state.myPosts = action.payload;
+        state.error = null;
       })
       .addCase(fetchMyPosts.rejected, (state, action) => {
         state.postsStatus = "failed";
@@ -63,6 +65,7 @@ const profileSlice = createSlice({
       .addCase(updateMyProfile.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.myProfile = action.payload;
+        state.error = null;
       })
       .addCase(updateMyProfile.rejected, (state, action) => {
         state.status = "failed";

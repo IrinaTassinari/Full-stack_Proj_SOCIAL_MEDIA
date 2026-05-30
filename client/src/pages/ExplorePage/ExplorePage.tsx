@@ -110,7 +110,7 @@ function ExplorePage() {
   return (
     <section className={styles.page} aria-label="Explore posts">
       <div className={styles.grid}>
-        {/* Это логика, которая назначает разным картинкам разные размеры в сетке Explore */}
+
         {explorePosts.map((post, index) => (
           <button
             className={`${styles.tile} ${

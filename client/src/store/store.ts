@@ -11,9 +11,10 @@ import messageNotificationsReducer from "../features/messageNotifications/messag
 import searchReducer from "../features/search/searchSlice";
 import subscriptionsReducer from "../features/subscriptions/subscriptionsSlice";
 
- const store = configureStore({
+// Central Redux store with all feature slices registered in one place.
+const store = configureStore({
   reducer: {
-    auth: authReducer, 
+    auth: authReducer,
     posts: postsReducer,
     profile: profileReducer,
     comments: commentsReducer,
@@ -27,16 +28,8 @@ import subscriptionsReducer from "../features/subscriptions/subscriptionsSlice";
   },
 });
 
-//Это TypeScript-тип всего Redux state
+// Typed helpers used by useAppDispatch and useAppSelector.
 export type RootState = ReturnType<typeof store.getState>;
-//Это TypeScript-тип dispatch
 export type AppDispatch = typeof store.dispatch;
 
 export default store;
-
-
-/**
- *  создаёт общий Redux store
-  подключает все slices
-  экспортирует типы RootState и AppDispatch
- */

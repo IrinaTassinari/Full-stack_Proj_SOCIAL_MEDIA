@@ -67,7 +67,6 @@ function CreatePostPage() {
     };
   }, []);
 
-  // Счетчик символов 0/200
   const counterText = useMemo(
     () => `${description.length}/${maxDescriptionLength}`,
     [description.length],

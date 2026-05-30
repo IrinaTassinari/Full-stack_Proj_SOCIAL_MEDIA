@@ -17,7 +17,8 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-        select: false, //  Mongoose по умолчанию не будет возвращать password при запросах
+        // Password hashes are excluded from queries unless explicitly selected.
+        select: false,
     },
     fullName: {
         type: String,
@@ -44,17 +45,17 @@ const userSchema = new mongoose.Schema({
         type: Date,
     }
 }, {
-    timestamps: true, // разрешаем создание полей createdAt и updatedAt
-    versionKey: false // запрещаем создание поля __v
+    // Adds createdAt and updatedAt fields.
+    timestamps: true,
+    // Do not include the default __v version key.
+    versionKey: false
 });
-// candidatePassword: string  - это пароль, который пользователь ввёл при логине
-// this.password -  это хэшированный пароль из базы данных.
 userSchema.methods.comparePassword = async function (candidatePassword) {
+    // Compare the plain login password with the stored password hash.
     return bcrypt.compare(candidatePassword, this.password);
 };
-//Это Mongoose middleware. Он запускается перед сохранением пользователя
 userSchema.pre('save', async function () {
-    //проверяет: изменился ли пароль?
+    // Hash the password only when it was created or changed.
     if (!this.isModified('password')) {
         return;
     }

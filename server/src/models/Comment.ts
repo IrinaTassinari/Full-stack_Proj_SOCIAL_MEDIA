@@ -27,8 +27,8 @@ const commentSchema = new mongoose.Schema<IComment>(
         }
     },
     {
-        timestamps: true, 
-        versionKey: false 
+        timestamps: true,
+        versionKey: false
     }
 );
 

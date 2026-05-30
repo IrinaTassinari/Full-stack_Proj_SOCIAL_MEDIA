@@ -39,6 +39,7 @@ The app supports authentication, profile management, post galleries, home and ex
 - Sign up
 - Log in
 - JWT-based protected routes
+- JWT token is currently stored on the client and sent through the `Authorization` header
 - Forgot password
 - Reset password by email token
 - Guest-only and protected frontend routing
@@ -47,6 +48,7 @@ The app supports authentication, profile management, post galleries, home and ex
 
 - View own profile
 - Edit profile information
+- Change username with backend uniqueness validation
 - Upload/update avatar through Cloudinary
 - View public user profiles
 - Search users
@@ -85,7 +87,7 @@ The app supports authentication, profile management, post galleries, home and ex
 - Private conversations
 - Chat list
 - Conversation history
-- Send messages
+- Send text messages
 - Message notification state
 - Socket.io infrastructure for real-time delivery
 - Empty chat state with suggested users from following list
@@ -100,6 +102,20 @@ The app supports authentication, profile management, post galleries, home and ex
 - Mobile pages for search and notifications
 - Responsive post preview modal
 - Responsive messages layout
+
+## Planned Improvements
+
+The following items are planned or under consideration and are not part of the current completed feature set yet:
+
+- Improve the messages page so a conversation is not opened automatically before the user selects a chat (messages - и чтобы сообщ не сразу открывались);
+- Restrict profile messaging so users can send direct messages only to users they follow, or define a stricter mutual-follow rule (и в profile - сообщ можно писать только тем кого follow);
+- Add account deletion from the profile settings (add 'delete profile');
+- Add a dedicated post details page that can be opened directly from a post URL (add btn 'go to post page');
+- Add an authenticated change-password flow for logged-in users (add 'change password');
+- Move authentication from client-side token storage to secure HTTP-only cookies (make token in cookies);
+- Decide whether usernames should remain editable after signup or become locked after account creation (think about username - if you can  change it ot no);
+- улучшить код - оптимизация в home page;
+
 
 ## Project Structure
 
