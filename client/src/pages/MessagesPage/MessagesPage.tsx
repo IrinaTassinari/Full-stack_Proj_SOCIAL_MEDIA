@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ChatList from "../../components/messages/ChatList";
 import ChatWindow from "../../components/messages/ChatWindow";
 import { fetchMyProfile } from "../../features/profile/profileThunks";
@@ -7,8 +7,12 @@ import {
   fetchMyChats,
   type Message,
 } from "../../features/messages/messagesThunks";
-import { receiveSocketMessage } from "../../features/messages/messagesSlice";
-import { markAllMessageNotificationsAsRead } from "../../features/messageNotifications/messageNotificationsThunks";
+import {
+  receiveSocketMessage,
+  selectChat,
+  selectChatUser,
+} from "../../features/messages/messagesSlice";
+import { fetchMessageNotifications } from "../../features/messageNotifications/messageNotificationsThunks";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { connectSocket, disconnectSocket } from "../../socket";
 import styles from "./MessagesPage.module.css";
@@ -19,16 +23,22 @@ const getUserId = (
 
 function MessagesPage() {
   const dispatch = useAppDispatch();
+  const location = useLocation();
   const navigate = useNavigate();
   const { myProfile } = useAppSelector((state) => state.profile);
 
   const currentUserId = getUserId(myProfile);
 
   useEffect(() => {
+    if (location.state?.openSelectedChat !== true) {
+      dispatch(selectChat(null));
+      dispatch(selectChatUser(null));
+    }
+
     dispatch(fetchMyProfile());
     dispatch(fetchMyChats());
-    dispatch(markAllMessageNotificationsAsRead());
-  }, [dispatch]);
+    dispatch(fetchMessageNotifications());
+  }, [dispatch, location.state]);
 
   useEffect(() => {
     if (!currentUserId) {
@@ -44,6 +54,7 @@ function MessagesPage() {
           currentUserId,
         }),
       );
+      dispatch(fetchMessageNotifications());
     };
 
     socket.on("receiveMessage", handleReceiveMessage);

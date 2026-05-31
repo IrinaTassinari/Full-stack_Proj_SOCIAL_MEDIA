@@ -1,14 +1,19 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { fetchConversation, type Message } from "../../features/messages/messagesThunks";
 import { selectChat, selectChatUser } from "../../features/messages/messagesSlice";
+import { markMessageNotificationAsRead } from "../../features/messageNotifications/messageNotificationsThunks";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import type { User } from "../../types/user";
 import { fetchUserFollowing } from "../../features/subscriptions/subscriptionsThunks";
 import styles from "./ChatList.module.css";
 
 const getUserId = (
-  user: { _id?: string; id?: string; userId?: string } | null | undefined,
-) => user?._id || user?.userId || user?.id || "";
+  user:
+    | { _id?: string; id?: string; userId?: string }
+    | string
+    | null
+    | undefined,
+) => (typeof user === "string" ? user : user?._id || user?.userId || user?.id || "");
 
 
 const getChatPartner = (message: Message, currentUserId: string) => {
@@ -40,10 +45,14 @@ type ChatListProps = {
 
 function ChatList({ currentUserId }: ChatListProps) {
   const dispatch = useAppDispatch();
+  const readingNotificationIds = useRef(new Set<string>());
   const { chats, selectedUserId, status, error } = useAppSelector(
     (state) => state.messages,
   );
   const { myProfile } = useAppSelector((state) => state.profile);
+  const messageNotifications = useAppSelector(
+    (state) => state.messageNotifications.items,
+  );
   const { followingByUserId, listStatus } = useAppSelector(
     (state) => state.subscriptions,
   );
@@ -63,6 +72,27 @@ function ChatList({ currentUserId }: ChatListProps) {
       dispatch(fetchUserFollowing(userId));
     }
   }, [dispatch, myProfile]);
+
+  useEffect(() => {
+    if (!selectedUserId) {
+      return;
+    }
+
+    messageNotifications.forEach((notification) => {
+      if (
+        !notification.isRead &&
+        getUserId(notification.sender) === selectedUserId &&
+        !readingNotificationIds.current.has(notification._id)
+      ) {
+        readingNotificationIds.current.add(notification._id);
+        void dispatch(markMessageNotificationAsRead(notification._id)).finally(
+          () => {
+            readingNotificationIds.current.delete(notification._id);
+          },
+        );
+      }
+    });
+  }, [dispatch, messageNotifications, selectedUserId]);
 
   return (
     <aside className={styles.sidebar}>
@@ -132,13 +162,18 @@ function ChatList({ currentUserId }: ChatListProps) {
           const partnerId = getUserId(partner);
           const isActive = selectedUserId === partnerId;
           const isOwnLastMessage = getUserId(chat.sender) === currentUserId;
+          const unreadCount = messageNotifications.filter(
+            (notification) =>
+              !notification.isRead &&
+              getUserId(notification.sender) === partnerId,
+          ).length;
 
           return (
             <li key={partnerId}>
               <button
                 className={`${styles.chatButton} ${
                   isActive ? styles.active : ""
-                }`}
+                } ${unreadCount > 0 ? styles.unread : ""}`}
                 type="button"
                 onClick={() => handleSelectChat(partnerId, partner)}
               >
@@ -158,6 +193,16 @@ function ChatList({ currentUserId }: ChatListProps) {
                     · {getAgeLabel(chat.createdAt)}
                   </span>
                 </span>
+                {unreadCount > 0 && (
+                  <span
+                    className={styles.unreadBadge}
+                    aria-label={`${unreadCount} unread ${
+                      unreadCount === 1 ? "message" : "messages"
+                    }`}
+                  >
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
               </button>
             </li>
           );

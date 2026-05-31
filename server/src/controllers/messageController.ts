@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import type { Request, Response, NextFunction } from "express";
 import { Message } from "../models/Message.js";
 import { User } from "../models/User.js";
+import { Subscribe } from "../models/Subscribe.js";
 import { NotificationMessage } from "../models/NotificationMessage.js";
 import { AppError } from "../utils/appError.js";
 import { getIo } from "../socket/socket.js";
@@ -32,6 +33,15 @@ export const sendMessage = async (
 
     if (receiverId === req.user._id.toString()) {
       throw new AppError("You cannot send message to yourself", 400);
+    }
+
+    const subscription = await Subscribe.findOne({
+      follower: req.user._id,
+      following: receiverId,
+    });
+
+    if (!subscription) {
+      throw new AppError("You can send messages only to users you follow", 403);
     }
 
     const { text } = req.body;
@@ -153,7 +163,6 @@ export const getMyChats = async (
         chatsMap.set(chatUserId, message);
       }
     }
-
 
     const allChats = Array.from(chatsMap.values());
 

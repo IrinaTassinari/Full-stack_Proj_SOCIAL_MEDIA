@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PostPreviewModal from "../../components/posts/PostPreviewModal";
 import Spinner from "../../components/ui/Spinner/Spinner";
 import { fetchPostComments } from "../../features/comments/commentsThunks";
@@ -25,6 +25,9 @@ function HomePage() {
   const likesByPostId = useAppSelector((state) => state.likes.byPostId);
   const commentsByPostId = useAppSelector((state) => state.comments.byPostId);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const requestedSubscriptionIds = useRef(new Set<string>());
+  const requestedLikesPostIds = useRef(new Set<string>());
+  const requestedCommentsPostIds = useRef(new Set<string>());
 
   useEffect(() => {
     dispatch(fetchAllPosts());
@@ -52,7 +55,8 @@ function HomePage() {
     );
 
     authorIds.forEach((authorId) => {
-      if (!byUserId[authorId]) {
+      if (!byUserId[authorId] && !requestedSubscriptionIds.current.has(authorId)) {
+        requestedSubscriptionIds.current.add(authorId);
         dispatch(fetchSubscriptionSummary({ userId: authorId, currentUserId }));
       }
     });
@@ -60,7 +64,11 @@ function HomePage() {
 
   useEffect(() => {
     allPosts.forEach((post) => {
-      if (!likesByPostId[post._id]) {
+      if (
+        !likesByPostId[post._id] &&
+        !requestedLikesPostIds.current.has(post._id)
+      ) {
+        requestedLikesPostIds.current.add(post._id);
         dispatch(fetchPostLikes(post._id));
       }
     });
@@ -68,7 +76,11 @@ function HomePage() {
 
   useEffect(() => {
     allPosts.forEach((post) => {
-      if (!commentsByPostId[post._id]) {
+      if (
+        !commentsByPostId[post._id] &&
+        !requestedCommentsPostIds.current.has(post._id)
+      ) {
+        requestedCommentsPostIds.current.add(post._id);
         dispatch(fetchPostComments(post._id));
       }
     });

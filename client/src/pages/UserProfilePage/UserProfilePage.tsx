@@ -1,10 +1,17 @@
 import axios from "axios";
-import { useEffect, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import {
+  useEffect,
+  useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import PostPreviewModal from "../../components/posts/PostPreviewModal";
 import SubscriptionsModal from "../../components/subscriptions/SubscriptionsModal";
 import Spinner from "../../components/ui/Spinner/Spinner";
-import { selectChat, selectChatUser } from "../../features/messages/messagesSlice";
+import {
+  selectChat,
+  selectChatUser,
+} from "../../features/messages/messagesSlice";
 import { fetchConversation } from "../../features/messages/messagesThunks";
 import { fetchMyProfile } from "../../features/profile/profileThunks";
 import {
@@ -56,19 +63,21 @@ function UserProfilePage() {
     "idle" | "loading" | "succeeded" | "failed"
   >("idle");
   const [profileError, setProfileError] = useState<string | null>(null);
-  const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
+  const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(
+    null,
+  );
   const [subscriptionsModal, setSubscriptionsModal] = useState<
     "followers" | "following" | null
   >(null);
   const selectedPost =
-    selectedPostIndex === null ? null : posts[selectedPostIndex] ?? null;
+    selectedPostIndex === null ? null : (posts[selectedPostIndex] ?? null);
   const currentUserId = getUserId(myProfile);
   const subscriptionSummary = userId ? byUserId[userId] : undefined;
   const followersCount = subscriptionSummary?.followersCount ?? 0;
   const followingCount = subscriptionSummary?.followingCount ?? 0;
   const isFollowing = subscriptionSummary?.isFollowing ?? false;
-  const followersList = userId ? followersByUserId[userId] ?? [] : [];
-  const followingList = userId ? followingByUserId[userId] ?? [] : [];
+  const followersList = userId ? (followersByUserId[userId] ?? []) : [];
+  const followingList = userId ? (followingByUserId[userId] ?? []) : [];
 
   useEffect(() => {
     if (!myProfile) {
@@ -92,9 +101,9 @@ function UserProfilePage() {
         setProfileError(null);
 
         const [userResponse, postsResponse] = await Promise.all([
-            axios.get<UserResponse>(`${API_URL}/api/users/${userId}`),
-            axios.get<PostsResponse>(`${API_URL}/api/posts/user/${userId}`),
-          ]);
+          axios.get<UserResponse>(`${API_URL}/api/users/${userId}`),
+          axios.get<PostsResponse>(`${API_URL}/api/posts/user/${userId}`),
+        ]);
 
         setUser(userResponse.data.user);
         setPosts(postsResponse.data.posts);
@@ -150,7 +159,7 @@ function UserProfilePage() {
     dispatch(selectChat(userId));
     dispatch(selectChatUser(user));
     dispatch(fetchConversation(userId));
-    navigate("/messages");
+    navigate("/messages", { state: { openSelectedChat: true } });
   };
 
   const handleStatKeyDown = (
@@ -204,6 +213,10 @@ function UserProfilePage() {
             <button
               className={styles.messageButton}
               type="button"
+              disabled={!isFollowing}
+              title={
+                !isFollowing ? "Follow this user to send a message" : undefined
+              }
               onClick={handleOpenMessages}
             >
               Message

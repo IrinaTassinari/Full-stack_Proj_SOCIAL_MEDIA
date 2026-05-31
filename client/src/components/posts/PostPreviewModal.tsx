@@ -5,9 +5,10 @@ import {
   type FormEvent,
   type TouchEvent,
 } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import EmojiPicker, { type EmojiClickData } from "emoji-picker-react";
 import CommentRow from "./CommentRow";
+import PostActionsModal from "./PostActionsModal";
 import type { Post } from "../../types/post";
 import { getPostImages } from "../../utils/postImages";
 import styles from "./PostPreviewModal.module.css";
@@ -21,6 +22,7 @@ import {
   deletePostComment,
 } from "../../features/comments/commentsThunks";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { deletePost } from "../../features/posts/postsThunks";
 
 const getUserId = (
   user: { _id?: string; id?: string; userId?: string } | null | undefined,
@@ -51,6 +53,10 @@ const getAgeLabel = (createdAt: string) => {
 type PostPreviewModalProps = {
   post: Post;
   onClose: () => void;
+  displayMode?: "modal" | "page";
+  showPostMenu?: boolean;
+  showGoToPostAction?: boolean;
+  onPostDeleted?: () => void;
   onPrevious?: () => void;
   onNext?: () => void;
   showFollowButton?: boolean;
@@ -62,6 +68,10 @@ type PostPreviewModalProps = {
 function PostPreviewModal({
   post,
   onClose,
+  displayMode = "modal",
+  showPostMenu = true,
+  showGoToPostAction = true,
+  onPostDeleted,
   onPrevious,
   onNext,
   showFollowButton = false,
@@ -70,7 +80,9 @@ function PostPreviewModal({
   onToggleFollowAuthor,
 }: PostPreviewModalProps) {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const avatar = post.author.avatar || "/icons/ICH_avatar.png";
+  const isPage = displayMode === "page";
 
   // Link the post author avatar/name to the author's profile page.
   const authorProfileUrl = `/users/${getUserId(post.author)}`;
@@ -90,6 +102,8 @@ function PostPreviewModal({
   const touchStartYRef = useRef<number | null>(null);
   const [commentText, setCommentText] = useState("");
   const [isEmojiOpen, setIsEmojiOpen] = useState(false);
+  const [isPostMenuOpen, setIsPostMenuOpen] = useState(false);
+  const [copyStatus, setCopyStatus] = useState<"idle" | "copied">("idle");
   const [likedOverride, setLikedOverride] = useState<{
     postId: string;
     value: boolean;
@@ -130,6 +144,7 @@ function PostPreviewModal({
   const likesLabel = `${likesCount} ${likesCount === 1 ? "like" : "likes"}`;
 
   const comments = postComments?.comments ?? [];
+  const isOwnPost = getUserId(post.author) === currentUserId;
 
   const handleToggleLike = () => {
     setLikedOverride({ postId: post._id, value: !isPostLiked });
@@ -138,6 +153,23 @@ function PostPreviewModal({
 
   const handleDeleteComment = (commentId: string) => {
     dispatch(deletePostComment({ postId: post._id, commentId }));
+  };
+
+  const handleCopyLink = async () => {
+    await navigator.clipboard.writeText(
+      `${window.location.origin}/posts/${post._id}`,
+    );
+    setCopyStatus("copied");
+  };
+
+  const handleDeletePost = async () => {
+    const result = await dispatch(deletePost(post._id));
+
+    if (deletePost.fulfilled.match(result)) {
+      setIsPostMenuOpen(false);
+      onPostDeleted?.();
+      onClose();
+    }
   };
 
 
@@ -150,6 +182,11 @@ function PostPreviewModal({
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        if (isPostMenuOpen) {
+          setIsPostMenuOpen(false);
+          return;
+        }
+
         onClose();
       }
 
@@ -167,7 +204,7 @@ function PostPreviewModal({
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [onClose, onNext, onPrevious]);
+  }, [isPostMenuOpen, onClose, onNext, onPrevious]);
 
   const handleTouchStart = (event: TouchEvent<HTMLElement>) => {
     touchStartXRef.current = event.touches[0]?.clientX ?? null;
@@ -226,15 +263,17 @@ function PostPreviewModal({
   };
 
   return (
-    <div className={styles.overlay}>
-      <button
-        className={styles.backdrop}
-        type="button"
-        aria-label="Close post"
-        onClick={onClose}
-      />
+    <div className={`${styles.overlay} ${isPage ? styles.pageOverlay : ""}`}>
+      {!isPage && (
+        <button
+          className={styles.backdrop}
+          type="button"
+          aria-label="Close post"
+          onClick={onClose}
+        />
+      )}
 
-      {onPrevious && (
+      {!isPage && onPrevious && (
         <button
           className={`${styles.navButton} ${styles.navButtonLeft}`}
           type="button"
@@ -245,7 +284,7 @@ function PostPreviewModal({
         </button>
       )}
 
-      {onNext && (
+      {!isPage && onNext && (
         <button
           className={`${styles.navButton} ${styles.navButtonRight}`}
           type="button"
@@ -256,8 +295,20 @@ function PostPreviewModal({
         </button>
       )}
 
+      {isPage && (
+        <button
+          className={styles.pageBackButton}
+          type="button"
+          aria-label="Back"
+          title="Back"
+          onClick={onClose}
+        >
+          <span aria-hidden="true">&larr;</span>
+        </button>
+      )}
+
       <article
-        className={styles.modal}
+        className={`${styles.modal} ${isPage ? styles.pagePost : ""}`}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
@@ -314,12 +365,28 @@ function PostPreviewModal({
               </>
             )}
 
-            <button
-              className={styles.closeButton}
-              type="button"
-              aria-label="Close post"
-              onClick={onClose}
-            />
+            {showPostMenu && (
+              <button
+                className={styles.dotsButton}
+                type="button"
+                aria-label="Post settings"
+                onClick={() => {
+                  setCopyStatus("idle");
+                  setIsPostMenuOpen(true);
+                }}
+              >
+                ...
+              </button>
+            )}
+
+            {!isPage && (
+              <button
+                className={styles.closeButton}
+                type="button"
+                aria-label="Close post"
+                onClick={onClose}
+              />
+            )}
           </header>
 
           <div className={styles.captionArea}>
@@ -395,6 +462,22 @@ function PostPreviewModal({
           </form>
         </div>
       </article>
+
+      {isPostMenuOpen && (
+        <PostActionsModal
+          isOwnPost={isOwnPost}
+          copyStatus={copyStatus}
+          onDelete={handleDeletePost}
+          onEdit={() => navigate(`/posts/${post._id}/edit`)}
+          onCopyLink={handleCopyLink}
+          onGoToPost={
+            showGoToPostAction
+              ? () => navigate(`/posts/${post._id}`)
+              : undefined
+          }
+          onClose={() => setIsPostMenuOpen(false)}
+        />
+      )}
     </div>
   );
 }

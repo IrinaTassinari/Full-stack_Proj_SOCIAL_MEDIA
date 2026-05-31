@@ -30,7 +30,7 @@
   width: 100%;
   min-height: 76px;
   display: grid;
-  grid-template-columns: 56px 1fr;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
   align-items: center;
   gap: 14px;
   padding: 10px 28px;
@@ -43,6 +43,30 @@
 .chatButton:hover,
 .active {
   background: #efefef;
+}
+
+.unread {
+  background: #f5f9ff;
+}
+
+.unread .chatMeta span {
+  color: #262626;
+  font-weight: 600;
+}
+
+.unreadBadge {
+  min-width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #0095f6;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .avatar {
@@ -174,7 +198,7 @@
   }
 
   .chatButton {
-    grid-template-columns: 48px 1fr;
+    grid-template-columns: 48px minmax(0, 1fr) auto;
     gap: 12px;
     padding: 10px 20px;
   }
@@ -198,7 +222,7 @@
   }
 
   .chatButton {
-    grid-template-columns: 42px 1fr;
+    grid-template-columns: 42px minmax(0, 1fr) auto;
     gap: 10px;
     padding: 10px 14px;
   }

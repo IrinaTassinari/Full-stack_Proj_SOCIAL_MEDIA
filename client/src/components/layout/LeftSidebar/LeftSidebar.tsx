@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { logout } from "../../../features/auth/authSlice";
 import { fetchMessageNotifications } from "../../../features/messageNotifications/messageNotificationsThunks";
+import { fetchNotifications } from "../../../features/notifications/notificationsThunks";
 import { fetchMyProfile } from "../../../features/profile/profileThunks";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import styles from "./LeftSidebar.module.css";
@@ -33,11 +34,15 @@ function LeftSidebar({
   const unreadMessageNotifications = useAppSelector(
     (state) => state.messageNotifications.unreadCount,
   );
+  const unreadNotifications = useAppSelector(
+    (state) => state.notifications.unreadCount,
+  );
   const profileAvatar = myProfile?.avatar || "/icons/ICH_avatar.png";
 
   useEffect(() => {
     dispatch(fetchMyProfile());
     dispatch(fetchMessageNotifications());
+    dispatch(fetchNotifications());
   }, [dispatch]);
 
   const handleLogout = () => {
@@ -118,20 +123,22 @@ function LeftSidebar({
                   type="button"
                   onClick={handleMessagesClick}
                 >
-                  <img
-                    className={styles.icon}
-                    src={item.icon}
-                    alt=""
-                    aria-hidden="true"
-                  />
+                  <span className={styles.iconWithBadge}>
+                    <img
+                      className={styles.icon}
+                      src={item.icon}
+                      alt=""
+                      aria-hidden="true"
+                    />
+                    {unreadMessageNotifications > 0 && (
+                      <span className={styles.badge}>
+                        {unreadMessageNotifications > 9
+                          ? "9+"
+                          : unreadMessageNotifications}
+                      </span>
+                    )}
+                  </span>
                   <span>{item.label}</span>
-                  {unreadMessageNotifications > 0 && (
-                    <span className={styles.badge}>
-                      {unreadMessageNotifications > 9
-                        ? "9+"
-                        : unreadMessageNotifications}
-                    </span>
-                  )}
                 </button>
               ) : (
                 <NavLink
@@ -161,12 +168,19 @@ function LeftSidebar({
               type="button"
               onClick={onNotificationsClick}
             >
-              <img
-                className={styles.icon}
-                src="/icons/notification.png"
-                alt=""
-                aria-hidden="true"
-              />
+              <span className={styles.iconWithBadge}>
+                <img
+                  className={styles.icon}
+                  src="/icons/notification.png"
+                  alt=""
+                  aria-hidden="true"
+                />
+                {unreadNotifications > 0 && (
+                  <span className={styles.badge}>
+                    {unreadNotifications > 9 ? "9+" : unreadNotifications}
+                  </span>
+                )}
+              </span>
               <span>Notifications</span>
             </button>
           </li>

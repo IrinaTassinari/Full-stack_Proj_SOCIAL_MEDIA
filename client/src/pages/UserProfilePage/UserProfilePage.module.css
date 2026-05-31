@@ -220,6 +220,11 @@
   text-align: center;
 }
 
+.messageButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 @media (max-width: 1355px) {
   .page {
     width: min(921px, calc(100vw - 244px - 48px));

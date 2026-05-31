@@ -15,6 +15,7 @@ type MessagesState = {
   status: "idle" | "loading" | "succeeded" | "failed";
   conversationStatus: "idle" | "loading" | "succeeded" | "failed";
   sendStatus: "idle" | "loading";
+  sendError: string | null;
   error: string | null;
 };
 
@@ -26,6 +27,7 @@ const initialState: MessagesState = {
   status: "idle",
   conversationStatus: "idle",
   sendStatus: "idle",
+  sendError: null,
   error: null,
 };
 
@@ -109,9 +111,11 @@ const messagesSlice = createSlice({
       })
       .addCase(sendMessage.pending, (state) => {
         state.sendStatus = "loading";
+        state.sendError = null;
       })
       .addCase(sendMessage.fulfilled, (state, action) => {
         state.sendStatus = "idle";
+        state.sendError = null;
         const receiverId = getUserId(action.payload.receiver);
 
         // Add the sent message to the current conversation.
@@ -132,7 +136,7 @@ const messagesSlice = createSlice({
       })
       .addCase(sendMessage.rejected, (state, action) => {
         state.sendStatus = "idle";
-        state.error =
+        state.sendError =
           typeof action.payload === "string"
             ? action.payload
             : action.error.message || "Failed to send message";

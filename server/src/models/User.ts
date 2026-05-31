@@ -24,6 +24,12 @@ const userSchema = new mongoose.Schema<IUser>(
             required: true,
             unique: true,
             trim: true,
+            minlength: 3,
+            maxlength: 30,
+            match: [
+              /^[A-Za-z0-9._]+$/,
+              "Username can contain only Latin letters, numbers, underscores, and periods",
+            ],
         },
         email: {
             type: String,

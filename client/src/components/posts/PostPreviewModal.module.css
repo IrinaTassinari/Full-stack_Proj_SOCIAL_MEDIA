@@ -16,6 +16,37 @@
   cursor: default;
 }
 
+.pageOverlay {
+  position: relative;
+  min-height: 100%;
+  padding: 40px;
+}
+
+.pageBackButton {
+  width: 44px;
+  height: 44px;
+  position: absolute;
+  left: max(
+    12px,
+    calc(50% - min(550px, calc((100% - 80px) / 2)) - 56px)
+  );
+  top: 40px;
+  z-index: 32;
+  padding: 0;
+  border: 1px solid #dbdbdb;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #000000;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.pageBackButton:hover {
+  opacity: 0.65;
+}
+
 .navButton {
   width: 44px;
   height: 44px;
@@ -60,6 +91,12 @@
   overflow: hidden;
   border-radius: 4px;
   background: #ffffff;
+}
+
+.pagePost {
+  height: min(720px, calc(100vh - 140px));
+  max-height: calc(100vh - 140px);
+  border: 1px solid #dbdbdb;
 }
 
 .imageWrap {
@@ -167,6 +204,28 @@
 
 .closeButton {
   margin-left: auto;
+}
+
+.dotsButton {
+  width: 32px;
+  height: 32px;
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #000000;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.dotsButton:hover {
+  opacity: 0.65;
+}
+
+.dotsButton + .closeButton {
+  margin-left: 8px;
 }
 
 .avatarRing {
@@ -446,6 +505,16 @@
     padding: 24px 16px 16px;
   }
 
+  .pageOverlay {
+    left: 0;
+    padding-top: 24px;
+  }
+
+  .pageBackButton {
+    left: 12px;
+    top: 24px;
+  }
+
   .modal {
     width: min(520px, calc(100vw - 72px - 32px));
     max-height: calc(100dvh - 32px);
@@ -491,11 +560,23 @@
   .header {
     display: none;
   }
+
+  .pageOverlay .header {
+    display: flex;
+  }
+
+  .pagePost {
+    max-height: calc(100dvh - 140px);
+  }
 }
 
 @media (max-width: 520px) {
   .overlay {
     padding: 16px 12px 12px;
+  }
+
+  .pageOverlay {
+    padding-bottom: 84px;
   }
 
   .modal {

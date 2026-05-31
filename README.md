@@ -76,6 +76,8 @@ The app supports authentication, profile management, post galleries, home and ex
 - Home feed
 - Random Explore feed with pagination
 - Post preview modal with image navigation
+- Dedicated post details page with a stable `/posts/:postId` URL
+- Post actions for copying a direct link and opening the post details page
 
 ### Social Features
 
@@ -113,12 +115,8 @@ The app supports authentication, profile management, post galleries, home and ex
 
 The following items are planned or under consideration and are not part of the current completed feature set yet:
 
-- Improve the messages page so a conversation is not opened automatically before the user selects a chat (messages - и чтобы сообщ не сразу открывались);
-- Restrict profile messaging so users can send direct messages only to users they follow, or define a stricter mutual-follow rule (и в profile - сообщ можно писать только тем кого follow);
-- Add a dedicated post details page that can be opened directly from a post URL (add btn 'go to post page');
 - Add an authenticated change-password flow for logged-in users (add 'change password');
 - Move authentication from client-side token storage to secure HTTP-only cookies (make token in cookies);
-- Decide whether usernames should remain editable after signup or become locked after account creation (think about username - if you can  change it ot no);
 - улучшить код - оптимизация в home page;
 
 

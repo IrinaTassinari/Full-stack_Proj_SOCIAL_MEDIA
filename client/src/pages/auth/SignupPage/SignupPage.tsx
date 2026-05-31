@@ -83,6 +83,10 @@ function SignupPage() {
               value={username}
               onChange={(event) => setUsername(event.target.value)}
               autoComplete="username"
+              minLength={3}
+              maxLength={30}
+              pattern="[A-Za-z0-9._]+"
+              title="Use only Latin letters, numbers, underscores, and periods"
               required
             />
 

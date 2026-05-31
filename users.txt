@@ -107,12 +107,7 @@
   "fullName": "Hiromi Higuruma"
 }
 
-{
-  "username": "iri",
-  "email": "irinatassinari@gmail.com",
-  "password": "123456",
-  "fullName": "IrinaT"
-}
+
 
 
 

@@ -36,6 +36,7 @@ function ChatWindow({ currentUserId }: ChatWindowProps) {
     selectedUser: selectedChatUser,
     conversationStatus,
     sendStatus,
+    sendError,
   } =
     useAppSelector((state) => state.messages);
   const [messageText, setMessageText] = useState("");
@@ -80,16 +81,21 @@ function ChatWindow({ currentUserId }: ChatWindowProps) {
     messagesArea.scrollTop = messagesArea.scrollHeight;
   }, [messages.length]);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!selectedUserId || !messageText.trim() || sendStatus === "loading") {
       return;
     }
 
-    dispatch(sendMessage({ receiverId: selectedUserId, text: messageText }));
-    setMessageText("");
-    setIsEmojiOpen(false);
+    const result = await dispatch(
+      sendMessage({ receiverId: selectedUserId, text: messageText }),
+    );
+
+    if (sendMessage.fulfilled.match(result)) {
+      setMessageText("");
+      setIsEmojiOpen(false);
+    }
   };
 
   const handleEmojiClick = (emojiData: EmojiClickData) => {
@@ -210,6 +216,11 @@ function ChatWindow({ currentUserId }: ChatWindowProps) {
         <button type="submit" disabled={!messageText.trim() || sendStatus === "loading"}>
           Send
         </button>
+        {sendError && (
+          <p className={styles.sendError} role="alert">
+            {sendError}
+          </p>
+        )}
       </form>
     </section>
   );

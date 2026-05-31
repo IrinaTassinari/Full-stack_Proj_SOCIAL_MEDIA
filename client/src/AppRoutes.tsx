@@ -10,6 +10,7 @@ import MyProfilePage from "./pages/MyProfilePage/MyProfilePage";
 import UserProfilePage from "./pages/UserProfilePage/UserProfilePage";
 import CreatePostPage from "./pages/CreatePostPage/CreatePostPage";
 import EditPostPage from "./pages/EditPostPage/EditPostPage";
+import PostPage from "./pages/PostPage/PostPage";
 import GuestRoute from "./components/routes/GuestRoute";
 import ProtectedRoute from "./components/routes/ProtectedRoute";
 import MainLayout from "./components/layout/MainLayout/MainLayout";
@@ -37,6 +38,7 @@ function AppRoutes() {
           <Route path="/messages" element={<MessagesPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/create" element={<CreatePostPage />} />
+          <Route path="/posts/:postId" element={<PostPage />} />
           <Route path="/posts/:postId/edit" element={<EditPostPage />} />
           <Route path="/profile" element={<MyProfilePage />} />
           <Route path="/profile/edit" element={<EditProfilePage />} />

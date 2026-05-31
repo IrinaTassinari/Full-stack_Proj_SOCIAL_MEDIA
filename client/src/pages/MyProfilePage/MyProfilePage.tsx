@@ -1,6 +1,7 @@
 import { useEffect, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import SubscriptionsModal from "../../components/subscriptions/SubscriptionsModal";
+import PostActionsModal from "../../components/posts/PostActionsModal";
 import Spinner from "../../components/ui/Spinner/Spinner";
 import {
   fetchPostLikes,
@@ -554,35 +555,15 @@ function MyProfilePage() {
           </article>
 
           {isPostMenuOpen && (
-            <>
-              <button
-                className={styles.menuBackdrop}
-                type="button"
-                aria-label="Close post menu"
-                onClick={() => setIsPostMenuOpen(false)}
-              />
-              <div className={styles.postMenu} role="dialog" aria-label="Post menu">
-                <button
-                  className={styles.deleteAction}
-                  type="button"
-                  onClick={handleDeletePost}
-                >
-                  Delete
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigate(`/posts/${selectedPost._id}/edit`)}
-                >
-                  Edit
-                </button>
-                <button type="button" onClick={handleCopyLink}>
-                  {copyStatus === "copied" ? "Copied!" : "Copy link"}
-                </button>
-                <button type="button" onClick={() => setIsPostMenuOpen(false)}>
-                  Cancel
-                </button>
-              </div>
-            </>
+            <PostActionsModal
+              isOwnPost
+              copyStatus={copyStatus}
+              onDelete={handleDeletePost}
+              onEdit={() => navigate(`/posts/${selectedPost._id}/edit`)}
+              onCopyLink={handleCopyLink}
+              onGoToPost={() => navigate(`/posts/${selectedPost._id}`)}
+              onClose={() => setIsPostMenuOpen(false)}
+            />
           )}
         </div>
       )}
