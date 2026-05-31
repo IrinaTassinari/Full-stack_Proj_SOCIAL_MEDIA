@@ -79,3 +79,19 @@ export const updateMyProfile = createAsyncThunk(
     }
   },
 );
+
+// DELETE /api/users/me
+export const deleteMyProfile = createAsyncThunk(
+  "profile/deleteMyProfile",
+  async (_, { rejectWithValue }) => {
+    try {
+      await axios.delete(`${API_URL}/api/users/me`, {
+        headers: getAuthHeaders(),
+      });
+    } catch (error: unknown) {
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to delete profile"),
+      );
+    }
+  },
+);

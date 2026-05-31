@@ -2,13 +2,20 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { Post } from "../../types/post";
 import type { User } from "../../types/user";
 import { deletePost, updatePost } from "../posts/postsThunks";
-import { fetchMyPosts, fetchMyProfile, updateMyProfile } from "./profileThunks";
+import { logout } from "../auth/authSlice";
+import {
+  deleteMyProfile,
+  fetchMyPosts,
+  fetchMyProfile,
+  updateMyProfile,
+} from "./profileThunks";
 
 type ProfileState = {
   myProfile: User | null;
   myPosts: Post[];
   status: "idle" | "loading" | "succeeded" | "failed";
   postsStatus: "idle" | "loading" | "succeeded" | "failed";
+  deleteStatus: "idle" | "loading" | "failed";
   error: string | null;
 };
 
@@ -17,6 +24,7 @@ const initialState: ProfileState = {
   myPosts: [],
   status: "idle",
   postsStatus: "idle",
+  deleteStatus: "idle",
   error: null,
 };
 
@@ -81,7 +89,21 @@ const profileSlice = createSlice({
         state.myPosts = state.myPosts.map((post) =>
           post._id === action.payload._id ? action.payload : post,
         );
+      })
+      .addCase(deleteMyProfile.pending, (state) => {
+        state.deleteStatus = "loading";
+        state.error = null;
+      })
+      .addCase(deleteMyProfile.fulfilled, () => initialState)
+      .addCase(deleteMyProfile.rejected, (state, action) => {
+        state.deleteStatus = "failed";
+        state.error =
+          typeof action.payload === "string"
+            ? action.payload
+            : action.error.message || "Failed to delete profile";
       });
+
+    builder.addCase(logout, () => initialState);
   },
 });
 

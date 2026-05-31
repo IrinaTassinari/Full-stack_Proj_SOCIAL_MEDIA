@@ -429,3 +429,9 @@
     width: min(128px, 100%);
   }
 }
+
+@media (max-width: 600px) {
+  .page {
+    width: calc(100vw - 24px);
+  }
+}

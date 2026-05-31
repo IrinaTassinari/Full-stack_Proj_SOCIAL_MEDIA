@@ -122,3 +122,11 @@
     width: calc(100vw - 56px - 24px);
   }
 }
+
+@media (max-width: 600px) {
+  .page,
+  .stateText,
+  .errorText {
+    width: calc(100vw - 24px);
+  }
+}

@@ -890,3 +890,9 @@
     width: calc(100vw - 56px - 16px);
   }
 }
+
+@media (max-width: 600px) {
+  .page {
+    width: calc(100vw - 24px);
+  }
+}

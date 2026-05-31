@@ -3,6 +3,7 @@ import {
   getMyProfile,
   getUserProfile,
   searchUsers,
+  deleteMyProfile,
   updateUserProfile,
 } from "../controllers/userController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
@@ -12,6 +13,7 @@ const router = Router();
 
 router.get("/me", authMiddleware, getMyProfile);
 router.patch("/me", authMiddleware, upload.single("avatar"), updateUserProfile);
+router.delete("/me", authMiddleware, deleteMyProfile);
 router.get("/search", searchUsers);
 router.get("/:id", getUserProfile);
 

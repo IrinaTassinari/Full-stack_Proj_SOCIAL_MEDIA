@@ -1,7 +1,9 @@
 import { type ChangeEvent, type FormEvent, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../components/ui/Spinner/Spinner";
+import { logout } from "../../features/auth/authSlice";
 import {
+  deleteMyProfile,
   fetchMyProfile,
   updateMyProfile,
 } from "../../features/profile/profileThunks";
@@ -14,10 +16,16 @@ const maxBioLength = 150;
 type EditProfileFormProps = {
   myProfile: User;
   status: "idle" | "loading" | "succeeded" | "failed";
+  deleteStatus: "idle" | "loading" | "failed";
   error: string | null;
 };
 
-function EditProfileForm({ myProfile, status, error }: EditProfileFormProps) {
+function EditProfileForm({
+  myProfile,
+  status,
+  deleteStatus,
+  error,
+}: EditProfileFormProps) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -25,11 +33,13 @@ function EditProfileForm({ myProfile, status, error }: EditProfileFormProps) {
   const [website, setWebsite] = useState(myProfile.website || "");
   const [bio, setBio] = useState(myProfile.bio || "");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(
     myProfile.avatar || "/icons/ICH_avatar.png",
   );
 
   const isLoading = status === "loading";
+  const isDeleting = deleteStatus === "loading";
 
   const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -60,6 +70,33 @@ function EditProfileForm({ myProfile, status, error }: EditProfileFormProps) {
       navigate("/profile");
     }
   };
+
+  const handleDeleteProfile = async () => {
+    const result = await dispatch(deleteMyProfile());
+
+    if (deleteMyProfile.fulfilled.match(result)) {
+      dispatch(logout());
+      navigate("/login", { replace: true });
+    }
+  };
+
+  useEffect(() => {
+    if (!isDeleteModalOpen) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !isDeleting) {
+        setIsDeleteModalOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isDeleteModalOpen, isDeleting]);
 
   return (
     <section className={styles.page}>
@@ -145,13 +182,73 @@ function EditProfileForm({ myProfile, status, error }: EditProfileFormProps) {
           </button>
         </div>
       </form>
+
+      <div className={styles.dangerZone}>
+        <h2>Delete profile</h2>
+        <p>
+          Permanently delete your account and all associated content. This
+          action cannot be undone.
+        </p>
+        <button
+          className={styles.deleteButton}
+          type="button"
+          disabled={isDeleting}
+          onClick={() => setIsDeleteModalOpen(true)}
+        >
+          {isDeleting ? "Deleting..." : "Delete profile"}
+        </button>
+      </div>
+
+      {isDeleteModalOpen && (
+        <div className={styles.modalOverlay}>
+          <button
+            className={styles.modalBackdrop}
+            type="button"
+            aria-label="Close delete profile dialog"
+            disabled={isDeleting}
+            onClick={() => setIsDeleteModalOpen(false)}
+          />
+          <section
+            className={styles.deleteModal}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-profile-title"
+          >
+            <h2 id="delete-profile-title">Delete profile?</h2>
+            <p>
+              Your posts, comments, likes, follows, and messages will be
+              permanently deleted. This action cannot be undone.
+            </p>
+            <div className={styles.modalActions}>
+              <button
+                className={styles.cancelButton}
+                type="button"
+                disabled={isDeleting}
+                onClick={() => setIsDeleteModalOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className={styles.confirmDeleteButton}
+                type="button"
+                disabled={isDeleting}
+                onClick={handleDeleteProfile}
+              >
+                {isDeleting ? "Deleting..." : "Delete profile"}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </section>
   );
 }
 
 function EditProfilePage() {
   const dispatch = useAppDispatch();
-  const { myProfile, status, error } = useAppSelector((state) => state.profile);
+  const { myProfile, status, deleteStatus, error } = useAppSelector(
+    (state) => state.profile,
+  );
 
   useEffect(() => {
     if (!myProfile) {
@@ -168,6 +265,7 @@ function EditProfilePage() {
       key={myProfile._id || myProfile.userId || myProfile.id}
       myProfile={myProfile}
       status={status}
+      deleteStatus={deleteStatus}
       error={error}
     />
   );

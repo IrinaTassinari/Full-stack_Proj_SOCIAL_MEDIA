@@ -507,3 +507,19 @@
     height: min(42dvh, calc(100dvh - 200px), calc(100vw - 72px - 24px));
   }
 }
+
+@media (max-width: 600px) {
+  .overlay {
+    left: 0;
+    padding-bottom: 68px;
+  }
+
+  .modal {
+    width: calc(100vw - 24px);
+    max-height: calc(100dvh - 80px);
+  }
+
+  .imageWrap {
+    height: min(42dvh, calc(100dvh - 256px), calc(100vw - 24px));
+  }
+}
