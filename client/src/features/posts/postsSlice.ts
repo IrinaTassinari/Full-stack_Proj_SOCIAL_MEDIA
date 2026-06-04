@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { Post } from "../../types/post";
+import { togglePostLike } from "../likes/likesThunks";
 import {
   createPost,
   deletePost,
@@ -35,17 +36,25 @@ const initialState: PostsState = {
   error: null,
 };
 
+const updatePostLikeState = (post: Post, liked: boolean) => ({
+  ...post,
+  likesCount: liked
+    ? (post.likesCount ?? 0) + 1
+    : Math.max(0, (post.likesCount ?? 0) - 1),
+  isLikedByMe: liked,
+});
+
 const postsSlice = createSlice({
   name: "posts",
   initialState,
   reducers: {
-  resetExplorePosts: (state) => {
-    state.explorePosts = [];
-    state.exploreHasMore = true;
-    state.status = "idle";
-    state.error = null;
+    resetExplorePosts: (state) => {
+      state.explorePosts = [];
+      state.exploreHasMore = true;
+      state.status = "idle";
+      state.error = null;
+    },
   },
-},
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllPosts.pending, (state) => {
@@ -138,6 +147,21 @@ const postsSlice = createSlice({
           typeof action.payload === "string"
             ? action.payload
             : action.error.message || "Failed to update post";
+      })
+      .addCase(togglePostLike.fulfilled, (state, action) => {
+        const { postId, liked } = action.payload;
+
+        state.allPosts = state.allPosts.map((post) =>
+          post._id === postId ? updatePostLikeState(post, liked) : post,
+        );
+
+        state.explorePosts = state.explorePosts.map((post) =>
+          post._id === postId ? updatePostLikeState(post, liked) : post,
+        );
+
+        if (state.selectedPost?._id === postId) {
+          state.selectedPost = updatePostLikeState(state.selectedPost, liked);
+        }
       })
       .addCase(deletePost.fulfilled, (state, action) => {
         state.allPosts = state.allPosts.filter(

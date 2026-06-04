@@ -1,4 +1,5 @@
 import type { User } from "./user";
+import type { Comment } from "./comment";
 
 export type Post = {
   _id: string;
@@ -8,4 +9,8 @@ export type Post = {
   images?: string[];
   createdAt: string;
   updatedAt: string;
+  likesCount?: number;
+  commentsCount?: number;
+  latestComment?: Comment | null;
+  isLikedByMe?: boolean;
 };

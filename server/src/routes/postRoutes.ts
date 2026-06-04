@@ -2,6 +2,7 @@ import { Router } from "express";
 import { createPost, deletePost, getAllPosts, getPostById, getUserPosts, updatePost, getExplorePosts } from "../controllers/postController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { upload } from "../middlewares/uploadUserImage.js";
+import { optionalAuthMiddleware } from "../middlewares/optionalAuthMiddleware.js";
 
 const router = Router();
 
@@ -14,10 +15,10 @@ router.post(
   ]),
   createPost,
 );
-router.get("/", getAllPosts);
+router.get("/", optionalAuthMiddleware, getAllPosts);
 router.get("/explore", getExplorePosts);
-router.get("/user/:userId", getUserPosts);
-router.get("/:id", getPostById);
+router.get("/user/:userId", optionalAuthMiddleware, getUserPosts);
+router.get("/:id", optionalAuthMiddleware, getPostById);
 router.patch(
   "/:id",
   authMiddleware,

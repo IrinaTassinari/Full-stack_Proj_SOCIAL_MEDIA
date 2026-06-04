@@ -30,6 +30,12 @@ import styles from "./UserProfilePage.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("token");
+
+  return token ? { Authorization: `Bearer ${token}` } : undefined;
+};
+
 type UserResponse = {
   success: boolean;
   user: User;
@@ -102,7 +108,9 @@ function UserProfilePage() {
 
         const [userResponse, postsResponse] = await Promise.all([
           axios.get<UserResponse>(`${API_URL}/api/users/${userId}`),
-          axios.get<PostsResponse>(`${API_URL}/api/posts/user/${userId}`),
+          axios.get<PostsResponse>(`${API_URL}/api/posts/user/${userId}`, {
+            headers: getAuthHeaders(),
+          }),
         ]);
 
         setUser(userResponse.data.user);

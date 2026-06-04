@@ -1,6 +1,8 @@
 import {
   type ChangeEvent,
   type FormEvent,
+  lazy,
+  Suspense,
   useEffect,
   useMemo,
   useRef,
@@ -10,8 +12,10 @@ import { useNavigate } from "react-router-dom";
 import { createPost } from "../../features/posts/postsThunks";
 import { fetchMyProfile } from "../../features/profile/profileThunks";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import EmojiPicker, { type EmojiClickData } from "emoji-picker-react";
+import type { EmojiClickData } from "emoji-picker-react";
 import styles from "./CreatePostPage.module.css";
+
+const EmojiPicker = lazy(() => import("emoji-picker-react"));
 
 const maxDescriptionLength = 200;
 const maxImagesCount = 10;
@@ -319,7 +323,9 @@ function CreatePostPage() {
               </button>
               {isEmojiOpen && (
                 <div className={styles.emojiPicker}>
-                  <EmojiPicker onEmojiClick={handleEmojiClick} />
+                  <Suspense fallback={null}>
+                    <EmojiPicker onEmojiClick={handleEmojiClick} />
+                  </Suspense>
                 </div>
               )}
               <button

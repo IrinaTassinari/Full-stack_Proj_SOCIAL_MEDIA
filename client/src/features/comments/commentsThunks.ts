@@ -39,6 +39,9 @@ export const fetchPostComments = createAsyncThunk(
     try {
       const response = await axios.get<CommentsResponse>(
         `${API_URL}/api/comments/${postId}`,
+        {
+          headers: getAuthHeaders(),
+        },
       );
 
       return {

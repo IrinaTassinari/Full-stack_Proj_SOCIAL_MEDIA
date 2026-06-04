@@ -1,9 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { Comment } from "../../types/comment";
-import {
-  fetchCommentLikes,
-  toggleCommentLike,
-} from "../../features/likes/likesCommentThunks";
+import { toggleCommentLike } from "../../features/likes/likesCommentThunks";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import styles from "./PostPreviewModal.module.css";
 
@@ -51,18 +48,15 @@ function CommentRow({
   const commentLikes = useAppSelector(
     (state) => state.commentLikes.byCommentId[comment._id],
   );
-  const likesCount = commentLikes?.count ?? 0;
-  const isCommentLikedFromServer =
-    commentLikes?.likes.some((like) => getUserId(like.user) === currentUserId) ??
-    false;
+  const likesCount = commentLikes?.count ?? comment.likesCount ?? 0;
+  const isCommentLikedFromServer = commentLikes
+    ? commentLikes.isLiked ||
+      commentLikes.likes.some((like) => getUserId(like.user) === currentUserId)
+    : Boolean(comment.isLikedByMe);
   const isCommentLiked =
     likedOverride?.commentId === comment._id
       ? likedOverride.value
       : isCommentLikedFromServer;
-
-  useEffect(() => {
-    dispatch(fetchCommentLikes(comment._id));
-  }, [comment._id, dispatch]);
 
   const handleToggleLike = () => {
     setLikedOverride({ commentId: comment._id, value: !isCommentLiked });

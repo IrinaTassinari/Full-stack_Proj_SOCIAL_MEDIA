@@ -1,12 +1,14 @@
 import {
   useEffect,
+  lazy,
   useRef,
   useState,
+  Suspense,
   type FormEvent,
   type TouchEvent,
 } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import EmojiPicker, { type EmojiClickData } from "emoji-picker-react";
+import type { EmojiClickData } from "emoji-picker-react";
 import CommentRow from "./CommentRow";
 import PostActionsModal from "./PostActionsModal";
 import type { Post } from "../../types/post";
@@ -27,6 +29,8 @@ import { deletePost } from "../../features/posts/postsThunks";
 const getUserId = (
   user: { _id?: string; id?: string; userId?: string } | null | undefined,
 ) => user?._id || user?.userId || user?.id || "";
+
+const EmojiPicker = lazy(() => import("emoji-picker-react"));
 
 // Convert a post or comment timestamp into a compact age label.
 const getAgeLabel = (createdAt: string) => {
@@ -132,12 +136,13 @@ function PostPreviewModal({
     (state) => state.comments.byPostId[post._id],
   );
 
-  const likesCount = postLikes?.count ?? 0;
+  const likesCount = post.likesCount ?? postLikes?.count ?? 0;
   const currentUserId = getUserId(myProfile);
 
-  const isPostLikedFromServer =
-    postLikes?.likes.some((like) => getUserId(like.user) === currentUserId) ??
-    false;
+  const isPostLikedFromServer = postLikes
+    ? postLikes.isLiked ||
+      postLikes.likes.some((like) => getUserId(like.user) === currentUserId)
+    : Boolean(post.isLikedByMe);
   // Optimistically reflect a click before the server response arrives.
   const isPostLiked =
     likedOverride?.postId === post._id ? likedOverride.value : isPostLikedFromServer;
@@ -174,10 +179,14 @@ function PostPreviewModal({
 
 
   useEffect(() => {
-    // Reload likes and comments whenever a different post is opened.
-    dispatch(fetchPostLikes(post._id));
+    // Comments still need the full list for the modal, while likes can use the
+    // enriched post values until the detailed likes state is explicitly loaded.
+    if (!postLikes) {
+      dispatch(fetchPostLikes(post._id));
+    }
+
     dispatch(fetchPostComments(post._id));
-  }, [dispatch, post._id]);
+  }, [dispatch, post._id, postLikes]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -449,7 +458,9 @@ function PostPreviewModal({
             </button>
             {isEmojiOpen && (
               <div className={styles.emojiPicker}>
-                <EmojiPicker onEmojiClick={handleEmojiClick} />
+                <Suspense fallback={null}>
+                  <EmojiPicker onEmojiClick={handleEmojiClick} />
+                </Suspense>
               </div>
             )}
             <input

@@ -1,9 +1,19 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 import { Link } from "react-router-dom";
-import EmojiPicker, { type EmojiClickData } from "emoji-picker-react";
+import type { EmojiClickData } from "emoji-picker-react";
 import { sendMessage, type Message } from "../../features/messages/messagesThunks";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import styles from "./ChatWindow.module.css";
+
+const EmojiPicker = lazy(() => import("emoji-picker-react"));
 
 const getUserId = (
   user: { _id?: string; id?: string; userId?: string } | null | undefined,
@@ -204,7 +214,9 @@ function ChatWindow({ currentUserId }: ChatWindowProps) {
         </button>
         {isEmojiOpen && (
           <div className={styles.emojiPicker}>
-            <EmojiPicker onEmojiClick={handleEmojiClick} />
+            <Suspense fallback={null}>
+              <EmojiPicker onEmojiClick={handleEmojiClick} />
+            </Suspense>
           </div>
         )}
         <input

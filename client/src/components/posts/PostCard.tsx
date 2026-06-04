@@ -57,15 +57,21 @@ function PostCard({ post, onOpenPost }: PostCardProps) {
   const isOwnPost = Boolean(currentUserId && authorId === currentUserId);
   const subscriptionSummary = byUserId[authorId];
   const isFollowingAuthor = subscriptionSummary?.isFollowing ?? false;
-  const likesCount = postLikes?.count ?? 0;
-  const isPostLikedFromServer =
-    postLikes?.likes.some((like) => getUserId(like.user) === currentUserId) ??
-    false;
+
+  const likesCount = post.likesCount ?? postLikes?.count ?? 0;
+
+  const isPostLikedFromServer = postLikes
+    ? postLikes.isLiked ||
+      postLikes.likes.some((like) => getUserId(like.user) === currentUserId)
+    : Boolean(post.isLikedByMe);
+
   const isPostLiked =
-    likedOverride?.postId === post._id ? likedOverride.value : isPostLikedFromServer;
+    likedOverride?.postId === post._id
+      ? likedOverride.value
+      : isPostLikedFromServer;
   const likesLabel = `${likesCount} ${likesCount === 1 ? "like" : "likes"}`;
-  const commentsCount = postComments?.count ?? 0;
-  const latestComment = postComments?.comments[0];
+  const commentsCount = postComments?.count ?? post.commentsCount ?? 0;
+  const latestComment = postComments?.comments[0] ?? post.latestComment;
 
   const handleToggleLike = () => {
     setLikedOverride({ postId: post._id, value: !isPostLiked });
@@ -127,7 +133,11 @@ function PostCard({ post, onOpenPost }: PostCardProps) {
         type="button"
         onClick={() => onOpenPost(post)}
       >
-        <img className={styles.postImage} src={getPostCoverImage(post)} alt="" />
+        <img
+          className={styles.postImage}
+          src={getPostCoverImage(post)}
+          alt=""
+        />
       </button>
 
       <div className={styles.actions}>
@@ -174,10 +184,10 @@ function PostCard({ post, onOpenPost }: PostCardProps) {
           type="button"
           onClick={() => onOpenPost(post)}
         >
-          View all {commentsCount} {commentsCount === 1 ? "comment" : "comments"}
+          View all {commentsCount}{" "}
+          {commentsCount === 1 ? "comment" : "comments"}
         </button>
       )}
-
     </article>
   );
 }

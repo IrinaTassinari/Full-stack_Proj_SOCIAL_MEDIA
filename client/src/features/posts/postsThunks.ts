@@ -5,7 +5,6 @@ import { getErrorMessage } from "../../utils/getErrorMessage";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
-
 type ExplorePostsResponse = {
   success: boolean;
   posts: Post[];
@@ -72,8 +71,9 @@ export const fetchAllPosts = createAsyncThunk(
   "posts/fetchAllPosts",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get<PostsResponse>(`${API_URL}/api/posts`);
-
+      const response = await axios.get<PostsResponse>(`${API_URL}/api/posts`, {
+        headers: getAuthHeaders(),
+      });
       return response.data.posts;
     } catch (error: unknown) {
       return rejectWithValue(getErrorMessage(error, "Failed to load posts"));
@@ -88,6 +88,9 @@ export const fetchPostById = createAsyncThunk(
     try {
       const response = await axios.get<PostResponse>(
         `${API_URL}/api/posts/${postId}`,
+        {
+          headers: getAuthHeaders(),
+        },
       );
 
       return response.data.post;

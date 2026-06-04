@@ -2,15 +2,16 @@ import { Router } from "express";
 import { createPost, deletePost, getAllPosts, getPostById, getUserPosts, updatePost, getExplorePosts } from "../controllers/postController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { upload } from "../middlewares/uploadUserImage.js";
+import { optionalAuthMiddleware } from "../middlewares/optionalAuthMiddleware.js";
 const router = Router();
 router.post("/", authMiddleware, upload.fields([
     { name: "images", maxCount: 10 },
     { name: "image", maxCount: 10 },
 ]), createPost);
-router.get("/", getAllPosts);
+router.get("/", optionalAuthMiddleware, getAllPosts);
 router.get("/explore", getExplorePosts);
-router.get("/user/:userId", getUserPosts);
-router.get("/:id", getPostById);
+router.get("/user/:userId", optionalAuthMiddleware, getUserPosts);
+router.get("/:id", optionalAuthMiddleware, getPostById);
 router.patch("/:id", authMiddleware, upload.fields([
     { name: "images", maxCount: 10 },
     { name: "image", maxCount: 10 },

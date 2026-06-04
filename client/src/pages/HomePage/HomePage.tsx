@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import PostPreviewModal from "../../components/posts/PostPreviewModal";
 import Spinner from "../../components/ui/Spinner/Spinner";
-import { fetchPostComments } from "../../features/comments/commentsThunks";
-import { fetchPostLikes } from "../../features/likes/likesThunks";
 import { fetchAllPosts } from "../../features/posts/postsThunks";
 import { fetchMyProfile } from "../../features/profile/profileThunks";
 import { fetchSubscriptionSummary } from "../../features/subscriptions/subscriptionsThunks";
@@ -22,12 +20,8 @@ function HomePage() {
   );
   const { myProfile } = useAppSelector((state) => state.profile);
   const { byUserId } = useAppSelector((state) => state.subscriptions);
-  const likesByPostId = useAppSelector((state) => state.likes.byPostId);
-  const commentsByPostId = useAppSelector((state) => state.comments.byPostId);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const requestedSubscriptionIds = useRef(new Set<string>());
-  const requestedLikesPostIds = useRef(new Set<string>());
-  const requestedCommentsPostIds = useRef(new Set<string>());
 
   useEffect(() => {
     dispatch(fetchAllPosts());
@@ -62,29 +56,6 @@ function HomePage() {
     });
   }, [allPosts, byUserId, dispatch, myProfile]);
 
-  useEffect(() => {
-    allPosts.forEach((post) => {
-      if (
-        !likesByPostId[post._id] &&
-        !requestedLikesPostIds.current.has(post._id)
-      ) {
-        requestedLikesPostIds.current.add(post._id);
-        dispatch(fetchPostLikes(post._id));
-      }
-    });
-  }, [allPosts, dispatch, likesByPostId]);
-
-  useEffect(() => {
-    allPosts.forEach((post) => {
-      if (
-        !commentsByPostId[post._id] &&
-        !requestedCommentsPostIds.current.has(post._id)
-      ) {
-        requestedCommentsPostIds.current.add(post._id);
-        dispatch(fetchPostComments(post._id));
-      }
-    });
-  }, [allPosts, commentsByPostId, dispatch]);
 
   if (feedStatus === "idle" || feedStatus === "loading") {
     return <Spinner label="Loading posts..." />;

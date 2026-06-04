@@ -83,16 +83,63 @@ export const getPostComments = async (
       .populate("user", "username fullName avatar")
       .sort({ createdAt: -1 });
 
+    const enrichedComments = await enrichComments(
+      comments,
+      req.user?._id?.toString(),
+    );
+
     const count = await Comment.countDocuments({ post: postId });
 
     res.status(200).json({
       success: true,
-      comments,
+      comments: enrichedComments,
       count,
     });
   } catch (error) {
     next(error);
   }
+};
+
+const enrichComments = async (
+  comments: Awaited<ReturnType<typeof Comment.find>>,
+  currentUserId?: string,
+) => {
+  const commentIds = comments.map((comment) => comment._id);
+
+  if (commentIds.length === 0) {
+    return [];
+  }
+
+  const [likesStats, likedByMe] = await Promise.all([
+    CommentLike.aggregate([
+      { $match: { comment: { $in: commentIds } } },
+      { $group: { _id: "$comment", count: { $sum: 1 } } },
+    ]),
+    currentUserId
+      ? CommentLike.find({
+          user: currentUserId,
+          comment: { $in: commentIds },
+        }).select("comment")
+      : [],
+  ]);
+
+  const likesCountByCommentId = new Map(
+    likesStats.map((item) => [String(item._id), item.count]),
+  );
+  const likedCommentIds = new Set(
+    likedByMe.map((like) => String(like.comment)),
+  );
+
+  return comments.map((comment) => {
+    const commentObject = comment.toObject();
+    const commentId = String(commentObject._id);
+
+    return {
+      ...commentObject,
+      likesCount: likesCountByCommentId.get(commentId) ?? 0,
+      isLikedByMe: likedCommentIds.has(commentId),
+    };
+  });
 };
 
 export const deleteComment = async (
